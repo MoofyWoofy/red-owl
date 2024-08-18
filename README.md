@@ -1,6 +1,6 @@
 # red_owl
 
-A new Flutter project.
+A angram of wordle. A wordle game inspired by the original
 
 ## Getting Started
 
