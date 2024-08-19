@@ -1,10 +1,10 @@
 {
-    "name": "red_owl",
-    "short_name": "red_owl",
+    "name": "Red Owl",
+    "short_name": "Red Owl",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
-    "theme_color": "#0175C2",
+    "theme_color": "#0F75FA",
     "description": "A new Flutter project.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
