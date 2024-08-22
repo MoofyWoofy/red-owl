@@ -1,6 +1,6 @@
-# red_owl
+# Red Owl
 
-A angram of wordle. A wordle game inspired by the original
+A angram of wordle. A wordle game inspired by the original game.
 
 ## Getting Started
 
@@ -14,3 +14,15 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+## Goals
+- learn
+  - riverpod
+  - use sqlite3 + drift (orm)
+  - how to use test library
+
+- deploy on 
+  1. android (play store)
+  2. windows
+  3. linux
+  4. web (wasm)
