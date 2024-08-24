@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:red_owl/config/shared.dart' show CustomColors;
 
 class Letter extends StatelessWidget {
-  const Letter({super.key, this.letter, this.icon});
-  final String? letter;
-  final IconData? icon;
+  const Letter({super.key, required this.letter});
+  final String letter;
 
   @override
   Widget build(BuildContext context) {
@@ -20,15 +19,17 @@ class Letter extends StatelessWidget {
             color: Theme.of(context).extension<CustomColors>()?.initial,
             borderRadius: BorderRadius.circular(4),
           ),
-          child: letter != null
+          child: letter != "DELETE"
               ? Text(
-                  letter!,
+                  letter,
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: Colors.white),
                 )
-              : FittedBox(
+              : const FittedBox(
                   fit: BoxFit.scaleDown,
-                  child: Icon(icon),
+                  child: Icon(
+                    Icons.backspace,
+                  ),
                 ),
         ),
       ),

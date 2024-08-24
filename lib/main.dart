@@ -16,6 +16,8 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'Red Owl',
       theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.red, brightness: Brightness.dark),
           brightness: Brightness.dark,
           extensions: const <ThemeExtension<dynamic>>[
             CustomColors(
@@ -60,35 +62,20 @@ class HomePage extends StatelessWidget {
               ),
               Column(
                 children: [
-                  IntrinsicHeight(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        OutlinedButton.icon(
-                          onPressed: null, // offline, random word each time
-                          label: const Text('Unlimited'),
-                          icon: const Icon(Icons.all_inclusive),
-                        ),
-                        const SizedBox(
-                          width: 30,
-                          child: VerticalDivider(),
-                        ),
-                        OutlinedButton.icon(
-                          onPressed: () {
-                            // daily word from API
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const WordlePage(gameType: "Daily")),
-                            );
-                          },
-                          label: const Text('Daily'),
-                          icon: const Icon(Icons.calendar_today),
-                        ),
-                      ],
-                    ),
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      // daily word from API
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const WordlePage(gameType: "Daily")),
+                      );
+                    },
+                    label: const Text('Daily'),
+                    icon: const Icon(Icons.calendar_today),
                   ),
+
                   const SizedBox(height: 20),
                   OutlinedButton.icon(
                     onPressed: () {
@@ -99,7 +86,7 @@ class HomePage extends StatelessWidget {
                       );
                     },
                     label: const Text('Status'),
-                    icon: const Icon(Icons.query_stats),
+                    icon: const Icon(Icons.bar_chart),
                   ),
                 ],
               )
