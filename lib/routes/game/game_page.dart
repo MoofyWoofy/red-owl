@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart'
     show KeyDownEvent, KeyRepeatEvent, KeyUpEvent, ServicesBinding;
-import 'package:red_owl/routes/game/widgets/shared.dart'
-    show KeyboardRow, Tile;
+import 'package:red_owl/config/shared.dart';
+import 'package:red_owl/routes/game/widgets/shared.dart' show KeyboardRow, Tile;
 
 class WordlePage extends ConsumerStatefulWidget {
   const WordlePage({super.key, required this.gameType});
@@ -32,6 +32,7 @@ class _WordlePageState extends ConsumerState<WordlePage> {
   void initState() {
     super.initState();
     ServicesBinding.instance.keyboard.addHandler(_onKey);
+    keyboardStatus.updateAll((key, val) => LetterStatus.initial);
   }
 
   @override
@@ -69,14 +70,17 @@ class _WordlePageState extends ConsumerState<WordlePage> {
           ),
           const Expanded(
             flex: 2,
-            child: Column(
-              children: [
-                KeyboardRow(minIndex: 0, maxIndex: 10),
-                SizedBox(height: 8),
-                KeyboardRow(minIndex: 11, maxIndex: 19),
-                SizedBox(height: 8),
-                KeyboardRow(minIndex: 20, maxIndex: 29),
-              ],
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12.0),
+              child: Column(
+                children: [
+                  KeyboardRow(minIndex: 0, maxIndex: 10),
+                  SizedBox(height: 8),
+                  KeyboardRow(minIndex: 11, maxIndex: 19, addSpacer: true),
+                  SizedBox(height: 8),
+                  KeyboardRow(minIndex: 20, maxIndex: 29),
+                ],
+              ),
             ),
           ),
         ],

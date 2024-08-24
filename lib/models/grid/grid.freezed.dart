@@ -19,6 +19,8 @@ mixin _$Grid {
   int get column => throw _privateConstructorUsedError;
   int get row => throw _privateConstructorUsedError;
   List<Tile> get tiles => throw _privateConstructorUsedError;
+  Map<String, LetterStatus> get keyboardStatus =>
+      throw _privateConstructorUsedError;
 
   /// Create a copy of Grid
   /// with the given fields replaced by the non-null parameter values.
@@ -31,7 +33,11 @@ abstract class $GridCopyWith<$Res> {
   factory $GridCopyWith(Grid value, $Res Function(Grid) then) =
       _$GridCopyWithImpl<$Res, Grid>;
   @useResult
-  $Res call({int column, int row, List<Tile> tiles});
+  $Res call(
+      {int column,
+      int row,
+      List<Tile> tiles,
+      Map<String, LetterStatus> keyboardStatus});
 }
 
 /// @nodoc
@@ -52,6 +58,7 @@ class _$GridCopyWithImpl<$Res, $Val extends Grid>
     Object? column = null,
     Object? row = null,
     Object? tiles = null,
+    Object? keyboardStatus = null,
   }) {
     return _then(_value.copyWith(
       column: null == column
@@ -66,6 +73,10 @@ class _$GridCopyWithImpl<$Res, $Val extends Grid>
           ? _value.tiles
           : tiles // ignore: cast_nullable_to_non_nullable
               as List<Tile>,
+      keyboardStatus: null == keyboardStatus
+          ? _value.keyboardStatus
+          : keyboardStatus // ignore: cast_nullable_to_non_nullable
+              as Map<String, LetterStatus>,
     ) as $Val);
   }
 }
@@ -77,7 +88,11 @@ abstract class _$$GridImplCopyWith<$Res> implements $GridCopyWith<$Res> {
       __$$GridImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int column, int row, List<Tile> tiles});
+  $Res call(
+      {int column,
+      int row,
+      List<Tile> tiles,
+      Map<String, LetterStatus> keyboardStatus});
 }
 
 /// @nodoc
@@ -95,6 +110,7 @@ class __$$GridImplCopyWithImpl<$Res>
     Object? column = null,
     Object? row = null,
     Object? tiles = null,
+    Object? keyboardStatus = null,
   }) {
     return _then(_$GridImpl(
       column: null == column
@@ -109,6 +125,10 @@ class __$$GridImplCopyWithImpl<$Res>
           ? _value.tiles
           : tiles // ignore: cast_nullable_to_non_nullable
               as List<Tile>,
+      keyboardStatus: null == keyboardStatus
+          ? _value.keyboardStatus
+          : keyboardStatus // ignore: cast_nullable_to_non_nullable
+              as Map<String, LetterStatus>,
     ));
   }
 }
@@ -117,7 +137,10 @@ class __$$GridImplCopyWithImpl<$Res>
 
 class _$GridImpl implements _Grid {
   const _$GridImpl(
-      {required this.column, required this.row, required this.tiles});
+      {required this.column,
+      required this.row,
+      required this.tiles,
+      required this.keyboardStatus});
 
   @override
   final int column;
@@ -125,10 +148,12 @@ class _$GridImpl implements _Grid {
   final int row;
   @override
   final List<Tile> tiles;
+  @override
+  final Map<String, LetterStatus> keyboardStatus;
 
   @override
   String toString() {
-    return 'Grid(column: $column, row: $row, tiles: $tiles)';
+    return 'Grid(column: $column, row: $row, tiles: $tiles, keyboardStatus: $keyboardStatus)';
   }
 
   @override
@@ -138,12 +163,18 @@ class _$GridImpl implements _Grid {
             other is _$GridImpl &&
             (identical(other.column, column) || other.column == column) &&
             (identical(other.row, row) || other.row == row) &&
-            const DeepCollectionEquality().equals(other.tiles, tiles));
+            const DeepCollectionEquality().equals(other.tiles, tiles) &&
+            const DeepCollectionEquality()
+                .equals(other.keyboardStatus, keyboardStatus));
   }
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, column, row, const DeepCollectionEquality().hash(tiles));
+      runtimeType,
+      column,
+      row,
+      const DeepCollectionEquality().hash(tiles),
+      const DeepCollectionEquality().hash(keyboardStatus));
 
   /// Create a copy of Grid
   /// with the given fields replaced by the non-null parameter values.
@@ -158,7 +189,8 @@ abstract class _Grid implements Grid {
   const factory _Grid(
       {required final int column,
       required final int row,
-      required final List<Tile> tiles}) = _$GridImpl;
+      required final List<Tile> tiles,
+      required final Map<String, LetterStatus> keyboardStatus}) = _$GridImpl;
 
   @override
   int get column;
@@ -166,6 +198,8 @@ abstract class _Grid implements Grid {
   int get row;
   @override
   List<Tile> get tiles;
+  @override
+  Map<String, LetterStatus> get keyboardStatus;
 
   /// Create a copy of Grid
   /// with the given fields replaced by the non-null parameter values.

@@ -21,7 +21,7 @@ class App extends StatelessWidget {
           extensions: const <ThemeExtension<dynamic>>[
             CustomColors(
               initial: Color.fromRGBO(129, 131, 132, 1),
-              yellow: Color.fromRGBO(129, 131, 132, 1),
+              yellow: Color.fromRGBO(181, 159, 59, 1),
               green: Color.fromRGBO(83, 141, 78, 1),
               notInWord: Color.fromRGBO(58, 58, 60, 1),
               borderInactive: Color.fromRGBO(58, 58, 60, 1),

@@ -7,27 +7,34 @@ class KeyboardRow extends StatelessWidget {
     super.key,
     required this.minIndex,
     required this.maxIndex,
+    this.addSpacer = false,
   });
   final int minIndex, maxIndex;
+  final bool addSpacer;
 
   @override
   Widget build(BuildContext context) {
     int index = 0;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: keyboardStatus.entries.map((e) {
+      children: [
+        if (addSpacer) const Spacer(),
+        ...keyboardStatus.entries.map((e) {
+          
         index++;
         if (index >= minIndex && index <= maxIndex) {
           switch (e.key) {
             case 'ENTER':
             case 'DELETE':
-              return Expanded(flex: 2, child: Letter(letter: e.key));
-            default:
-              return Expanded(child: Letter(letter: e.key));
+                return Expanded(flex: 8, child: Letter(letter: e.key));
+              default:
+                return Expanded(flex: 4, child: Letter(letter: e.key));
           }
         }
         return const SizedBox();
-      }).toList(),
+        }),
+        if (addSpacer) const Spacer(),
+      ],
     );
   }
 }
