@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart'
     show KeyDownEvent, KeyRepeatEvent, KeyUpEvent, ServicesBinding;
 import 'package:red_owl/routes/game/widgets/shared.dart'
-    show KeyboardRow, WordleBox;
+    show KeyboardRow, Tile;
 
 class WordlePage extends ConsumerStatefulWidget {
   const WordlePage({super.key, required this.gameType});
@@ -45,7 +45,8 @@ class _WordlePageState extends ConsumerState<WordlePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-            "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}"),
+          "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
+        ),
       ),
       body: Column(
         children: [
@@ -61,7 +62,9 @@ class _WordlePageState extends ConsumerState<WordlePage> {
                   crossAxisSpacing: 4,
                 ),
                 itemBuilder: (context, index) {
-                  return const WordleBox();
+                  return Tile(
+                    index: index,
+                  );
                 }),
           ),
           const Expanded(

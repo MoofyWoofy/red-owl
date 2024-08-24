@@ -1,3 +1,3 @@
 export 'keyboard_row.dart';
-export 'wordle_box.dart';
+export 'tile.dart';
 export 'letter.dart';

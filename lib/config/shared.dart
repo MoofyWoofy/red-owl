@@ -1,2 +1,3 @@
 export 'custom_colors.dart';
-export 'letters_status.dart' show letterStatus;
+export 'letter_status.dart';
+export 'keyboard_status.dart';

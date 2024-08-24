@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:red_owl/routes/game/widgets/shared.dart' show Letter, WordleBox;
-import 'package:red_owl/config/shared.dart' show letterStatus;
+import 'package:red_owl/routes/game/widgets/shared.dart' show Letter;
+import 'package:red_owl/config/shared.dart' show keyboardStatus;
 
 class KeyboardRow extends StatelessWidget {
   const KeyboardRow({
@@ -15,7 +15,7 @@ class KeyboardRow extends StatelessWidget {
     int index = 0;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: letterStatus.entries.map((e) {
+      children: keyboardStatus.entries.map((e) {
         index++;
         if (index >= minIndex && index <= maxIndex) {
           switch (e.key) {
