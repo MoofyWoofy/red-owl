@@ -15,19 +15,21 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'Red Owl',
       theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.red, brightness: Brightness.dark),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.red,
           brightness: Brightness.dark,
-          extensions: const <ThemeExtension<dynamic>>[
-            CustomColors(
-              initial: Color.fromRGBO(129, 131, 132, 1),
-              yellow: Color.fromRGBO(181, 159, 59, 1),
-              green: Color.fromRGBO(83, 141, 78, 1),
-              notInWord: Color.fromRGBO(58, 58, 60, 1),
-              borderInactive: Color.fromRGBO(58, 58, 60, 1),
-              borderActive: Color.fromRGBO(86, 87, 88, 1),
-            )
-          ]
+        ),
+        brightness: Brightness.dark,
+        extensions: const <ThemeExtension<dynamic>>[
+          CustomColors(
+            initial: Color.fromRGBO(129, 131, 132, 1),
+            yellow: Color.fromRGBO(181, 159, 59, 1),
+            green: Color.fromRGBO(83, 141, 78, 1),
+            notInWord: Color.fromRGBO(58, 58, 60, 1),
+            borderInactive: Color.fromRGBO(58, 58, 60, 1),
+            borderActive: Color.fromRGBO(86, 87, 88, 1),
+          ),
+        ],
       ),
       home: const HomePage(title: 'Red Owl'),
     );
@@ -74,7 +76,6 @@ class HomePage extends StatelessWidget {
                     label: const Text('Daily'),
                     icon: const Icon(Icons.calendar_today),
                   ),
-
                   const SizedBox(height: 20),
                   OutlinedButton.icon(
                     onPressed: () {
