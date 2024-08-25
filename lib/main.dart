@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' show ProviderScope;
 import 'package:red_owl/routes/shared.dart';
-import 'package:red_owl/config/shared.dart' show CustomColors;
+import 'package:red_owl/config/shared.dart' show lightTheme, darkTheme;
 
 void main() {
   runApp(const ProviderScope(child: App()));
@@ -14,23 +14,9 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Red Owl',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.red,
-          brightness: Brightness.dark,
-        ),
-        brightness: Brightness.dark,
-        extensions: const <ThemeExtension<dynamic>>[
-          CustomColors(
-            initial: Color.fromRGBO(129, 131, 132, 1),
-            yellow: Color.fromRGBO(181, 159, 59, 1),
-            green: Color.fromRGBO(83, 141, 78, 1),
-            notInWord: Color.fromRGBO(58, 58, 60, 1),
-            borderInactive: Color.fromRGBO(58, 58, 60, 1),
-            borderActive: Color.fromRGBO(86, 87, 88, 1),
-          ),
-        ],
-      ),
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: ThemeMode.system,
       home: const HomePage(title: 'Red Owl'),
     );
   }

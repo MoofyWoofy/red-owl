@@ -9,28 +9,33 @@ class Tile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Color? color;
+    Color? backgroundColor, textColor;
     Color borderColor =
         Theme.of(context).extension<CustomColors>()!.borderInactive!;
 
     if (index < ref.watch(gridProvider).tiles.length) {
       switch (ref.watch(gridProvider).tiles[index].status) {
         case LetterStatus.initial:
-          color = null;
+          backgroundColor = null;
           borderColor =
               Theme.of(context).extension<CustomColors>()!.borderActive!;
           break;
         case LetterStatus.green:
-          color = Theme.of(context).extension<CustomColors>()!.green!;
+          backgroundColor = Theme.of(context).extension<CustomColors>()!.green!;
           borderColor = Colors.transparent;
+          textColor = Colors.white;
           break;
         case LetterStatus.yellow:
-          color = Theme.of(context).extension<CustomColors>()!.yellow!;
+          backgroundColor =
+              Theme.of(context).extension<CustomColors>()!.yellow!;
           borderColor = Colors.transparent;
+          textColor = Colors.white;
           break;
         case LetterStatus.notInWord:
-          color = Theme.of(context).extension<CustomColors>()!.notInWord!;
+          backgroundColor =
+              Theme.of(context).extension<CustomColors>()!.notInWord!;
           borderColor = Colors.transparent;
+          textColor = Colors.white;
           break;
       }
     }
@@ -39,7 +44,7 @@ class Tile extends ConsumerWidget {
       width: 50,
       height: 50,
       decoration: BoxDecoration(
-        color: color,
+        color: backgroundColor,
         border: Border.all(
           color: borderColor,
           width: 2,
@@ -53,8 +58,9 @@ class Tile extends ConsumerWidget {
                   padding: const EdgeInsets.all(4.0),
                   child: Text(
                     ref.watch(gridProvider).tiles[index].letter,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
+                      color: textColor,
                     ),
                   ),
                 ),

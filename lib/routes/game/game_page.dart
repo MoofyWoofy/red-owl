@@ -59,8 +59,8 @@ class _WordlePageState extends ConsumerState<WordlePage> {
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 5,
-                  mainAxisSpacing: 4,
-                  crossAxisSpacing: 4,
+                  mainAxisSpacing: 5,
+                  crossAxisSpacing: 5,
                 ),
                 itemBuilder: (context, index) {
                   return Tile(

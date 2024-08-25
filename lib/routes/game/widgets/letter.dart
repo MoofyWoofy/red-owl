@@ -9,20 +9,25 @@ class Letter extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Color? color;
+    Color? backgroundColor;
+    Color? textColor;
     switch (ref.watch(gridProvider).keyboardStatus[letter]) {
       case LetterStatus.initial:
-        color = Theme.of(context).extension<CustomColors>()?.initial;
+        backgroundColor = Theme.of(context).extension<CustomColors>()?.initial;
         break;
       case LetterStatus.green:
-        color = Theme.of(context).extension<CustomColors>()?.green;
+        backgroundColor = Theme.of(context).extension<CustomColors>()?.green;
+        textColor = Colors.white;
         break;
       case LetterStatus.yellow:
-        color = Theme.of(context).extension<CustomColors>()?.yellow;
+        backgroundColor = Theme.of(context).extension<CustomColors>()?.yellow;
+        textColor = Colors.white;
         break;
       case LetterStatus.notInWord:
       case null:
-        color = Theme.of(context).extension<CustomColors>()?.notInWord;
+        backgroundColor =
+            Theme.of(context).extension<CustomColors>()?.notInWord;
+        textColor = Colors.white;
         break;
     }
 
@@ -37,19 +42,19 @@ class Letter extends ConsumerWidget {
         child: Ink(
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            color: color,
+            color: backgroundColor,
             borderRadius: BorderRadius.circular(4),
           ),
           child: letter != "DELETE"
               ? Text(
                   letter,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: textColor),
                 )
               : const FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Icon(
-                    Icons.backspace,
+                    Icons.backspace_outlined,
                   ),
                 ),
         ),
