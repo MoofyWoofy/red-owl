@@ -5,6 +5,7 @@ import 'package:red_owl/routes/shared.dart';
 import 'package:red_owl/config/shared.dart'
     show lightTheme, darkTheme, SharedPreferencesKeys, BoolFamilyProviderIDs;
 import 'package:red_owl/util/shared.dart' show SharedPreferenceService;
+import 'package:red_owl/widgets/shared.dart' show appBar;
 
 
 Future<void> main() async {
@@ -40,9 +41,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
+      appBar: appBar(context: context, title: title),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
@@ -78,7 +77,7 @@ class HomePage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const SettingsPage()),
+                            builder: (context) => const StatsPage()),
                       );
                     },
                     label: const Text('Status'),

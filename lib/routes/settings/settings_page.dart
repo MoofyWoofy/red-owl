@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:red_owl/config/shared.dart'
     show SharedPreferencesKeys, BoolFamilyProviderIDs;
 import 'package:red_owl/routes/settings/widgets/shared.dart' show SwitchItem;
+import 'package:red_owl/widgets/shared.dart' show appBar;
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -9,9 +10,11 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
-        title: const Text("Settings"),
+      appBar: appBar(
+        context: context,
+        title: 'Settings',
+        showSettingsPage: false,
+        automaticallyImplyLeading: false,
       ),
       body: const Padding(
         padding: EdgeInsets.all(24.0),

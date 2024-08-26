@@ -4,6 +4,7 @@ import 'package:flutter/services.dart'
     show KeyDownEvent, KeyRepeatEvent, KeyUpEvent, ServicesBinding;
 import 'package:red_owl/config/shared.dart';
 import 'package:red_owl/routes/game/widgets/shared.dart' show KeyboardRow, Tile;
+import 'package:red_owl/widgets/shared.dart' show appBar;
 
 class WordlePage extends ConsumerStatefulWidget {
   const WordlePage({super.key, required this.gameType});
@@ -44,10 +45,10 @@ class _WordlePageState extends ConsumerState<WordlePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
-        ),
+      appBar: appBar(
+        context: context,
+        title:
+            "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
       ),
       body: Column(
         children: [
