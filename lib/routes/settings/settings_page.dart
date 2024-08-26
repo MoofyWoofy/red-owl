@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:red_owl/config/shared.dart' show SharedPreferencesKeys;
 import 'package:red_owl/routes/settings/widgets/shared.dart' show SwitchItem;
 
-class SettingsPage extends ConsumerWidget {
+class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
@@ -18,14 +18,18 @@ class SettingsPage extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SwitchItem(
+              SwitchItem(
                 title: 'Dark Mode',
                 icon: Icons.contrast,
+                boolProviderId: 'isDarkMode'.hashCode,
+                sharedPrefsKey: SharedPreferencesKeys.isDarkMode,
               ),
               const SizedBox(height: 20),
-              const SwitchItem(
+              SwitchItem(
                 title: 'Use custom word list',
                 icon: Icons.list_alt,
+                boolProviderId: 'useCustomList'.hashCode,
+                sharedPrefsKey: SharedPreferencesKeys.useCustomList,
               ),
             ],
           ),

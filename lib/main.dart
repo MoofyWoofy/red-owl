@@ -1,22 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart' show ProviderScope;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:red_owl/riverpod/shared.dart' show boolFamilyNotifierProvider;
 import 'package:red_owl/routes/shared.dart';
-import 'package:red_owl/config/shared.dart' show lightTheme, darkTheme;
+import 'package:red_owl/config/shared.dart'
+    show lightTheme, darkTheme, SharedPreferencesKeys;
+import 'package:red_owl/util/shared.dart' show SharedPreferenceService;
 
-void main() {
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SharedPreferenceService().init();
   runApp(const ProviderScope(child: App()));
 }
 
-class App extends StatelessWidget {
+class App extends ConsumerWidget {
   const App({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    bool isDarkMode = ref.watch(boolFamilyNotifierProvider(
+      id: 'isDarkMode'.hashCode,
+      sharedPrefsKey: SharedPreferencesKeys.isDarkMode,
+    ));
+
     return MaterialApp(
       title: 'Red Owl',
       theme: lightTheme,
       darkTheme: darkTheme,
-      themeMode: ThemeMode.system,
+      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       home: const HomePage(title: 'Red Owl'),
     );
   }
@@ -68,7 +79,7 @@ class HomePage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const StatsPage()),
+                            builder: (context) => const SettingsPage()),
                       );
                     },
                     label: const Text('Status'),
