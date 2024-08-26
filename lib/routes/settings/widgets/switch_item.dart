@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:red_owl/riverpod/shared.dart' show boolFamilyNotifierProvider;
-import 'package:red_owl/config/shared.dart' show SharedPreferencesKeys;
+import 'package:red_owl/config/shared.dart'
+    show SharedPreferencesKeys, BoolFamilyProviderIDs;
 
 class SwitchItem extends ConsumerStatefulWidget {
   const SwitchItem({
@@ -13,7 +14,7 @@ class SwitchItem extends ConsumerStatefulWidget {
   });
   final String title;
   final IconData icon;
-  final int boolProviderId;
+  final BoolFamilyProviderIDs boolProviderId;
   final SharedPreferencesKeys sharedPrefsKey;
 
   @override
@@ -39,7 +40,7 @@ class _SwitchItemState extends ConsumerState<SwitchItem> {
               id: widget.boolProviderId,
               sharedPrefsKey: widget.sharedPrefsKey,
             ).notifier)
-            .updateBoolean(value, widget.sharedPrefsKey);
+            .updateBoolean(widget.sharedPrefsKey, value);
       },
     );
   }

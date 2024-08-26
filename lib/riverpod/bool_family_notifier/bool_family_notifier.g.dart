@@ -7,7 +7,7 @@ part of 'bool_family_notifier.dart';
 // **************************************************************************
 
 String _$boolFamilyNotifierHash() =>
-    r'fc8c0732bf3383365374b55d920852142552993a';
+    r'734414c8e38dd2f7ec03cc431f70dc443516ee71';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -31,11 +31,11 @@ class _SystemHash {
 }
 
 abstract class _$BoolFamilyNotifier extends BuildlessAutoDisposeNotifier<bool> {
-  late final int id;
+  late final BoolFamilyProviderIDs id;
   late final SharedPreferencesKeys sharedPrefsKey;
 
   bool build({
-    required int id,
+    required BoolFamilyProviderIDs id,
     required SharedPreferencesKeys sharedPrefsKey,
   });
 }
@@ -51,7 +51,7 @@ class BoolFamilyNotifierFamily extends Family<bool> {
 
   /// See also [BoolFamilyNotifier].
   BoolFamilyNotifierProvider call({
-    required int id,
+    required BoolFamilyProviderIDs id,
     required SharedPreferencesKeys sharedPrefsKey,
   }) {
     return BoolFamilyNotifierProvider(
@@ -90,7 +90,7 @@ class BoolFamilyNotifierProvider
     extends AutoDisposeNotifierProviderImpl<BoolFamilyNotifier, bool> {
   /// See also [BoolFamilyNotifier].
   BoolFamilyNotifierProvider({
-    required int id,
+    required BoolFamilyProviderIDs id,
     required SharedPreferencesKeys sharedPrefsKey,
   }) : this._internal(
           () => BoolFamilyNotifier()
@@ -120,7 +120,7 @@ class BoolFamilyNotifierProvider
     required this.sharedPrefsKey,
   }) : super.internal();
 
-  final int id;
+  final BoolFamilyProviderIDs id;
   final SharedPreferencesKeys sharedPrefsKey;
 
   @override
@@ -176,7 +176,7 @@ class BoolFamilyNotifierProvider
 
 mixin BoolFamilyNotifierRef on AutoDisposeNotifierProviderRef<bool> {
   /// The parameter `id` of this provider.
-  int get id;
+  BoolFamilyProviderIDs get id;
 
   /// The parameter `sharedPrefsKey` of this provider.
   SharedPreferencesKeys get sharedPrefsKey;
@@ -188,7 +188,7 @@ class _BoolFamilyNotifierProviderElement
   _BoolFamilyNotifierProviderElement(super.provider);
 
   @override
-  int get id => (origin as BoolFamilyNotifierProvider).id;
+  BoolFamilyProviderIDs get id => (origin as BoolFamilyNotifierProvider).id;
   @override
   SharedPreferencesKeys get sharedPrefsKey =>
       (origin as BoolFamilyNotifierProvider).sharedPrefsKey;

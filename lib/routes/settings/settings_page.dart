@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:red_owl/config/shared.dart' show SharedPreferencesKeys;
+import 'package:red_owl/config/shared.dart'
+    show SharedPreferencesKeys, BoolFamilyProviderIDs;
 import 'package:red_owl/routes/settings/widgets/shared.dart' show SwitchItem;
 
 class SettingsPage extends StatelessWidget {
@@ -12,8 +13,8 @@ class SettingsPage extends StatelessWidget {
         automaticallyImplyLeading: true,
         title: const Text("Settings"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
+      body: const Padding(
+        padding: EdgeInsets.all(24.0),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -21,14 +22,14 @@ class SettingsPage extends StatelessWidget {
               SwitchItem(
                 title: 'Dark Mode',
                 icon: Icons.contrast,
-                boolProviderId: 'isDarkMode'.hashCode,
+                boolProviderId: BoolFamilyProviderIDs.isDarkMode,
                 sharedPrefsKey: SharedPreferencesKeys.isDarkMode,
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               SwitchItem(
                 title: 'Use custom word list',
                 icon: Icons.list_alt,
-                boolProviderId: 'useCustomList'.hashCode,
+                boolProviderId: BoolFamilyProviderIDs.useCustomList,
                 sharedPrefsKey: SharedPreferencesKeys.useCustomList,
               ),
             ],

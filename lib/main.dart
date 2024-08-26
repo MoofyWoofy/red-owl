@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:red_owl/riverpod/shared.dart' show boolFamilyNotifierProvider;
 import 'package:red_owl/routes/shared.dart';
 import 'package:red_owl/config/shared.dart'
-    show lightTheme, darkTheme, SharedPreferencesKeys;
+    show lightTheme, darkTheme, SharedPreferencesKeys, BoolFamilyProviderIDs;
 import 'package:red_owl/util/shared.dart' show SharedPreferenceService;
 
 
@@ -19,7 +19,7 @@ class App extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     bool isDarkMode = ref.watch(boolFamilyNotifierProvider(
-      id: 'isDarkMode'.hashCode,
+      id: BoolFamilyProviderIDs.isDarkMode,
       sharedPrefsKey: SharedPreferencesKeys.isDarkMode,
     ));
 
@@ -48,7 +48,6 @@ class HomePage extends StatelessWidget {
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            // crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
