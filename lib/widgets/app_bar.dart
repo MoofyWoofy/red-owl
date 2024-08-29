@@ -12,6 +12,7 @@ AppBar appBar({
     title: Text(title),
     centerTitle: centerTitle,
     automaticallyImplyLeading: automaticallyImplyLeading,
+    elevation: 4,
     actions: [
       IconButton(
         icon: showSettingsPage

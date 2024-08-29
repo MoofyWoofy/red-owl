@@ -12,7 +12,12 @@ class Grid extends _$Grid {
   @override
   models.Grid build() {
     return models.Grid(
-        column: 0, row: 0, tiles: [], keyboardStatus: keyboardStatus);
+      column: 0,
+      row: 0,
+      tiles: [],
+      keyboardStatus: keyboardStatus,
+      runAnimation: false,
+    );
   }
 
   Future<void> onKeyboardPressed({required String key}) async {
@@ -41,6 +46,7 @@ class Grid extends _$Grid {
               row: -1,
               tiles: tiles,
               keyboardStatus: keyboardStatusTemp,
+              runAnimation: true,
             );
           } else if (!result.isWordInList) {
             print('"word" is not in wordlist');
@@ -72,6 +78,7 @@ class Grid extends _$Grid {
               row: state.row + 1,
               tiles: tiles,
               keyboardStatus: keyboardStatusTemp,
+              runAnimation: true,
             );
           }
         }
@@ -103,4 +110,7 @@ class Grid extends _$Grid {
     final json = jsonDecode(response.body) as Map<String, dynamic>;
     return models.GuessResult.fromJson(json);
   }
+
+  void setRunAnimationValue(bool value) =>
+      state = state.copyWith(runAnimation: value);
 }

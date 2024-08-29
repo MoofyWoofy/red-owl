@@ -10,6 +10,7 @@ class Grid with _$Grid {
     required int column,
     required int row,
     required List<Tile> tiles,
-      required Map<String, LetterStatus> keyboardStatus
+    required Map<String, LetterStatus> keyboardStatus,
+    required bool runAnimation,
   }) = _Grid;
 }
