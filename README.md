@@ -15,11 +15,17 @@ For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
+
+## TODO Features:
+- Able to import / export custom word list. if importing, replace existing word list
+
+
 ## Goals
 - learn
-  - riverpod
   - use sqlite3 + drift (orm)
   - how to use test library
+  - how to create local package and use it
+  - animations
 
 - deploy on 
   1. android (play store)
