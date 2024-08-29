@@ -17,7 +17,10 @@ class Grid extends _$Grid {
       tiles: [],
       keyboardStatus: keyboardStatus,
       runAnimation: false,
-      isEnterOrBackPressed: false,
+      isEnterOrDeletePressed: false,
+      isGameWon: false,
+      isGameOver: false,
+      enoughCharacters: false,
     );
   }
 
@@ -47,7 +50,7 @@ class Grid extends _$Grid {
               row: -1,
               tiles: tiles,
               runAnimation: true,
-              isEnterOrBackPressed: true,
+              isEnterOrDeletePressed: true,
             );
             _updateKeyboard(keyboardStatusTemp);
           } else if (!result.isWordInList) {
@@ -90,7 +93,7 @@ class Grid extends _$Grid {
           state = state.copyWith(
             column: state.column - 1,
             tiles: state.tiles.toList()..removeLast(),
-            isEnterOrBackPressed: true,
+            isEnterOrDeletePressed: true,
           );
         }
         break;
@@ -100,7 +103,7 @@ class Grid extends _$Grid {
             column: state.column + 1,
             tiles: state.tiles.toList()
               ..add(models.Tile(letter: key, status: LetterStatus.initial)),
-            isEnterOrBackPressed: false,
+            isEnterOrDeletePressed: false,
           );
         }
         break;

@@ -16,13 +16,33 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$Grid {
+  /// current grid column.
   int get column => throw _privateConstructorUsedError;
+
+  /// current grid row.
   int get row => throw _privateConstructorUsedError;
+
+  /// List of all tiles in grid.
   List<Tile> get tiles => throw _privateConstructorUsedError;
+
+  /// Keyboard status, green/yellow etc.
   Map<String, LetterStatus> get keyboardStatus =>
       throw _privateConstructorUsedError;
+
+  /// Run flip animation (when checking word).
   bool get runAnimation => throw _privateConstructorUsedError;
-  bool get isEnterOrBackPressed => throw _privateConstructorUsedError;
+
+  /// Check if letter pressed is ENTER or DELETE.
+  bool get isEnterOrDeletePressed => throw _privateConstructorUsedError;
+
+  /// Did player win the game?
+  bool get isGameWon => throw _privateConstructorUsedError;
+
+  /// Is the game over?
+  bool get isGameOver => throw _privateConstructorUsedError;
+
+  /// Does the row have 5 character to check word?
+  bool get enoughCharacters => throw _privateConstructorUsedError;
 
   /// Create a copy of Grid
   /// with the given fields replaced by the non-null parameter values.
@@ -41,7 +61,10 @@ abstract class $GridCopyWith<$Res> {
       List<Tile> tiles,
       Map<String, LetterStatus> keyboardStatus,
       bool runAnimation,
-      bool isEnterOrBackPressed});
+      bool isEnterOrDeletePressed,
+      bool isGameWon,
+      bool isGameOver,
+      bool enoughCharacters});
 }
 
 /// @nodoc
@@ -64,7 +87,10 @@ class _$GridCopyWithImpl<$Res, $Val extends Grid>
     Object? tiles = null,
     Object? keyboardStatus = null,
     Object? runAnimation = null,
-    Object? isEnterOrBackPressed = null,
+    Object? isEnterOrDeletePressed = null,
+    Object? isGameWon = null,
+    Object? isGameOver = null,
+    Object? enoughCharacters = null,
   }) {
     return _then(_value.copyWith(
       column: null == column
@@ -87,9 +113,21 @@ class _$GridCopyWithImpl<$Res, $Val extends Grid>
           ? _value.runAnimation
           : runAnimation // ignore: cast_nullable_to_non_nullable
               as bool,
-      isEnterOrBackPressed: null == isEnterOrBackPressed
-          ? _value.isEnterOrBackPressed
-          : isEnterOrBackPressed // ignore: cast_nullable_to_non_nullable
+      isEnterOrDeletePressed: null == isEnterOrDeletePressed
+          ? _value.isEnterOrDeletePressed
+          : isEnterOrDeletePressed // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isGameWon: null == isGameWon
+          ? _value.isGameWon
+          : isGameWon // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isGameOver: null == isGameOver
+          ? _value.isGameOver
+          : isGameOver // ignore: cast_nullable_to_non_nullable
+              as bool,
+      enoughCharacters: null == enoughCharacters
+          ? _value.enoughCharacters
+          : enoughCharacters // ignore: cast_nullable_to_non_nullable
               as bool,
     ) as $Val);
   }
@@ -108,7 +146,10 @@ abstract class _$$GridImplCopyWith<$Res> implements $GridCopyWith<$Res> {
       List<Tile> tiles,
       Map<String, LetterStatus> keyboardStatus,
       bool runAnimation,
-      bool isEnterOrBackPressed});
+      bool isEnterOrDeletePressed,
+      bool isGameWon,
+      bool isGameOver,
+      bool enoughCharacters});
 }
 
 /// @nodoc
@@ -128,7 +169,10 @@ class __$$GridImplCopyWithImpl<$Res>
     Object? tiles = null,
     Object? keyboardStatus = null,
     Object? runAnimation = null,
-    Object? isEnterOrBackPressed = null,
+    Object? isEnterOrDeletePressed = null,
+    Object? isGameWon = null,
+    Object? isGameOver = null,
+    Object? enoughCharacters = null,
   }) {
     return _then(_$GridImpl(
       column: null == column
@@ -151,9 +195,21 @@ class __$$GridImplCopyWithImpl<$Res>
           ? _value.runAnimation
           : runAnimation // ignore: cast_nullable_to_non_nullable
               as bool,
-      isEnterOrBackPressed: null == isEnterOrBackPressed
-          ? _value.isEnterOrBackPressed
-          : isEnterOrBackPressed // ignore: cast_nullable_to_non_nullable
+      isEnterOrDeletePressed: null == isEnterOrDeletePressed
+          ? _value.isEnterOrDeletePressed
+          : isEnterOrDeletePressed // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isGameWon: null == isGameWon
+          ? _value.isGameWon
+          : isGameWon // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isGameOver: null == isGameOver
+          ? _value.isGameOver
+          : isGameOver // ignore: cast_nullable_to_non_nullable
+              as bool,
+      enoughCharacters: null == enoughCharacters
+          ? _value.enoughCharacters
+          : enoughCharacters // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
   }
@@ -168,15 +224,25 @@ class _$GridImpl implements _Grid {
       required final List<Tile> tiles,
       required final Map<String, LetterStatus> keyboardStatus,
       required this.runAnimation,
-      required this.isEnterOrBackPressed})
+      required this.isEnterOrDeletePressed,
+      required this.isGameWon,
+      required this.isGameOver,
+      required this.enoughCharacters})
       : _tiles = tiles,
         _keyboardStatus = keyboardStatus;
 
+  /// current grid column.
   @override
   final int column;
+
+  /// current grid row.
   @override
   final int row;
+
+  /// List of all tiles in grid.
   final List<Tile> _tiles;
+
+  /// List of all tiles in grid.
   @override
   List<Tile> get tiles {
     if (_tiles is EqualUnmodifiableListView) return _tiles;
@@ -184,7 +250,10 @@ class _$GridImpl implements _Grid {
     return EqualUnmodifiableListView(_tiles);
   }
 
+  /// Keyboard status, green/yellow etc.
   final Map<String, LetterStatus> _keyboardStatus;
+
+  /// Keyboard status, green/yellow etc.
   @override
   Map<String, LetterStatus> get keyboardStatus {
     if (_keyboardStatus is EqualUnmodifiableMapView) return _keyboardStatus;
@@ -192,14 +261,29 @@ class _$GridImpl implements _Grid {
     return EqualUnmodifiableMapView(_keyboardStatus);
   }
 
+  /// Run flip animation (when checking word).
   @override
   final bool runAnimation;
+
+  /// Check if letter pressed is ENTER or DELETE.
   @override
-  final bool isEnterOrBackPressed;
+  final bool isEnterOrDeletePressed;
+
+  /// Did player win the game?
+  @override
+  final bool isGameWon;
+
+  /// Is the game over?
+  @override
+  final bool isGameOver;
+
+  /// Does the row have 5 character to check word?
+  @override
+  final bool enoughCharacters;
 
   @override
   String toString() {
-    return 'Grid(column: $column, row: $row, tiles: $tiles, keyboardStatus: $keyboardStatus, runAnimation: $runAnimation, isEnterOrBackPressed: $isEnterOrBackPressed)';
+    return 'Grid(column: $column, row: $row, tiles: $tiles, keyboardStatus: $keyboardStatus, runAnimation: $runAnimation, isEnterOrDeletePressed: $isEnterOrDeletePressed, isGameWon: $isGameWon, isGameOver: $isGameOver, enoughCharacters: $enoughCharacters)';
   }
 
   @override
@@ -214,8 +298,14 @@ class _$GridImpl implements _Grid {
                 .equals(other._keyboardStatus, _keyboardStatus) &&
             (identical(other.runAnimation, runAnimation) ||
                 other.runAnimation == runAnimation) &&
-            (identical(other.isEnterOrBackPressed, isEnterOrBackPressed) ||
-                other.isEnterOrBackPressed == isEnterOrBackPressed));
+            (identical(other.isEnterOrDeletePressed, isEnterOrDeletePressed) ||
+                other.isEnterOrDeletePressed == isEnterOrDeletePressed) &&
+            (identical(other.isGameWon, isGameWon) ||
+                other.isGameWon == isGameWon) &&
+            (identical(other.isGameOver, isGameOver) ||
+                other.isGameOver == isGameOver) &&
+            (identical(other.enoughCharacters, enoughCharacters) ||
+                other.enoughCharacters == enoughCharacters));
   }
 
   @override
@@ -226,7 +316,10 @@ class _$GridImpl implements _Grid {
       const DeepCollectionEquality().hash(_tiles),
       const DeepCollectionEquality().hash(_keyboardStatus),
       runAnimation,
-      isEnterOrBackPressed);
+      isEnterOrDeletePressed,
+      isGameWon,
+      isGameOver,
+      enoughCharacters);
 
   /// Create a copy of Grid
   /// with the given fields replaced by the non-null parameter values.
@@ -244,20 +337,46 @@ abstract class _Grid implements Grid {
       required final List<Tile> tiles,
       required final Map<String, LetterStatus> keyboardStatus,
       required final bool runAnimation,
-      required final bool isEnterOrBackPressed}) = _$GridImpl;
+      required final bool isEnterOrDeletePressed,
+      required final bool isGameWon,
+      required final bool isGameOver,
+      required final bool enoughCharacters}) = _$GridImpl;
 
+  /// current grid column.
   @override
   int get column;
+
+  /// current grid row.
   @override
   int get row;
+
+  /// List of all tiles in grid.
   @override
   List<Tile> get tiles;
+
+  /// Keyboard status, green/yellow etc.
   @override
   Map<String, LetterStatus> get keyboardStatus;
+
+  /// Run flip animation (when checking word).
   @override
   bool get runAnimation;
+
+  /// Check if letter pressed is ENTER or DELETE.
   @override
-  bool get isEnterOrBackPressed;
+  bool get isEnterOrDeletePressed;
+
+  /// Did player win the game?
+  @override
+  bool get isGameWon;
+
+  /// Is the game over?
+  @override
+  bool get isGameOver;
+
+  /// Does the row have 5 character to check word?
+  @override
+  bool get enoughCharacters;
 
   /// Create a copy of Grid
   /// with the given fields replaced by the non-null parameter values.

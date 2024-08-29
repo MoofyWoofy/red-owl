@@ -4,8 +4,8 @@ import 'package:flutter/services.dart'
     show KeyDownEvent, KeyRepeatEvent, KeyUpEvent, ServicesBinding;
 import 'package:red_owl/config/shared.dart';
 import 'package:red_owl/riverpod/shared.dart' show gridProvider;
-import 'package:red_owl/routes/game/widgets/pop_in_animation.dart';
-import 'package:red_owl/routes/game/widgets/shared.dart' show KeyboardRow, Tile;
+import 'package:red_owl/routes/game/widgets/shared.dart'
+    show KeyboardRow, Tile, PopInAnimation;
 import 'package:red_owl/widgets/shared.dart' show appBar;
 
 class WordlePage extends ConsumerStatefulWidget {
@@ -70,7 +70,7 @@ class _WordlePageState extends ConsumerState<WordlePage> {
                   bool animateBounceEffect = false;
                   var grid = ref.watch(gridProvider);
                   var gridIndex = (grid.row * 5 + grid.column) - 1;
-                  if (gridIndex == index && !grid.isEnterOrBackPressed) {
+                  if (gridIndex == index && !grid.isEnterOrDeletePressed) {
                     animateBounceEffect = true;
                   }
 
