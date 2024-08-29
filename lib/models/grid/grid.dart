@@ -4,7 +4,7 @@ import 'package:red_owl/config/shared.dart' show LetterStatus;
 
 part 'grid.freezed.dart';
 
-@Freezed(makeCollectionsUnmodifiable: false)
+@freezed
 class Grid with _$Grid {
   const factory Grid({
     required int column,

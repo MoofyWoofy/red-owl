@@ -140,11 +140,11 @@ class __$$GridImplCopyWithImpl<$Res>
           : row // ignore: cast_nullable_to_non_nullable
               as int,
       tiles: null == tiles
-          ? _value.tiles
+          ? _value._tiles
           : tiles // ignore: cast_nullable_to_non_nullable
               as List<Tile>,
       keyboardStatus: null == keyboardStatus
-          ? _value.keyboardStatus
+          ? _value._keyboardStatus
           : keyboardStatus // ignore: cast_nullable_to_non_nullable
               as Map<String, LetterStatus>,
       runAnimation: null == runAnimation
@@ -165,19 +165,33 @@ class _$GridImpl implements _Grid {
   const _$GridImpl(
       {required this.column,
       required this.row,
-      required this.tiles,
-      required this.keyboardStatus,
+      required final List<Tile> tiles,
+      required final Map<String, LetterStatus> keyboardStatus,
       required this.runAnimation,
-      required this.isEnterOrBackPressed});
+      required this.isEnterOrBackPressed})
+      : _tiles = tiles,
+        _keyboardStatus = keyboardStatus;
 
   @override
   final int column;
   @override
   final int row;
+  final List<Tile> _tiles;
   @override
-  final List<Tile> tiles;
+  List<Tile> get tiles {
+    if (_tiles is EqualUnmodifiableListView) return _tiles;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_tiles);
+  }
+
+  final Map<String, LetterStatus> _keyboardStatus;
   @override
-  final Map<String, LetterStatus> keyboardStatus;
+  Map<String, LetterStatus> get keyboardStatus {
+    if (_keyboardStatus is EqualUnmodifiableMapView) return _keyboardStatus;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_keyboardStatus);
+  }
+
   @override
   final bool runAnimation;
   @override
@@ -195,9 +209,9 @@ class _$GridImpl implements _Grid {
             other is _$GridImpl &&
             (identical(other.column, column) || other.column == column) &&
             (identical(other.row, row) || other.row == row) &&
-            const DeepCollectionEquality().equals(other.tiles, tiles) &&
+            const DeepCollectionEquality().equals(other._tiles, _tiles) &&
             const DeepCollectionEquality()
-                .equals(other.keyboardStatus, keyboardStatus) &&
+                .equals(other._keyboardStatus, _keyboardStatus) &&
             (identical(other.runAnimation, runAnimation) ||
                 other.runAnimation == runAnimation) &&
             (identical(other.isEnterOrBackPressed, isEnterOrBackPressed) ||
@@ -209,8 +223,8 @@ class _$GridImpl implements _Grid {
       runtimeType,
       column,
       row,
-      const DeepCollectionEquality().hash(tiles),
-      const DeepCollectionEquality().hash(keyboardStatus),
+      const DeepCollectionEquality().hash(_tiles),
+      const DeepCollectionEquality().hash(_keyboardStatus),
       runAnimation,
       isEnterOrBackPressed);
 

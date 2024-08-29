@@ -34,7 +34,7 @@ class Grid extends _$Grid {
 
           var result = await getGuessResult(guess);
           var tiles = state.tiles.toList();
-          var keyboardStatusTemp = state.keyboardStatus;
+          var keyboardStatusTemp = {...state.keyboardStatus};
 // check result
           if (result.isCorrect) {
             print('answer is correct');
@@ -46,10 +46,10 @@ class Grid extends _$Grid {
               column: -1,
               row: -1,
               tiles: tiles,
-              keyboardStatus: keyboardStatusTemp,
               runAnimation: true,
               isEnterOrBackPressed: true,
             );
+            _updateKeyboard(keyboardStatusTemp);
           } else if (!result.isWordInList) {
             print('"word" is not in wordlist');
           } else {
@@ -79,16 +79,16 @@ class Grid extends _$Grid {
               column: 0,
               row: state.row + 1,
               tiles: tiles,
-              keyboardStatus: keyboardStatusTemp,
               runAnimation: true,
             );
+            _updateKeyboard(keyboardStatusTemp);
           }
         }
         break;
       case 'DELETE':
         if (state.column > 0) {
           state = state.copyWith(
-              column: state.column - 1,
+            column: state.column - 1,
             tiles: state.tiles.toList()..removeLast(),
             isEnterOrBackPressed: true,
           );
@@ -118,4 +118,10 @@ class Grid extends _$Grid {
 
   void setRunAnimationValue(bool value) =>
       state = state.copyWith(runAnimation: value);
+
+  void _updateKeyboard(Map<String, LetterStatus> keyboardStatus) {
+    Future.delayed(const Duration(seconds: 1), () {
+      state = state.copyWith(keyboardStatus: keyboardStatus);
+    });
+  }
 }
