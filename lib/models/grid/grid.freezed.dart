@@ -22,6 +22,7 @@ mixin _$Grid {
   Map<String, LetterStatus> get keyboardStatus =>
       throw _privateConstructorUsedError;
   bool get runAnimation => throw _privateConstructorUsedError;
+  bool get isEnterOrBackPressed => throw _privateConstructorUsedError;
 
   /// Create a copy of Grid
   /// with the given fields replaced by the non-null parameter values.
@@ -39,7 +40,8 @@ abstract class $GridCopyWith<$Res> {
       int row,
       List<Tile> tiles,
       Map<String, LetterStatus> keyboardStatus,
-      bool runAnimation});
+      bool runAnimation,
+      bool isEnterOrBackPressed});
 }
 
 /// @nodoc
@@ -62,6 +64,7 @@ class _$GridCopyWithImpl<$Res, $Val extends Grid>
     Object? tiles = null,
     Object? keyboardStatus = null,
     Object? runAnimation = null,
+    Object? isEnterOrBackPressed = null,
   }) {
     return _then(_value.copyWith(
       column: null == column
@@ -84,6 +87,10 @@ class _$GridCopyWithImpl<$Res, $Val extends Grid>
           ? _value.runAnimation
           : runAnimation // ignore: cast_nullable_to_non_nullable
               as bool,
+      isEnterOrBackPressed: null == isEnterOrBackPressed
+          ? _value.isEnterOrBackPressed
+          : isEnterOrBackPressed // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 }
@@ -100,7 +107,8 @@ abstract class _$$GridImplCopyWith<$Res> implements $GridCopyWith<$Res> {
       int row,
       List<Tile> tiles,
       Map<String, LetterStatus> keyboardStatus,
-      bool runAnimation});
+      bool runAnimation,
+      bool isEnterOrBackPressed});
 }
 
 /// @nodoc
@@ -120,6 +128,7 @@ class __$$GridImplCopyWithImpl<$Res>
     Object? tiles = null,
     Object? keyboardStatus = null,
     Object? runAnimation = null,
+    Object? isEnterOrBackPressed = null,
   }) {
     return _then(_$GridImpl(
       column: null == column
@@ -142,6 +151,10 @@ class __$$GridImplCopyWithImpl<$Res>
           ? _value.runAnimation
           : runAnimation // ignore: cast_nullable_to_non_nullable
               as bool,
+      isEnterOrBackPressed: null == isEnterOrBackPressed
+          ? _value.isEnterOrBackPressed
+          : isEnterOrBackPressed // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -154,7 +167,8 @@ class _$GridImpl implements _Grid {
       required this.row,
       required this.tiles,
       required this.keyboardStatus,
-      required this.runAnimation});
+      required this.runAnimation,
+      required this.isEnterOrBackPressed});
 
   @override
   final int column;
@@ -166,10 +180,12 @@ class _$GridImpl implements _Grid {
   final Map<String, LetterStatus> keyboardStatus;
   @override
   final bool runAnimation;
+  @override
+  final bool isEnterOrBackPressed;
 
   @override
   String toString() {
-    return 'Grid(column: $column, row: $row, tiles: $tiles, keyboardStatus: $keyboardStatus, runAnimation: $runAnimation)';
+    return 'Grid(column: $column, row: $row, tiles: $tiles, keyboardStatus: $keyboardStatus, runAnimation: $runAnimation, isEnterOrBackPressed: $isEnterOrBackPressed)';
   }
 
   @override
@@ -183,7 +199,9 @@ class _$GridImpl implements _Grid {
             const DeepCollectionEquality()
                 .equals(other.keyboardStatus, keyboardStatus) &&
             (identical(other.runAnimation, runAnimation) ||
-                other.runAnimation == runAnimation));
+                other.runAnimation == runAnimation) &&
+            (identical(other.isEnterOrBackPressed, isEnterOrBackPressed) ||
+                other.isEnterOrBackPressed == isEnterOrBackPressed));
   }
 
   @override
@@ -193,7 +211,8 @@ class _$GridImpl implements _Grid {
       row,
       const DeepCollectionEquality().hash(tiles),
       const DeepCollectionEquality().hash(keyboardStatus),
-      runAnimation);
+      runAnimation,
+      isEnterOrBackPressed);
 
   /// Create a copy of Grid
   /// with the given fields replaced by the non-null parameter values.
@@ -210,7 +229,8 @@ abstract class _Grid implements Grid {
       required final int row,
       required final List<Tile> tiles,
       required final Map<String, LetterStatus> keyboardStatus,
-      required final bool runAnimation}) = _$GridImpl;
+      required final bool runAnimation,
+      required final bool isEnterOrBackPressed}) = _$GridImpl;
 
   @override
   int get column;
@@ -222,6 +242,8 @@ abstract class _Grid implements Grid {
   Map<String, LetterStatus> get keyboardStatus;
   @override
   bool get runAnimation;
+  @override
+  bool get isEnterOrBackPressed;
 
   /// Create a copy of Grid
   /// with the given fields replaced by the non-null parameter values.

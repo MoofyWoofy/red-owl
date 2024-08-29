@@ -12,5 +12,6 @@ class Grid with _$Grid {
     required List<Tile> tiles,
     required Map<String, LetterStatus> keyboardStatus,
     required bool runAnimation,
+    required bool isEnterOrBackPressed,
   }) = _Grid;
 }

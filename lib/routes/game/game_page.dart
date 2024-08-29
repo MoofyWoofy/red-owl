@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart'
     show KeyDownEvent, KeyRepeatEvent, KeyUpEvent, ServicesBinding;
 import 'package:red_owl/config/shared.dart';
+import 'package:red_owl/riverpod/shared.dart' show gridProvider;
+import 'package:red_owl/routes/game/widgets/pop_in_animation.dart';
 import 'package:red_owl/routes/game/widgets/shared.dart' show KeyboardRow, Tile;
 import 'package:red_owl/widgets/shared.dart' show appBar;
 
@@ -15,6 +17,7 @@ class WordlePage extends ConsumerStatefulWidget {
 }
 
 class _WordlePageState extends ConsumerState<WordlePage> {
+
   bool _onKey(KeyEvent event) {
     final key = event.logicalKey.keyLabel;
 
@@ -38,8 +41,8 @@ class _WordlePageState extends ConsumerState<WordlePage> {
 
   @override
   void dispose() {
-    ServicesBinding.instance.keyboard.removeHandler(_onKey);
     super.dispose();
+    ServicesBinding.instance.keyboard.removeHandler(_onKey);
   }
 
   @override
@@ -64,8 +67,18 @@ class _WordlePageState extends ConsumerState<WordlePage> {
                   crossAxisSpacing: 5,
                 ),
                 itemBuilder: (context, index) {
-                  return Tile(
-                    index: index,
+                  bool animateBounceEffect = false;
+                  var grid = ref.watch(gridProvider);
+                  var gridIndex = (grid.row * 5 + grid.column) - 1;
+                  if (gridIndex == index && !grid.isEnterOrBackPressed) {
+                    animateBounceEffect = true;
+                  }
+
+                  return PopInAnimation(
+                    animate: animateBounceEffect,
+                    child: Tile(
+                      index: index,
+                    ),
                   );
                 }),
           ),
