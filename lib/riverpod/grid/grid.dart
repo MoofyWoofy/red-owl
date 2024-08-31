@@ -16,7 +16,7 @@ class Grid extends _$Grid {
       row: 0,
       tiles: [],
       keyboardStatus: keyboardStatus,
-      runAnimation: false,
+      runFlipAnimation: false,
       isEnterOrDeletePressed: false,
       isGameWon: false,
       isGameOver: false,
@@ -28,6 +28,7 @@ class Grid extends _$Grid {
     switch (key) {
       case 'ENTER':
         if (state.column == 5) {
+          state = state.copyWith(isEnterOrDeletePressed: true);
           String guess = state.tiles
               .skip(state.row * 5)
               .take(5)
@@ -46,11 +47,10 @@ class Grid extends _$Grid {
               keyboardStatusTemp[tiles[i].letter] = LetterStatus.green;
             }
             state = state.copyWith(
-              column: -1,
-              row: -1,
               tiles: tiles,
-              runAnimation: true,
-              isEnterOrDeletePressed: true,
+              runFlipAnimation: true,
+              isGameWon: true,
+              isGameOver: true,
             );
             _updateKeyboard(keyboardStatusTemp);
           } else if (!result.isWordInList) {
@@ -82,7 +82,9 @@ class Grid extends _$Grid {
               column: 0,
               row: state.row + 1,
               tiles: tiles,
-              runAnimation: true,
+              runFlipAnimation: true,
+              isGameWon: false,
+              isGameOver: true,
             );
             _updateKeyboard(keyboardStatusTemp);
           }
@@ -119,8 +121,7 @@ class Grid extends _$Grid {
     return models.GuessResult.fromJson(json);
   }
 
-  void setRunAnimationValue(bool value) =>
-      state = state.copyWith(runAnimation: value);
+  void updateState(models.Grid newState) => state = newState;
 
   void _updateKeyboard(Map<String, LetterStatus> keyboardStatus) {
     Future.delayed(const Duration(seconds: 1), () {

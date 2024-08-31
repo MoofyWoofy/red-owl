@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart'
     show KeyDownEvent, KeyRepeatEvent, KeyUpEvent, ServicesBinding;
-import 'package:red_owl/config/shared.dart';
+import 'package:red_owl/config/shared.dart'
+    show LetterStatus, animationTiming, keyboardStatus;
 import 'package:red_owl/riverpod/shared.dart' show gridProvider;
 import 'package:red_owl/routes/game/widgets/shared.dart'
-    show KeyboardRow, Tile, PopInAnimation;
+    show BounceAnimation, KeyboardRow, PopInAnimation, Tile;
 import 'package:red_owl/widgets/shared.dart' show appBar;
 
 class WordlePage extends ConsumerStatefulWidget {
@@ -17,7 +18,6 @@ class WordlePage extends ConsumerStatefulWidget {
 }
 
 class _WordlePageState extends ConsumerState<WordlePage> {
-
   bool _onKey(KeyEvent event) {
     final key = event.logicalKey.keyLabel;
 
@@ -67,17 +67,32 @@ class _WordlePageState extends ConsumerState<WordlePage> {
                   crossAxisSpacing: 5,
                 ),
                 itemBuilder: (context, index) {
+                  bool animatePopInEffect = false;
                   bool animateBounceEffect = false;
                   var grid = ref.watch(gridProvider);
-                  var gridIndex = (grid.row * 5 + grid.column) - 1;
+                  int gridIndex = (grid.row * 5 + grid.column) - 1;
+                  int bounceDelay = animationTiming.bounce.initialDelay!;
                   if (gridIndex == index && !grid.isEnterOrDeletePressed) {
-                    animateBounceEffect = true;
+                    animatePopInEffect = true;
+                  }
+                  if (grid.isGameWon) {
+                    var tilesIndexes =
+                        List.generate(5, (i) => (grid.row * 5) + i);
+                    if (tilesIndexes.contains(index)) {
+                      animateBounceEffect = true;
+                      bounceDelay +=
+                          animationTiming.bounce.intervalDelay! * (index % 5);
+                    }
                   }
 
-                  return PopInAnimation(
-                    animate: animateBounceEffect,
-                    child: Tile(
-                      index: index,
+                  return BounceAnimation(
+                    runAnimation: animateBounceEffect,
+                    delay: bounceDelay,
+                    child: PopInAnimation(
+                      runAnimation: animatePopInEffect,
+                      child: Tile(
+                        index: index,
+                      ),
                     ),
                   );
                 }),

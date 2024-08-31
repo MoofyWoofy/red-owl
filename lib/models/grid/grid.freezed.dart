@@ -30,7 +30,7 @@ mixin _$Grid {
       throw _privateConstructorUsedError;
 
   /// Run flip animation (when checking word).
-  bool get runAnimation => throw _privateConstructorUsedError;
+  bool get runFlipAnimation => throw _privateConstructorUsedError;
 
   /// Check if letter pressed is ENTER or DELETE.
   bool get isEnterOrDeletePressed => throw _privateConstructorUsedError;
@@ -60,7 +60,7 @@ abstract class $GridCopyWith<$Res> {
       int row,
       List<Tile> tiles,
       Map<String, LetterStatus> keyboardStatus,
-      bool runAnimation,
+      bool runFlipAnimation,
       bool isEnterOrDeletePressed,
       bool isGameWon,
       bool isGameOver,
@@ -86,7 +86,7 @@ class _$GridCopyWithImpl<$Res, $Val extends Grid>
     Object? row = null,
     Object? tiles = null,
     Object? keyboardStatus = null,
-    Object? runAnimation = null,
+    Object? runFlipAnimation = null,
     Object? isEnterOrDeletePressed = null,
     Object? isGameWon = null,
     Object? isGameOver = null,
@@ -109,9 +109,9 @@ class _$GridCopyWithImpl<$Res, $Val extends Grid>
           ? _value.keyboardStatus
           : keyboardStatus // ignore: cast_nullable_to_non_nullable
               as Map<String, LetterStatus>,
-      runAnimation: null == runAnimation
-          ? _value.runAnimation
-          : runAnimation // ignore: cast_nullable_to_non_nullable
+      runFlipAnimation: null == runFlipAnimation
+          ? _value.runFlipAnimation
+          : runFlipAnimation // ignore: cast_nullable_to_non_nullable
               as bool,
       isEnterOrDeletePressed: null == isEnterOrDeletePressed
           ? _value.isEnterOrDeletePressed
@@ -145,7 +145,7 @@ abstract class _$$GridImplCopyWith<$Res> implements $GridCopyWith<$Res> {
       int row,
       List<Tile> tiles,
       Map<String, LetterStatus> keyboardStatus,
-      bool runAnimation,
+      bool runFlipAnimation,
       bool isEnterOrDeletePressed,
       bool isGameWon,
       bool isGameOver,
@@ -168,7 +168,7 @@ class __$$GridImplCopyWithImpl<$Res>
     Object? row = null,
     Object? tiles = null,
     Object? keyboardStatus = null,
-    Object? runAnimation = null,
+    Object? runFlipAnimation = null,
     Object? isEnterOrDeletePressed = null,
     Object? isGameWon = null,
     Object? isGameOver = null,
@@ -191,9 +191,9 @@ class __$$GridImplCopyWithImpl<$Res>
           ? _value._keyboardStatus
           : keyboardStatus // ignore: cast_nullable_to_non_nullable
               as Map<String, LetterStatus>,
-      runAnimation: null == runAnimation
-          ? _value.runAnimation
-          : runAnimation // ignore: cast_nullable_to_non_nullable
+      runFlipAnimation: null == runFlipAnimation
+          ? _value.runFlipAnimation
+          : runFlipAnimation // ignore: cast_nullable_to_non_nullable
               as bool,
       isEnterOrDeletePressed: null == isEnterOrDeletePressed
           ? _value.isEnterOrDeletePressed
@@ -223,7 +223,7 @@ class _$GridImpl implements _Grid {
       required this.row,
       required final List<Tile> tiles,
       required final Map<String, LetterStatus> keyboardStatus,
-      required this.runAnimation,
+      required this.runFlipAnimation,
       required this.isEnterOrDeletePressed,
       required this.isGameWon,
       required this.isGameOver,
@@ -263,7 +263,7 @@ class _$GridImpl implements _Grid {
 
   /// Run flip animation (when checking word).
   @override
-  final bool runAnimation;
+  final bool runFlipAnimation;
 
   /// Check if letter pressed is ENTER or DELETE.
   @override
@@ -283,7 +283,7 @@ class _$GridImpl implements _Grid {
 
   @override
   String toString() {
-    return 'Grid(column: $column, row: $row, tiles: $tiles, keyboardStatus: $keyboardStatus, runAnimation: $runAnimation, isEnterOrDeletePressed: $isEnterOrDeletePressed, isGameWon: $isGameWon, isGameOver: $isGameOver, enoughCharacters: $enoughCharacters)';
+    return 'Grid(column: $column, row: $row, tiles: $tiles, keyboardStatus: $keyboardStatus, runFlipAnimation: $runFlipAnimation, isEnterOrDeletePressed: $isEnterOrDeletePressed, isGameWon: $isGameWon, isGameOver: $isGameOver, enoughCharacters: $enoughCharacters)';
   }
 
   @override
@@ -296,8 +296,8 @@ class _$GridImpl implements _Grid {
             const DeepCollectionEquality().equals(other._tiles, _tiles) &&
             const DeepCollectionEquality()
                 .equals(other._keyboardStatus, _keyboardStatus) &&
-            (identical(other.runAnimation, runAnimation) ||
-                other.runAnimation == runAnimation) &&
+            (identical(other.runFlipAnimation, runFlipAnimation) ||
+                other.runFlipAnimation == runFlipAnimation) &&
             (identical(other.isEnterOrDeletePressed, isEnterOrDeletePressed) ||
                 other.isEnterOrDeletePressed == isEnterOrDeletePressed) &&
             (identical(other.isGameWon, isGameWon) ||
@@ -315,7 +315,7 @@ class _$GridImpl implements _Grid {
       row,
       const DeepCollectionEquality().hash(_tiles),
       const DeepCollectionEquality().hash(_keyboardStatus),
-      runAnimation,
+      runFlipAnimation,
       isEnterOrDeletePressed,
       isGameWon,
       isGameOver,
@@ -336,7 +336,7 @@ abstract class _Grid implements Grid {
       required final int row,
       required final List<Tile> tiles,
       required final Map<String, LetterStatus> keyboardStatus,
-      required final bool runAnimation,
+      required final bool runFlipAnimation,
       required final bool isEnterOrDeletePressed,
       required final bool isGameWon,
       required final bool isGameOver,
@@ -360,7 +360,7 @@ abstract class _Grid implements Grid {
 
   /// Run flip animation (when checking word).
   @override
-  bool get runAnimation;
+  bool get runFlipAnimation;
 
   /// Check if letter pressed is ENTER or DELETE.
   @override

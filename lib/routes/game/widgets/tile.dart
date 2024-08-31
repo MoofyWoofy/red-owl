@@ -2,7 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:red_owl/config/shared.dart' show CustomColors, LetterStatus;
+import 'package:red_owl/config/shared.dart'
+    show CustomColors, LetterStatus, animationTiming;
 import 'package:red_owl/riverpod/shared.dart' show gridProvider;
 import 'package:red_owl/models/shared.dart' show Grid;
 
@@ -25,7 +26,7 @@ class _TileState extends ConsumerState<Tile>
 
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 400),
+      duration: Duration(milliseconds: animationTiming.flip.duration),
     );
   }
 
@@ -42,10 +43,15 @@ class _TileState extends ConsumerState<Tile>
         Theme.of(context).extension<CustomColors>()!.borderInactive!;
 
     if (widget.index < grid.tiles.length) {
-      if (grid.runAnimation) {
-        Future.delayed(Duration(milliseconds: (widget.index % 5) * 100), () {
+      if (grid.runFlipAnimation) {
+        Future.delayed(
+            Duration(
+                milliseconds: (widget.index % 5) *
+                    animationTiming.flip.intervalDelay!), () {
           _animationController.forward();
-          ref.read(gridProvider.notifier).setRunAnimationValue(false);
+          ref
+              .read(gridProvider.notifier)
+              .updateState(grid.copyWith(runFlipAnimation: false));
         });
       }
 

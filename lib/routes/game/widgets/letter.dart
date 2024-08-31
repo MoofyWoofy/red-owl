@@ -11,7 +11,8 @@ class Letter extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     Color? backgroundColor;
     Color? textColor;
-    switch (ref.watch(gridProvider).keyboardStatus[letter]) {
+    var grid = ref.watch(gridProvider);
+    switch (grid.keyboardStatus[letter]) {
       case LetterStatus.initial:
         backgroundColor = Theme.of(context).extension<CustomColors>()?.initial;
         break;
@@ -31,32 +32,35 @@ class Letter extends ConsumerWidget {
         break;
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(right: 5),
-      child: InkWell(
-        splashFactory: NoSplash.splashFactory,
-        highlightColor: Colors.black38,
-        onTap: () {
-          ref.read(gridProvider.notifier).onKeyboardPressed(key: letter);
-        },
-        child: Ink(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: letter != "DELETE"
-              ? Text(
-                  letter,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: textColor),
-                )
-              : const FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Icon(
-                    Icons.backspace_outlined,
+    return IgnorePointer(
+      ignoring: grid.isGameWon,
+      child: Padding(
+        padding: const EdgeInsets.only(right: 5),
+        child: InkWell(
+          splashFactory: NoSplash.splashFactory,
+          highlightColor: Colors.black38,
+          onTap: () {
+            ref.read(gridProvider.notifier).onKeyboardPressed(key: letter);
+          },
+          child: Ink(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: letter != "DELETE"
+                ? Text(
+                    letter,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: textColor),
+                  )
+                : const FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Icon(
+                      Icons.backspace_outlined,
+                    ),
                   ),
-                ),
+          ),
         ),
       ),
     );

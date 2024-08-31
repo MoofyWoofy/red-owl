@@ -20,7 +20,7 @@ class Grid with _$Grid {
     required Map<String, LetterStatus> keyboardStatus,
 
     /// Run flip animation (when checking word).
-    required bool runAnimation,
+    required bool runFlipAnimation,
 
     /// Check if letter pressed is ENTER or DELETE.
     required bool isEnterOrDeletePressed,
