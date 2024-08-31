@@ -77,14 +77,16 @@ class Grid extends _$Grid {
               // lose game
               print('lost the game');
               // make keyboard grayed out
+              state = state.copyWith(
+                isGameWon: false,
+                isGameOver: true,
+              );
             }
             state = state.copyWith(
               column: 0,
               row: state.row + 1,
               tiles: tiles,
               runFlipAnimation: true,
-              isGameWon: false,
-              isGameOver: true,
             );
             _updateKeyboard(keyboardStatusTemp);
           }

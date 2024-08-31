@@ -33,7 +33,7 @@ class Letter extends ConsumerWidget {
     }
 
     return IgnorePointer(
-      ignoring: grid.isGameWon,
+      ignoring: grid.isGameOver,
       child: Padding(
         padding: const EdgeInsets.only(right: 5),
         child: InkWell(

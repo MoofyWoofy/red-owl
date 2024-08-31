@@ -6,7 +6,7 @@ part of 'grid.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$gridHash() => r'882a3578bb77e174e3849869c63e49a85072d2aa';
+String _$gridHash() => r'df1bf3a827edebbd11b00092ae57276c00361264';
 
 /// See also [Grid].
 @ProviderFor(Grid)
