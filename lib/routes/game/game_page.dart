@@ -5,6 +5,7 @@ import 'package:flutter/services.dart'
 import 'package:red_owl/config/shared.dart'
     show LetterStatus, animationTiming, keyboardStatus;
 import 'package:red_owl/riverpod/shared.dart' show gridProvider;
+import 'package:red_owl/routes/game/widgets/animations/shake.dart';
 import 'package:red_owl/routes/game/widgets/shared.dart'
     show BounceAnimation, KeyboardRow, PopInAnimation, Tile;
 import 'package:red_owl/widgets/shared.dart' show appBar;
@@ -67,31 +68,42 @@ class _WordlePageState extends ConsumerState<WordlePage> {
                   crossAxisSpacing: 5,
                 ),
                 itemBuilder: (context, index) {
-                  bool animatePopInEffect = false;
-                  bool animateBounceEffect = false;
+                  bool animatePopInEffect = false,
+                      animateBounceEffect = false,
+                      animateShakeEffect = false;
                   var grid = ref.watch(gridProvider);
                   int gridIndex = (grid.row * 5 + grid.column) - 1;
                   int bounceDelay = animationTiming.bounce.initialDelay!;
-                  if (gridIndex == index && !grid.isEnterOrDeletePressed) {
+                  var currentTilesRowIndexes =
+                      List.generate(5, (i) => (grid.row * 5) + i);
+                  if (gridIndex == index &&
+                      !grid.isEnterOrDeletePressed &&
+                      !grid.notEnoughCharacters) {
                     animatePopInEffect = true;
                   }
                   if (grid.isGameWon) {
-                    var tilesIndexes =
-                        List.generate(5, (i) => (grid.row * 5) + i);
-                    if (tilesIndexes.contains(index)) {
+                    if (currentTilesRowIndexes.contains(index)) {
                       animateBounceEffect = true;
                       bounceDelay +=
                           animationTiming.bounce.intervalDelay! * (index % 5);
                     }
                   }
+                  if (grid.notEnoughCharacters) {
+                    if (currentTilesRowIndexes.contains(index)) {
+                      animateShakeEffect = true;
+                    }
+                  }
 
-                  return BounceAnimation(
-                    runAnimation: animateBounceEffect,
-                    delay: bounceDelay,
-                    child: PopInAnimation(
-                      runAnimation: animatePopInEffect,
-                      child: Tile(
-                        index: index,
+                  return ShakeAnimation(
+                    runAnimation: animateShakeEffect,
+                    child: BounceAnimation(
+                      runAnimation: animateBounceEffect,
+                      delay: bounceDelay,
+                      child: PopInAnimation(
+                        runAnimation: animatePopInEffect,
+                        child: Tile(
+                          index: index,
+                        ),
                       ),
                     ),
                   );

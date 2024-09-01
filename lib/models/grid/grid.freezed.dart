@@ -42,7 +42,7 @@ mixin _$Grid {
   bool get isGameOver => throw _privateConstructorUsedError;
 
   /// Does the row have 5 character to check word?
-  bool get enoughCharacters => throw _privateConstructorUsedError;
+  bool get notEnoughCharacters => throw _privateConstructorUsedError;
 
   /// Create a copy of Grid
   /// with the given fields replaced by the non-null parameter values.
@@ -64,7 +64,7 @@ abstract class $GridCopyWith<$Res> {
       bool isEnterOrDeletePressed,
       bool isGameWon,
       bool isGameOver,
-      bool enoughCharacters});
+      bool notEnoughCharacters});
 }
 
 /// @nodoc
@@ -90,7 +90,7 @@ class _$GridCopyWithImpl<$Res, $Val extends Grid>
     Object? isEnterOrDeletePressed = null,
     Object? isGameWon = null,
     Object? isGameOver = null,
-    Object? enoughCharacters = null,
+    Object? notEnoughCharacters = null,
   }) {
     return _then(_value.copyWith(
       column: null == column
@@ -125,9 +125,9 @@ class _$GridCopyWithImpl<$Res, $Val extends Grid>
           ? _value.isGameOver
           : isGameOver // ignore: cast_nullable_to_non_nullable
               as bool,
-      enoughCharacters: null == enoughCharacters
-          ? _value.enoughCharacters
-          : enoughCharacters // ignore: cast_nullable_to_non_nullable
+      notEnoughCharacters: null == notEnoughCharacters
+          ? _value.notEnoughCharacters
+          : notEnoughCharacters // ignore: cast_nullable_to_non_nullable
               as bool,
     ) as $Val);
   }
@@ -149,7 +149,7 @@ abstract class _$$GridImplCopyWith<$Res> implements $GridCopyWith<$Res> {
       bool isEnterOrDeletePressed,
       bool isGameWon,
       bool isGameOver,
-      bool enoughCharacters});
+      bool notEnoughCharacters});
 }
 
 /// @nodoc
@@ -172,7 +172,7 @@ class __$$GridImplCopyWithImpl<$Res>
     Object? isEnterOrDeletePressed = null,
     Object? isGameWon = null,
     Object? isGameOver = null,
-    Object? enoughCharacters = null,
+    Object? notEnoughCharacters = null,
   }) {
     return _then(_$GridImpl(
       column: null == column
@@ -207,9 +207,9 @@ class __$$GridImplCopyWithImpl<$Res>
           ? _value.isGameOver
           : isGameOver // ignore: cast_nullable_to_non_nullable
               as bool,
-      enoughCharacters: null == enoughCharacters
-          ? _value.enoughCharacters
-          : enoughCharacters // ignore: cast_nullable_to_non_nullable
+      notEnoughCharacters: null == notEnoughCharacters
+          ? _value.notEnoughCharacters
+          : notEnoughCharacters // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
   }
@@ -227,7 +227,7 @@ class _$GridImpl implements _Grid {
       required this.isEnterOrDeletePressed,
       required this.isGameWon,
       required this.isGameOver,
-      required this.enoughCharacters})
+      required this.notEnoughCharacters})
       : _tiles = tiles,
         _keyboardStatus = keyboardStatus;
 
@@ -279,11 +279,11 @@ class _$GridImpl implements _Grid {
 
   /// Does the row have 5 character to check word?
   @override
-  final bool enoughCharacters;
+  final bool notEnoughCharacters;
 
   @override
   String toString() {
-    return 'Grid(column: $column, row: $row, tiles: $tiles, keyboardStatus: $keyboardStatus, runFlipAnimation: $runFlipAnimation, isEnterOrDeletePressed: $isEnterOrDeletePressed, isGameWon: $isGameWon, isGameOver: $isGameOver, enoughCharacters: $enoughCharacters)';
+    return 'Grid(column: $column, row: $row, tiles: $tiles, keyboardStatus: $keyboardStatus, runFlipAnimation: $runFlipAnimation, isEnterOrDeletePressed: $isEnterOrDeletePressed, isGameWon: $isGameWon, isGameOver: $isGameOver, notEnoughCharacters: $notEnoughCharacters)';
   }
 
   @override
@@ -304,8 +304,8 @@ class _$GridImpl implements _Grid {
                 other.isGameWon == isGameWon) &&
             (identical(other.isGameOver, isGameOver) ||
                 other.isGameOver == isGameOver) &&
-            (identical(other.enoughCharacters, enoughCharacters) ||
-                other.enoughCharacters == enoughCharacters));
+            (identical(other.notEnoughCharacters, notEnoughCharacters) ||
+                other.notEnoughCharacters == notEnoughCharacters));
   }
 
   @override
@@ -319,7 +319,7 @@ class _$GridImpl implements _Grid {
       isEnterOrDeletePressed,
       isGameWon,
       isGameOver,
-      enoughCharacters);
+      notEnoughCharacters);
 
   /// Create a copy of Grid
   /// with the given fields replaced by the non-null parameter values.
@@ -340,7 +340,7 @@ abstract class _Grid implements Grid {
       required final bool isEnterOrDeletePressed,
       required final bool isGameWon,
       required final bool isGameOver,
-      required final bool enoughCharacters}) = _$GridImpl;
+      required final bool notEnoughCharacters}) = _$GridImpl;
 
   /// current grid column.
   @override
@@ -376,7 +376,7 @@ abstract class _Grid implements Grid {
 
   /// Does the row have 5 character to check word?
   @override
-  bool get enoughCharacters;
+  bool get notEnoughCharacters;
 
   /// Create a copy of Grid
   /// with the given fields replaced by the non-null parameter values.

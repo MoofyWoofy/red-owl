@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:red_owl/config/shared.dart' show animationTiming;
 
 class PopInAnimation extends StatefulWidget {
-  const PopInAnimation(
-      {required this.child, required this.runAnimation, super.key});
-
+  const PopInAnimation({
+    super.key,
+    required this.child,
+    required this.runAnimation,
+  });
   final Widget child;
   final bool runAnimation;
 
@@ -19,6 +21,7 @@ class _PopInAnimationState extends State<PopInAnimation>
 
   @override
   void initState() {
+    super.initState();
     _animationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: animationTiming.popIn.duration),
@@ -29,8 +32,6 @@ class _PopInAnimationState extends State<PopInAnimation>
       TweenSequenceItem(tween: Tween(begin: 0.7, end: 1), weight: 3),
     ]).animate(CurvedAnimation(
         parent: _animationController, curve: Curves.bounceInOut));
-
-    super.initState();
   }
 
   @override

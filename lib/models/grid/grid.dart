@@ -32,6 +32,6 @@ class Grid with _$Grid {
     required bool isGameOver,
 
     /// Does the row have 5 character to check word?
-    required bool enoughCharacters,
+    required bool notEnoughCharacters,
   }) = _Grid;
 }

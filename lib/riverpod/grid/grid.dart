@@ -22,7 +22,7 @@ class Grid extends _$Grid {
       isEnterOrDeletePressed: false,
       isGameWon: false,
       isGameOver: false,
-      enoughCharacters: false,
+      notEnoughCharacters: false,
     );
   }
 
@@ -36,7 +36,7 @@ class Grid extends _$Grid {
         .map((e) => e.letter)
         .join()
         .toUpperCase();
-    
+
     switch (key) {
       case 'ENTER':
         if (state.column == 5) {
@@ -59,6 +59,7 @@ class Grid extends _$Grid {
               runFlipAnimation: true,
               isGameWon: true,
               isGameOver: true,
+              notEnoughCharacters: false,
             );
             _updateKeyboard(keyboardStatusTemp);
           } else if (!result.isWordInList) {
@@ -100,14 +101,15 @@ class Grid extends _$Grid {
               row: state.row + 1,
               tiles: tiles,
               runFlipAnimation: true,
+              notEnoughCharacters: false,
             );
             _updateKeyboard(keyboardStatusTemp);
           }
         } else {
           // Not enough characters
+          state = state.copyWith(notEnoughCharacters: true);
           if (context.mounted) {
             showSnackBar(context, 'Not enough letters');
-            state = state;
           }
         }
         break;
@@ -117,6 +119,7 @@ class Grid extends _$Grid {
             column: state.column - 1,
             tiles: state.tiles.toList()..removeLast(),
             isEnterOrDeletePressed: true,
+            notEnoughCharacters: false,
           );
         }
         break;
@@ -127,6 +130,7 @@ class Grid extends _$Grid {
             tiles: state.tiles.toList()
               ..add(models.Tile(letter: key, status: LetterStatus.initial)),
             isEnterOrDeletePressed: false,
+            notEnoughCharacters: false,
           );
         }
         break;
