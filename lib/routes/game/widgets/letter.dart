@@ -40,7 +40,10 @@ class Letter extends ConsumerWidget {
           splashFactory: NoSplash.splashFactory,
           highlightColor: Colors.black38,
           onTap: () {
-            ref.read(gridProvider.notifier).onKeyboardPressed(key: letter);
+            ref.read(gridProvider.notifier).onKeyboardPressed(
+                  key: letter,
+                  context: context,
+                );
           },
           child: Ink(
             padding: const EdgeInsets.symmetric(vertical: 8),

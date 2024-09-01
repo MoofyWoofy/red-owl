@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-void showSnack(BuildContext context, String text, [int duration = 2]) {
+void showSnackBar(BuildContext context, String text, [int duration = 2]) {
   WidgetsBinding.instance.addPostFrameCallback((timestamp) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -25,11 +25,5 @@ void showSnack(BuildContext context, String text, [int duration = 2]) {
         behavior: SnackBarBehavior.floating,
       ),
     );
-    //? A hacky solution to prevent multiple snackbar from displaying.
-    Future.delayed(Duration(seconds: duration), () {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).clearSnackBars();
-      }
-    });
   });
 }

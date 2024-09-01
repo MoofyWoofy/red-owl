@@ -8,7 +8,6 @@ import 'package:red_owl/riverpod/shared.dart' show gridProvider;
 import 'package:red_owl/routes/game/widgets/shared.dart'
     show BounceAnimation, KeyboardRow, PopInAnimation, Tile;
 import 'package:red_owl/widgets/shared.dart' show appBar;
-import 'package:red_owl/util/shared.dart' show showSnack;
 
 class WordlePage extends ConsumerStatefulWidget {
   const WordlePage({super.key, required this.gameType});
@@ -48,14 +47,6 @@ class _WordlePageState extends ConsumerState<WordlePage> {
 
   @override
   Widget build(BuildContext context) {
-    var grid = ref.watch(gridProvider);
-    if (grid.isGameOver) {
-      if (grid.isGameWon) {
-        showSnack(context, 'You got it!');
-      } else {
-        showSnack(context, 'Better luck next time');
-      }
-    }
     return Scaffold(
       appBar: appBar(
         context: context,
