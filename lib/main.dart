@@ -4,13 +4,14 @@ import 'package:red_owl/riverpod/shared.dart' show boolFamilyNotifierProvider;
 import 'package:red_owl/routes/shared.dart';
 import 'package:red_owl/config/shared.dart'
     show lightTheme, darkTheme, SharedPreferencesKeys, BoolFamilyProviderIDs;
-import 'package:red_owl/util/shared.dart' show SharedPreferenceService;
+import 'package:red_owl/util/shared.dart'
+    show SharedPreferenceService, WordleService;
 import 'package:red_owl/widgets/shared.dart' show appBar;
-
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharedPreferenceService().init();
+  await WordleService().init();
   runApp(const ProviderScope(child: App()));
 }
 

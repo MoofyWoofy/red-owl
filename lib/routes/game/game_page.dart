@@ -5,9 +5,8 @@ import 'package:flutter/services.dart'
 import 'package:red_owl/config/shared.dart'
     show LetterStatus, animationTiming, keyboardStatus;
 import 'package:red_owl/riverpod/shared.dart' show gridProvider;
-import 'package:red_owl/routes/game/widgets/animations/shake.dart';
 import 'package:red_owl/routes/game/widgets/shared.dart'
-    show BounceAnimation, KeyboardRow, PopInAnimation, Tile;
+    show BounceAnimation, KeyboardRow, PopInAnimation, ShakeAnimation, Tile;
 import 'package:red_owl/widgets/shared.dart' show appBar;
 
 class WordlePage extends ConsumerStatefulWidget {

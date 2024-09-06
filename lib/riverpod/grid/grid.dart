@@ -1,11 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/widgets.dart' show BuildContext;
-import 'package:red_owl/util/shared.dart' show showSnackBar;
+import 'package:red_owl/util/shared.dart' show WordleService, showSnackBar;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:red_owl/models/shared.dart' as models;
 import 'package:red_owl/config/shared.dart' show LetterStatus, keyboardStatus;
-import 'package:http/http.dart' as http;
 
 part 'grid.g.dart';
 
@@ -138,12 +135,9 @@ class Grid extends _$Grid {
   }
 
   Future<models.GuessResult> getGuessResult(String guess) async {
-    final response = await http.post(
-      Uri.https('wordle-api-kappa.vercel.app', '/$guess'),
-      headers: {'Content-Type': 'application/json'},
+    return models.GuessResult.fromJson(
+      await WordleService().checkGuessWord(guess),
     );
-    final json = jsonDecode(response.body) as Map<String, dynamic>;
-    return models.GuessResult.fromJson(json);
   }
 
   void updateState(models.Grid newState) => state = newState;
