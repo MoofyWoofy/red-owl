@@ -11,11 +11,13 @@ class SwitchItem extends ConsumerStatefulWidget {
     required this.icon,
     required this.boolProviderId,
     required this.sharedPrefsKey,
+    this.callback,
   });
   final String title;
   final IconData icon;
   final BoolFamilyProviderIDs boolProviderId;
   final SharedPreferencesKeys sharedPrefsKey;
+  final ValueChanged<bool>? callback;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _SwitchItemState();
@@ -34,7 +36,8 @@ class _SwitchItemState extends ConsumerState<SwitchItem> {
       value: toggle,
       secondary: Icon(widget.icon),
       controlAffinity: ListTileControlAffinity.platform,
-      onChanged: (value) {
+      onChanged: widget.callback ??
+          (value) {
         ref
             .read(boolFamilyNotifierProvider(
               id: widget.boolProviderId,

@@ -6,11 +6,11 @@ part of 'grid.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$gridHash() => r'37ee67d1f21813df2e342e04a635b571e916b10a';
+String _$gridHash() => r'78010eb1780587ac4e4ebf1c604218214cda3bbb';
 
 /// See also [Grid].
 @ProviderFor(Grid)
-final gridProvider = AutoDisposeNotifierProvider<Grid, models.Grid>.internal(
+final gridProvider = NotifierProvider<Grid, models.Grid>.internal(
   Grid.new,
   name: r'gridProvider',
   debugGetCreateSourceHash:
@@ -19,6 +19,6 @@ final gridProvider = AutoDisposeNotifierProvider<Grid, models.Grid>.internal(
   allTransitiveDependencies: null,
 );
 
-typedef _$Grid = AutoDisposeNotifier<models.Grid>;
+typedef _$Grid = Notifier<models.Grid>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

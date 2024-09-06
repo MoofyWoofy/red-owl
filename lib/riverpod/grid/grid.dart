@@ -6,7 +6,7 @@ import 'package:red_owl/config/shared.dart' show LetterStatus, keyboardStatus;
 
 part 'grid.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class Grid extends _$Grid {
   @override
   models.Grid build() {
@@ -141,6 +141,21 @@ class Grid extends _$Grid {
   }
 
   void updateState(models.Grid newState) => state = newState;
+  
+  void resetGrid() {
+    state = models.Grid(
+      column: 0,
+      row: 0,
+      tiles: [],
+      keyboardStatus: keyboardStatus,
+      runFlipAnimation: false,
+      isEnterOrDeletePressed: false,
+      isGameWon: false,
+      isGameOver: false,
+      notEnoughCharacters: false,
+    );
+    // TODO: Clear game state from sharedPrefs
+  }
 
   void _updateKeyboard(Map<String, LetterStatus> keyboardStatus) {
     Future.delayed(const Duration(seconds: 1), () {

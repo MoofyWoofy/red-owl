@@ -4,9 +4,12 @@ import 'package:red_owl/routes/shared.dart' show SettingsPage;
 AppBar appBar({
   required BuildContext context,
   required String title,
+  // TODO: rename showSettingsPage to showSettingsIcon
+  // TODO: showSettingsPage should be false by default (remove Settingpage appBar)
   bool showSettingsPage = true,
   bool automaticallyImplyLeading = true,
   bool centerTitle = true,
+  bool showCancelIcon = false,
 }) {
   return AppBar(
     title: Text(title),
@@ -14,22 +17,26 @@ AppBar appBar({
     automaticallyImplyLeading: automaticallyImplyLeading,
     elevation: 4,
     actions: [
-      IconButton(
-        icon: showSettingsPage
-            ? const Icon(Icons.settings)
-            : const Icon(Icons.clear),
-        tooltip: showSettingsPage ? 'Settings' : 'Exit',
-        onPressed: () {
-          if (showSettingsPage) {
+      if (showSettingsPage) ...[
+        IconButton(
+          icon: const Icon(Icons.settings),
+          tooltip: 'Settings',
+          onPressed: () {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const SettingsPage()),
             );
-          } else {
+          },
+        ),
+      ] else if (showCancelIcon) ...[
+        IconButton(
+          icon: const Icon(Icons.clear),
+          tooltip: 'Exit',
+          onPressed: () {
             Navigator.pop(context);
-          }
-        },
-      ),
+          },
+        ),
+      ]
     ],
   );
 }

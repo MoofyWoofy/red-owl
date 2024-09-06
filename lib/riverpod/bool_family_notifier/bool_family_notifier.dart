@@ -27,6 +27,10 @@ class BoolFamilyNotifier extends _$BoolFamilyNotifier {
           // if data exists in shared Preferences, return value.
           return dataFromSharedPref;
         }
+      case SharedPreferencesKeys.useCustomList:
+        bool? dataFromSharedPref =
+            SharedPreferenceService().getBool(sharedPrefsKey.toString());
+        return dataFromSharedPref ?? false;
       default:
         // Default value if not specified.
         return false;
