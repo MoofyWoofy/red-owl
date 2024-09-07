@@ -46,8 +46,8 @@ class _BounceAnimationState extends State<BounceAnimation>
 
   @override
   void dispose() {
-    super.dispose();
     _animationController.dispose();
+    super.dispose();
   }
 
   @override

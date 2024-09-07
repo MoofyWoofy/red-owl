@@ -4,9 +4,7 @@ import 'package:red_owl/routes/shared.dart' show SettingsPage;
 AppBar appBar({
   required BuildContext context,
   required String title,
-  // TODO: rename showSettingsPage to showSettingsIcon
-  // TODO: showSettingsPage should be false by default (remove Settingpage appBar)
-  bool showSettingsPage = true,
+  bool showSettingIcon = false,
   bool automaticallyImplyLeading = true,
   bool centerTitle = true,
   bool showCancelIcon = false,
@@ -17,7 +15,7 @@ AppBar appBar({
     automaticallyImplyLeading: automaticallyImplyLeading,
     elevation: 4,
     actions: [
-      if (showSettingsPage) ...[
+      if (showSettingIcon) ...[
         IconButton(
           icon: const Icon(Icons.settings),
           tooltip: 'Settings',

@@ -7,7 +7,11 @@ class StatsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar(title: 'Stats', context: context),
+      appBar: appBar(
+        title: 'Stats',
+        context: context,
+        showSettingIcon: true,
+      ),
       body: const Placeholder(),
     );
   }

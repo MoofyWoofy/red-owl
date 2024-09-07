@@ -57,8 +57,8 @@ class _ShakeAnimationState extends State<ShakeAnimation>
 
   @override
   void dispose() {
-    super.dispose();
     _animationController.dispose();
+    super.dispose();
   }
 
   @override

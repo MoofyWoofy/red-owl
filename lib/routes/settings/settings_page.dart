@@ -23,7 +23,6 @@ class SettingsPage extends ConsumerWidget {
       appBar: appBar(
         context: context,
         title: 'Settings',
-        showSettingsPage: false,
         showCancelIcon: true,
         automaticallyImplyLeading: false,
       ),
@@ -48,7 +47,7 @@ class SettingsPage extends ConsumerWidget {
                 callback: (value) async {
                   var grid = ref.watch(gridProvider);
                   bool updateCustomList = true;
-                  if (grid.tiles.isNotEmpty || grid.isGameOver) {
+                  if (grid.tiles.isNotEmpty && !grid.isGameOver) {
                     updateCustomList = await showDialog(
                       context: context,
                       builder: (_) => const GameInProgressDialog(

@@ -24,7 +24,6 @@ class _ViewCustomListPageState extends State<ViewCustomListPage> {
         appBar: appBar(
           context: context,
           title: 'Custom list',
-          showSettingsPage: false,
         ),
         body: FutureBuilder(
           future: _words,

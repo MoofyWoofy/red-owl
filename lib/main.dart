@@ -42,7 +42,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar(context: context, title: title),
+      appBar: appBar(context: context, title: title, showSettingIcon: true),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
