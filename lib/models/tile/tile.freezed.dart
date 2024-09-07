@@ -16,8 +16,14 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$Tile {
+  /// Letter
   String get letter => throw _privateConstructorUsedError;
+
+  /// Tile status
   LetterStatus get status => throw _privateConstructorUsedError;
+
+  /// did tile play Flip animation before
+  bool get hasFlipAnimationPlayed => throw _privateConstructorUsedError;
 
   /// Create a copy of Tile
   /// with the given fields replaced by the non-null parameter values.
@@ -30,7 +36,7 @@ abstract class $TileCopyWith<$Res> {
   factory $TileCopyWith(Tile value, $Res Function(Tile) then) =
       _$TileCopyWithImpl<$Res, Tile>;
   @useResult
-  $Res call({String letter, LetterStatus status});
+  $Res call({String letter, LetterStatus status, bool hasFlipAnimationPlayed});
 }
 
 /// @nodoc
@@ -50,6 +56,7 @@ class _$TileCopyWithImpl<$Res, $Val extends Tile>
   $Res call({
     Object? letter = null,
     Object? status = null,
+    Object? hasFlipAnimationPlayed = null,
   }) {
     return _then(_value.copyWith(
       letter: null == letter
@@ -60,6 +67,10 @@ class _$TileCopyWithImpl<$Res, $Val extends Tile>
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as LetterStatus,
+      hasFlipAnimationPlayed: null == hasFlipAnimationPlayed
+          ? _value.hasFlipAnimationPlayed
+          : hasFlipAnimationPlayed // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 }
@@ -71,7 +82,7 @@ abstract class _$$TileImplCopyWith<$Res> implements $TileCopyWith<$Res> {
       __$$TileImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String letter, LetterStatus status});
+  $Res call({String letter, LetterStatus status, bool hasFlipAnimationPlayed});
 }
 
 /// @nodoc
@@ -88,6 +99,7 @@ class __$$TileImplCopyWithImpl<$Res>
   $Res call({
     Object? letter = null,
     Object? status = null,
+    Object? hasFlipAnimationPlayed = null,
   }) {
     return _then(_$TileImpl(
       letter: null == letter
@@ -98,6 +110,10 @@ class __$$TileImplCopyWithImpl<$Res>
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as LetterStatus,
+      hasFlipAnimationPlayed: null == hasFlipAnimationPlayed
+          ? _value.hasFlipAnimationPlayed
+          : hasFlipAnimationPlayed // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -105,16 +121,26 @@ class __$$TileImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$TileImpl implements _Tile {
-  const _$TileImpl({required this.letter, required this.status});
+  const _$TileImpl(
+      {required this.letter,
+      required this.status,
+      required this.hasFlipAnimationPlayed});
 
+  /// Letter
   @override
   final String letter;
+
+  /// Tile status
   @override
   final LetterStatus status;
 
+  /// did tile play Flip animation before
+  @override
+  final bool hasFlipAnimationPlayed;
+
   @override
   String toString() {
-    return 'Tile(letter: $letter, status: $status)';
+    return 'Tile(letter: $letter, status: $status, hasFlipAnimationPlayed: $hasFlipAnimationPlayed)';
   }
 
   @override
@@ -123,11 +149,14 @@ class _$TileImpl implements _Tile {
         (other.runtimeType == runtimeType &&
             other is _$TileImpl &&
             (identical(other.letter, letter) || other.letter == letter) &&
-            (identical(other.status, status) || other.status == status));
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.hasFlipAnimationPlayed, hasFlipAnimationPlayed) ||
+                other.hasFlipAnimationPlayed == hasFlipAnimationPlayed));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, letter, status);
+  int get hashCode =>
+      Object.hash(runtimeType, letter, status, hasFlipAnimationPlayed);
 
   /// Create a copy of Tile
   /// with the given fields replaced by the non-null parameter values.
@@ -141,12 +170,20 @@ class _$TileImpl implements _Tile {
 abstract class _Tile implements Tile {
   const factory _Tile(
       {required final String letter,
-      required final LetterStatus status}) = _$TileImpl;
+      required final LetterStatus status,
+      required final bool hasFlipAnimationPlayed}) = _$TileImpl;
 
+  /// Letter
   @override
   String get letter;
+
+  /// Tile status
   @override
   LetterStatus get status;
+
+  /// did tile play Flip animation before
+  @override
+  bool get hasFlipAnimationPlayed;
 
   /// Create a copy of Tile
   /// with the given fields replaced by the non-null parameter values.

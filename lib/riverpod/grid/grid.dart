@@ -125,7 +125,11 @@ class Grid extends _$Grid {
           state = state.copyWith(
             column: state.column + 1,
             tiles: state.tiles.toList()
-              ..add(models.Tile(letter: key, status: LetterStatus.initial)),
+              ..add(models.Tile(
+                letter: key,
+                status: LetterStatus.initial,
+                hasFlipAnimationPlayed: false,
+              )),
             isEnterOrDeletePressed: false,
             notEnoughCharacters: false,
           );

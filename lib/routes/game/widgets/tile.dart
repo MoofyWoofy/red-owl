@@ -19,6 +19,7 @@ class _TileState extends ConsumerState<Tile>
     with SingleTickerProviderStateMixin {
   Color? backgroundColor, textColor;
   late AnimationController _animationController;
+  bool hasFlipAnimationPlayed = false;
 
   @override
   void initState() {
@@ -32,8 +33,8 @@ class _TileState extends ConsumerState<Tile>
 
   @override
   void dispose() {
-    super.dispose();
     _animationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -43,15 +44,20 @@ class _TileState extends ConsumerState<Tile>
         Theme.of(context).extension<CustomColors>()!.borderInactive!;
 
     if (widget.index < grid.tiles.length) {
-      if (grid.runFlipAnimation) {
+      if (grid.runFlipAnimation &&
+          !grid.tiles[widget.index].hasFlipAnimationPlayed) {
         Future.delayed(
             Duration(
-                milliseconds: (widget.index % 5) *
-                    animationTiming.flip.intervalDelay!), () {
+              milliseconds:
+                  (widget.index % 5) * animationTiming.flip.intervalDelay!,
+            ), () {
           _animationController.forward();
-          ref
-              .read(gridProvider.notifier)
-              .updateState(grid.copyWith(runFlipAnimation: false));
+          ref.read(gridProvider.notifier).updateState(grid.copyWith(
+                runFlipAnimation: false,
+                tiles: [...grid.tiles]
+                    .map((e) => e.copyWith(hasFlipAnimationPlayed: true))
+                    .toList(),
+              ));
         });
       }
 
@@ -79,7 +85,9 @@ class _TileState extends ConsumerState<Tile>
           textColor = Colors.white;
           break;
       }
+      hasFlipAnimationPlayed = grid.tiles[widget.index].hasFlipAnimationPlayed;
     }
+
 
     return AnimatedBuilder(
       animation: _animationController,
@@ -98,7 +106,8 @@ class _TileState extends ConsumerState<Tile>
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: flip > 0 ? backgroundColor : null,
+              color:
+                  (flip > 0 || hasFlipAnimationPlayed) ? backgroundColor : null,
               border: Border.all(
                 color: borderColor,
                 width: 2,
@@ -114,7 +123,9 @@ class _TileState extends ConsumerState<Tile>
                           grid.tiles[widget.index].letter,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: flip > 0 ? textColor : null,
+                            color: (flip > 0 || hasFlipAnimationPlayed)
+                                ? textColor
+                                : null,
                           ),
                         ),
                       ),

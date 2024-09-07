@@ -6,7 +6,11 @@ part 'tile.freezed.dart';
 @freezed
 class Tile with _$Tile {
   const factory Tile({
+    /// Letter
     required String letter,
+    /// Tile status
     required LetterStatus status,
+    /// did tile play Flip animation before
+    required bool hasFlipAnimationPlayed,
   }) = _Tile;
 }
