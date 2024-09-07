@@ -6,7 +6,7 @@ import 'package:red_owl/config/shared.dart'
     show lightTheme, darkTheme, SharedPreferencesKeys, BoolFamilyProviderIDs;
 import 'package:red_owl/util/shared.dart'
     show SharedPreferenceService, WordleService;
-import 'package:red_owl/widgets/shared.dart' show appBar;
+import 'package:red_owl/widgets/shared.dart' show Logo, appBar;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,14 +49,7 @@ class HomePage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: const Image(
-                  image: AssetImage('assets/icon.png'),
-                  height: 150,
-                  width: 150,
-                ),
-              ),
+              const Logo(),
               Column(
                 children: [
                   OutlinedButton.icon(
