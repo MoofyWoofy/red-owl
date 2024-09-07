@@ -16,7 +16,7 @@ class BoolFamilyNotifier extends _$BoolFamilyNotifier {
     switch (sharedPrefsKey) {
       case SharedPreferencesKeys.isDarkMode:
         bool? dataFromSharedPref =
-            SharedPreferenceService().getBool(sharedPrefsKey.toString());
+            SharedPreferenceService().getBool(sharedPrefsKey);
 
         if (dataFromSharedPref == null) {
           // If no data is in shared Preferences, use system brightness instead.
@@ -29,7 +29,7 @@ class BoolFamilyNotifier extends _$BoolFamilyNotifier {
         }
       case SharedPreferencesKeys.useCustomList:
         bool? dataFromSharedPref =
-            SharedPreferenceService().getBool(sharedPrefsKey.toString());
+            SharedPreferenceService().getBool(sharedPrefsKey);
         return dataFromSharedPref ?? false;
       default:
         // Default value if not specified.
@@ -39,7 +39,7 @@ class BoolFamilyNotifier extends _$BoolFamilyNotifier {
 
   /// Update state & save boolean to Shared Preferences.
   void updateBoolean(SharedPreferencesKeys sharedPrefKey, bool val) {
-    SharedPreferenceService().setBool(sharedPrefKey.toString(), val);
+    SharedPreferenceService().setBool(sharedPrefKey, val);
     state = val;
   }
 }

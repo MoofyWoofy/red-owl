@@ -31,7 +31,7 @@ class WordleService {
 
   Future<List<String>> get getWordList async {
     var useCustomList = SharedPreferenceService()
-        .getBool(SharedPreferencesKeys.useCustomList.toString());
+        .getBool(SharedPreferencesKeys.useCustomList);
     if (useCustomList != null && useCustomList) {
       Directory directory = await getApplicationDocumentsDirectory();
       try {

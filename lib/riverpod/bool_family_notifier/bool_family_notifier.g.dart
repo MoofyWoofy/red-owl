@@ -7,7 +7,7 @@ part of 'bool_family_notifier.dart';
 // **************************************************************************
 
 String _$boolFamilyNotifierHash() =>
-    r'7ffa5893b23a1eb63d1b266bd1e9a5d12c09e7c4';
+    r'd77308a8283feef24263eae722bed7ec6496eb86';
 
 /// Copied from Dart SDK
 class _SystemHash {

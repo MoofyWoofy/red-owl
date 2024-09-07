@@ -21,11 +21,11 @@ class SharedPreferenceService {
     );
   }
 
-  bool? getBool(String key) {
-    return _prefs.getBool(key);
+  bool? getBool(SharedPreferencesKeys key) {
+    return _prefs.getBool(key.toString());
   }
 
-  void setBool(String key, bool val) {
-    _prefs.setBool(key, val);
+  void setBool(SharedPreferencesKeys key, bool val) {
+    _prefs.setBool(key.toString(), val);
   }
 }
