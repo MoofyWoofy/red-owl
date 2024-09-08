@@ -1,8 +1,18 @@
+import 'dart:convert';
+
 import 'package:flutter/widgets.dart' show BuildContext;
-import 'package:red_owl/util/shared.dart' show WordleService, showSnackBar;
+import 'package:red_owl/util/shared.dart'
+    show
+        SharedPreferenceService,
+        WordleService,
+        dateToString,
+        getDateOnly,
+        showSnackBar,
+        stringToDate;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:red_owl/models/shared.dart' as models;
-import 'package:red_owl/config/shared.dart' show LetterStatus, keyboardStatus;
+import 'package:red_owl/config/shared.dart'
+    show LetterStatus, SharedPreferencesKeys, keyboardStatus;
 
 part 'grid.g.dart';
 
@@ -10,17 +20,39 @@ part 'grid.g.dart';
 class Grid extends _$Grid {
   @override
   models.Grid build() {
-    return models.Grid(
-      column: 0,
-      row: 0,
-      tiles: [],
-      keyboardStatus: keyboardStatus,
-      runFlipAnimation: false,
-      isEnterOrDeletePressed: false,
-      isGameWon: false,
-      isGameOver: false,
-      notEnoughCharacters: false,
-    );
+    String? gridBase64 =
+        SharedPreferenceService().getString(SharedPreferencesKeys.gridState);
+
+    // get game date, so that we know whether to reset the grid or not.
+    String? gameDateString =
+        SharedPreferenceService().getString(SharedPreferencesKeys.gameDate);
+    DateTime gameDate = gameDateString == null
+        ? getDateOnly(DateTime.now())
+        : getDateOnly(stringToDate(gameDateString));
+
+    // get today's date
+    DateTime today = getDateOnly(DateTime.now());
+
+    if (gameDate != today) {
+      gridBase64 = null;
+    }
+
+    if (gridBase64 == null) {
+      return models.Grid(
+        column: 0,
+        row: 0,
+        tiles: [],
+        keyboardStatus: keyboardStatus,
+        runFlipAnimation: false,
+        isEnterOrDeletePressed: false,
+        isGameWon: false,
+        isGameOver: false,
+        notEnoughCharacters: false,
+      );
+    } else {
+      String gridJsonString = utf8.decode(base64.decode(gridBase64));
+      return models.Grid.fromJson(jsonDecode(gridJsonString));
+    }
   }
 
   Future<void> onKeyboardPressed({
@@ -101,6 +133,16 @@ class Grid extends _$Grid {
               notEnoughCharacters: false,
             );
             _updateKeyboard(keyboardStatusTemp);
+            // Save grid to share prefs.
+            String gameState = jsonEncode(state.toJson());
+            String gameStateBase64 = base64.encode(utf8.encode(gameState));
+
+            SharedPreferenceService()
+                .setString(SharedPreferencesKeys.gridState, gameStateBase64);
+
+            // Save game date
+            SharedPreferenceService().setString(
+                SharedPreferencesKeys.gameDate, dateToString(DateTime.now()));
           }
         } else {
           // Not enough characters
@@ -145,8 +187,11 @@ class Grid extends _$Grid {
   }
 
   void updateState(models.Grid newState) => state = newState;
-  
+
   void resetGrid() {
+    // Clear game state from sharedPrefs
+    SharedPreferenceService().remove(SharedPreferencesKeys.gridState);
+    
     state = models.Grid(
       column: 0,
       row: 0,
@@ -158,7 +203,6 @@ class Grid extends _$Grid {
       isGameOver: false,
       notEnoughCharacters: false,
     );
-    // TODO: Clear game state from sharedPrefs
   }
 
   void _updateKeyboard(Map<String, LetterStatus> keyboardStatus) {

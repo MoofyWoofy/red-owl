@@ -21,11 +21,23 @@ class SharedPreferenceService {
     );
   }
 
+  Future<void> remove(SharedPreferencesKeys key) async {
+    await _prefs.remove(key.toString());
+  }
+
   bool? getBool(SharedPreferencesKeys key) {
     return _prefs.getBool(key.toString());
   }
 
   void setBool(SharedPreferencesKeys key, bool val) {
     _prefs.setBool(key.toString(), val);
+  }
+
+  String? getString(SharedPreferencesKeys key) {
+    return _prefs.getString(key.toString());
+  }
+
+  void setString(SharedPreferencesKeys key, String val) {
+    _prefs.setString(key.toString(), val);
   }
 }

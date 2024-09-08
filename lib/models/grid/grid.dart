@@ -3,6 +3,7 @@ import 'package:red_owl/models/shared.dart' show Tile;
 import 'package:red_owl/config/shared.dart' show LetterStatus;
 
 part 'grid.freezed.dart';
+part 'grid.g.dart';
 
 @freezed
 class Grid with _$Grid {
@@ -34,4 +35,6 @@ class Grid with _$Grid {
     /// Does the row have 5 character to check word?
     required bool notEnoughCharacters,
   }) = _Grid;
+
+  factory Grid.fromJson(Map<String, Object?> json) => _$GridFromJson(json);
 }

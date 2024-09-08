@@ -14,6 +14,10 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
+Grid _$GridFromJson(Map<String, dynamic> json) {
+  return _Grid.fromJson(json);
+}
+
 /// @nodoc
 mixin _$Grid {
   /// current grid column.
@@ -43,6 +47,9 @@ mixin _$Grid {
 
   /// Does the row have 5 character to check word?
   bool get notEnoughCharacters => throw _privateConstructorUsedError;
+
+  /// Serializes this Grid to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
   /// Create a copy of Grid
   /// with the given fields replaced by the non-null parameter values.
@@ -216,7 +223,7 @@ class __$$GridImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class _$GridImpl implements _Grid {
   const _$GridImpl(
       {required this.column,
@@ -230,6 +237,9 @@ class _$GridImpl implements _Grid {
       required this.notEnoughCharacters})
       : _tiles = tiles,
         _keyboardStatus = keyboardStatus;
+
+  factory _$GridImpl.fromJson(Map<String, dynamic> json) =>
+      _$$GridImplFromJson(json);
 
   /// current grid column.
   @override
@@ -308,6 +318,7 @@ class _$GridImpl implements _Grid {
                 other.notEnoughCharacters == notEnoughCharacters));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -328,6 +339,13 @@ class _$GridImpl implements _Grid {
   @pragma('vm:prefer-inline')
   _$$GridImplCopyWith<_$GridImpl> get copyWith =>
       __$$GridImplCopyWithImpl<_$GridImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$GridImplToJson(
+      this,
+    );
+  }
 }
 
 abstract class _Grid implements Grid {
@@ -341,6 +359,8 @@ abstract class _Grid implements Grid {
       required final bool isGameWon,
       required final bool isGameOver,
       required final bool notEnoughCharacters}) = _$GridImpl;
+
+  factory _Grid.fromJson(Map<String, dynamic> json) = _$GridImpl.fromJson;
 
   /// current grid column.
   @override

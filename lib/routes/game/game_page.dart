@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart'
     show KeyDownEvent, KeyRepeatEvent, KeyUpEvent, ServicesBinding;
-import 'package:intl/intl.dart';
 import 'package:red_owl/config/shared.dart'
     show LetterStatus, animationTiming, keyboardStatus;
 import 'package:red_owl/riverpod/shared.dart' show gridProvider;
 import 'package:red_owl/routes/game/widgets/shared.dart'
     show BounceAnimation, KeyboardRow, PopInAnimation, ShakeAnimation, Tile;
+import 'package:red_owl/util/shared.dart' show dateToString;
 import 'package:red_owl/widgets/shared.dart' show appBar;
 
 class WordlePage extends ConsumerStatefulWidget {
@@ -51,7 +51,7 @@ class _WordlePageState extends ConsumerState<WordlePage> {
     return Scaffold(
       appBar: appBar(
         context: context,
-        title: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+        title: dateToString(DateTime.now()),
         showSettingIcon: true,
       ),
       body: Column(

@@ -14,6 +14,10 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
+Tile _$TileFromJson(Map<String, dynamic> json) {
+  return _Tile.fromJson(json);
+}
+
 /// @nodoc
 mixin _$Tile {
   /// Letter
@@ -24,6 +28,9 @@ mixin _$Tile {
 
   /// did tile play Flip animation before
   bool get hasFlipAnimationPlayed => throw _privateConstructorUsedError;
+
+  /// Serializes this Tile to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
   /// Create a copy of Tile
   /// with the given fields replaced by the non-null parameter values.
@@ -119,12 +126,15 @@ class __$$TileImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class _$TileImpl implements _Tile {
   const _$TileImpl(
       {required this.letter,
       required this.status,
       required this.hasFlipAnimationPlayed});
+
+  factory _$TileImpl.fromJson(Map<String, dynamic> json) =>
+      _$$TileImplFromJson(json);
 
   /// Letter
   @override
@@ -154,6 +164,7 @@ class _$TileImpl implements _Tile {
                 other.hasFlipAnimationPlayed == hasFlipAnimationPlayed));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
       Object.hash(runtimeType, letter, status, hasFlipAnimationPlayed);
@@ -165,6 +176,13 @@ class _$TileImpl implements _Tile {
   @pragma('vm:prefer-inline')
   _$$TileImplCopyWith<_$TileImpl> get copyWith =>
       __$$TileImplCopyWithImpl<_$TileImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$TileImplToJson(
+      this,
+    );
+  }
 }
 
 abstract class _Tile implements Tile {
@@ -172,6 +190,8 @@ abstract class _Tile implements Tile {
       {required final String letter,
       required final LetterStatus status,
       required final bool hasFlipAnimationPlayed}) = _$TileImpl;
+
+  factory _Tile.fromJson(Map<String, dynamic> json) = _$TileImpl.fromJson;
 
   /// Letter
   @override

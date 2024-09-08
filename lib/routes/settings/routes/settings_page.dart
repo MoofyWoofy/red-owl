@@ -149,7 +149,6 @@ class SettingsPage extends ConsumerWidget {
               ),
               onPressed: () => showAboutDialog(
                 context: context,
-                applicationVersion: '1.0',
                 applicationIcon: const Logo(size: 75),
               ),
               child: const Padding(
