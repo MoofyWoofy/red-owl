@@ -103,6 +103,9 @@ class _WordlePageState extends ConsumerState<WordlePage> {
                         runAnimation: animatePopInEffect,
                         child: Tile(
                           index: index,
+                          hasFlipAnimationPlayed: index < (grid.tiles.length)
+                              ? grid.tiles[index].hasFlipAnimationPlayed
+                              : false,
                         ),
                       ),
                     ),

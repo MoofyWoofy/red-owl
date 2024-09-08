@@ -5,7 +5,6 @@ import 'package:red_owl/util/shared.dart'
     show
         SharedPreferenceService,
         WordleService,
-        dateToString,
         getDateOnly,
         showSnackBar,
         stringToDate;
@@ -16,7 +15,7 @@ import 'package:red_owl/config/shared.dart'
 
 part 'grid.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 class Grid extends _$Grid {
   @override
   models.Grid build() {
@@ -35,6 +34,8 @@ class Grid extends _$Grid {
 
     if (gameDate != today) {
       gridBase64 = null;
+      // Clear shared prefs
+      SharedPreferenceService().remove(SharedPreferencesKeys.gridState);
     }
 
     if (gridBase64 == null) {
@@ -133,16 +134,6 @@ class Grid extends _$Grid {
               notEnoughCharacters: false,
             );
             _updateKeyboard(keyboardStatusTemp);
-            // Save grid to share prefs.
-            String gameState = jsonEncode(state.toJson());
-            String gameStateBase64 = base64.encode(utf8.encode(gameState));
-
-            SharedPreferenceService()
-                .setString(SharedPreferencesKeys.gridState, gameStateBase64);
-
-            // Save game date
-            SharedPreferenceService().setString(
-                SharedPreferencesKeys.gameDate, dateToString(DateTime.now()));
           }
         } else {
           // Not enough characters
@@ -206,8 +197,6 @@ class Grid extends _$Grid {
   }
 
   void _updateKeyboard(Map<String, LetterStatus> keyboardStatus) {
-    Future.delayed(const Duration(seconds: 1), () {
-      state = state.copyWith(keyboardStatus: keyboardStatus);
-    });
+    state = state.copyWith(keyboardStatus: keyboardStatus);
   }
 }

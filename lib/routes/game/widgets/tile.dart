@@ -1,15 +1,23 @@
+import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:red_owl/config/shared.dart'
-    show CustomColors, LetterStatus, animationTiming;
+    show CustomColors, LetterStatus, SharedPreferencesKeys, animationTiming;
 import 'package:red_owl/riverpod/shared.dart' show gridProvider;
 import 'package:red_owl/models/shared.dart' show Grid;
+import 'package:red_owl/util/shared.dart'
+    show SharedPreferenceService, dateToString;
 
 class Tile extends ConsumerStatefulWidget {
-  const Tile({super.key, required this.index});
+  const Tile({
+    super.key,
+    required this.index,
+    required this.hasFlipAnimationPlayed,
+  });
   final int index;
+  final bool hasFlipAnimationPlayed;
 
   @override
   ConsumerState<Tile> createState() => _TileState();
@@ -19,7 +27,6 @@ class _TileState extends ConsumerState<Tile>
     with SingleTickerProviderStateMixin {
   Color? backgroundColor, textColor;
   late AnimationController _animationController;
-  bool hasFlipAnimationPlayed = false;
 
   @override
   void initState() {
@@ -51,13 +58,28 @@ class _TileState extends ConsumerState<Tile>
               milliseconds:
                   (widget.index % 5) * animationTiming.flip.intervalDelay!,
             ), () {
-          _animationController.forward();
-          ref.read(gridProvider.notifier).updateState(grid.copyWith(
-                runFlipAnimation: false,
-                tiles: [...grid.tiles]
-                    .map((e) => e.copyWith(hasFlipAnimationPlayed: true))
-                    .toList(),
-              ));
+          _animationController.forward().whenComplete(() {
+            // TODO: optimize code with map() instead
+            var tiles = [...grid.tiles];
+            var newTiles = tiles
+                .map((e) => e.copyWith(hasFlipAnimationPlayed: true))
+                .toList();
+            var newGrid =
+                grid.copyWith(runFlipAnimation: false, tiles: newTiles);
+
+            ref.read(gridProvider.notifier).updateState(newGrid);
+
+            // Save grid to share prefs.
+            String gameState = jsonEncode(newGrid.toJson());
+            String gameStateBase64 = base64.encode(utf8.encode(gameState));
+
+            SharedPreferenceService()
+                .setString(SharedPreferencesKeys.gridState, gameStateBase64);
+
+            // Save game date
+            SharedPreferenceService().setString(
+                SharedPreferencesKeys.gameDate, dateToString(DateTime.now()));
+          });
         });
       }
 
@@ -85,9 +107,7 @@ class _TileState extends ConsumerState<Tile>
           textColor = Colors.white;
           break;
       }
-      hasFlipAnimationPlayed = grid.tiles[widget.index].hasFlipAnimationPlayed;
     }
-
 
     return AnimatedBuilder(
       animation: _animationController,
@@ -106,8 +126,9 @@ class _TileState extends ConsumerState<Tile>
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color:
-                  (flip > 0 || hasFlipAnimationPlayed) ? backgroundColor : null,
+              color: (flip > 0 || widget.hasFlipAnimationPlayed)
+                  ? backgroundColor
+                  : null,
               border: Border.all(
                 color: borderColor,
                 width: 2,
@@ -123,7 +144,7 @@ class _TileState extends ConsumerState<Tile>
                           grid.tiles[widget.index].letter,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: (flip > 0 || hasFlipAnimationPlayed)
+                            color: (flip > 0 || widget.hasFlipAnimationPlayed)
                                 ? textColor
                                 : null,
                           ),
