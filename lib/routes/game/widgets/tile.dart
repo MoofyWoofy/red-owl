@@ -49,6 +49,7 @@ class _TileState extends ConsumerState<Tile>
     Grid grid = ref.watch(gridProvider);
     Color borderColor =
         Theme.of(context).extension<CustomColors>()!.borderInactive!;
+    bool hasFlipAnimationPlayed = widget.hasFlipAnimationPlayed;
 
     if (widget.index < grid.tiles.length) {
       if (grid.runFlipAnimation &&
@@ -107,6 +108,12 @@ class _TileState extends ConsumerState<Tile>
           textColor = Colors.white;
           break;
       }
+    } else {
+      // Set default values to variables so that tile rebuilds.
+      // By default it does not when Navigator pops settingsPage back to GamePage
+      backgroundColor = null;
+      borderColor = Theme.of(context).extension<CustomColors>()!.borderActive!;
+      hasFlipAnimationPlayed = false;
     }
 
     return AnimatedBuilder(
@@ -126,9 +133,8 @@ class _TileState extends ConsumerState<Tile>
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: (flip > 0 || widget.hasFlipAnimationPlayed)
-                  ? backgroundColor
-                  : null,
+              color:
+                  (flip > 0 || hasFlipAnimationPlayed) ? backgroundColor : null,
               border: Border.all(
                 color: borderColor,
                 width: 2,
@@ -144,7 +150,7 @@ class _TileState extends ConsumerState<Tile>
                           grid.tiles[widget.index].letter,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: (flip > 0 || widget.hasFlipAnimationPlayed)
+                            color: (flip > 0 || hasFlipAnimationPlayed)
                                 ? textColor
                                 : null,
                           ),

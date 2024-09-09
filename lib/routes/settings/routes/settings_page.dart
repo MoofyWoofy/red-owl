@@ -52,11 +52,12 @@ class SettingsPage extends ConsumerWidget {
                         bool updateCustomList = true;
                         if (grid.tiles.isNotEmpty && !grid.isGameOver) {
                           updateCustomList = await showDialog(
-                            context: context,
-                            builder: (_) => const GameInProgressDialog(
-                                content:
-                                    'Game in progress, changing word list will reset the game'),
-                          );
+                                context: context,
+                                builder: (_) => const GameInProgressDialog(
+                                    content:
+                                        'Game in progress, changing word list will reset the game'),
+                              ) ??
+                              false;
                           // If user selected 'yes' then reset grid
                           if (updateCustomList) {
                             ref.read(gridProvider.notifier).resetGrid();
