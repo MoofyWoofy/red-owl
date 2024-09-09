@@ -16,19 +16,24 @@ For help getting started with Flutter development, view the
 samples, guidance on mobile development, and a full API reference.
 
 
+## Features:
+- Able to use custom word list.
+- View stats
+- Light/Dark mode
+
+
 ## TODO Features:
-- Able to import / export custom word list. if importing, replace existing word list
+- Stats page
 
 
 ## Goals
 - learn
   - use sqlite3 + drift (orm)
   - how to use test library
-  - how to create local package and use it
   - animations
 
 - deploy on 
-  1. android (play store)
+  1. android (Play store & F-droid)
   2. windows
   3. linux
   4. web (wasm)

@@ -107,6 +107,36 @@ class SettingsPage extends ConsumerWidget {
 
                                 if (result != null) {
                                   File file = File(result.files.single.path!);
+
+                                  // Validate file to ensure data is clean
+                                  final contents = await file.readAsString();
+                                  List<String> words = contents
+                                      .split('\n')
+                                      .map((e) => e.trim())
+                                      .toList();
+                                  RegExp regExp = RegExp(r'^[a-zA-Z]{5}$');
+
+                                  for (var i = 0; i < words.length; i++) {
+                                    if (!regExp.hasMatch(words[i])) {
+                                      // if word is invalid, show snackbar
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            duration:
+                                                const Duration(seconds: 3),
+                                            content: Text(
+                                              'line: ${i + 1} "${words[i]}" is not valid',
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            behavior: SnackBarBehavior.floating,
+                                          ),
+                                        );
+                                      }
+                                      return;
+                                    }
+                                  }
+
                                   Directory directory =
                                       await getApplicationDocumentsDirectory();
 
@@ -116,6 +146,19 @@ class SettingsPage extends ConsumerWidget {
                                   await WordleService().init();
                                   // Reset grid
                                   ref.read(gridProvider.notifier).resetGrid();
+
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        duration: Duration(seconds: 3),
+                                        content: Text(
+                                          'Success',
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
+                                  }
                                 } else {
                                   // User canceled the picker
                                 }
