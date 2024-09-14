@@ -7,6 +7,12 @@ enum SharedPreferencesKeys {
   /// The wordle date the grid is keep track of
   gameDate,
 
+  /// List<String> : games played, games won, current streak, max streak
+  statsData,
+
+  /// data for Stats graph
+  guessDistribution,
+
   /// Use standard wordle list or custom list
   useCustomList;
 

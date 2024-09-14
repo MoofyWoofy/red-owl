@@ -89,7 +89,7 @@ class SettingsPage extends ConsumerWidget {
                             onPressed: () async {
                               var grid = ref.watch(gridProvider);
                               bool importCustomList = true;
-                              if (grid.tiles.isNotEmpty || grid.isGameOver) {
+                              if (grid.tiles.isNotEmpty && !grid.isGameOver) {
                                 importCustomList = await showDialog(
                                   context: context,
                                   builder: (_) => const GameInProgressDialog(

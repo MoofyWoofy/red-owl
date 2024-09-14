@@ -40,4 +40,12 @@ class SharedPreferenceService {
   void setString(SharedPreferencesKeys key, String val) {
     _prefs.setString(key.toString(), val);
   }
+
+  List<String>? getStringList(SharedPreferencesKeys key) {
+    return _prefs.getStringList(key.toString());
+  }
+
+  void setStringList(SharedPreferencesKeys key, List<String> val) {
+    _prefs.setStringList(key.toString(), val);
+  }
 }

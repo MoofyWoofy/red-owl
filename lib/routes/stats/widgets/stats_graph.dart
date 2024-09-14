@@ -1,7 +1,10 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+import 'dart:math' show max;
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:red_owl/config/shared.dart' show SharedPreferencesKeys;
+import 'package:red_owl/util/misc.dart' show convertListStringToListDouble;
+import 'package:red_owl/util/shared.dart' show SharedPreferenceService;
 
 class StatsGraph extends StatelessWidget {
   const StatsGraph({super.key});
@@ -9,14 +12,30 @@ class StatsGraph extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Padding(
-      padding: EdgeInsets.all(12.0),
+      padding: EdgeInsets.fromLTRB(8, 12, 30, 12),
       child: AspectRatio(aspectRatio: 16 / 9, child: _GuessDistributionChart()),
     );
   }
 }
 
-class _GuessDistributionChart extends StatelessWidget {
+class _GuessDistributionChart extends StatefulWidget {
   const _GuessDistributionChart();
+
+  @override
+  State<_GuessDistributionChart> createState() =>
+      _GuessDistributionChartState();
+}
+
+class _GuessDistributionChartState extends State<_GuessDistributionChart> {
+  late List<String> _arr;
+
+  @override
+  void initState() {
+    super.initState();
+    _arr = SharedPreferenceService()
+            .getStringList(SharedPreferencesKeys.guessDistribution) ??
+        ['0', '0', '0', '0', '0', '0'];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +50,7 @@ class _GuessDistributionChart extends StatelessWidget {
           gridData: const FlGridData(show: false),
           alignment: BarChartAlignment.spaceAround,
           minY: 0,
-          maxY: 100,
+          maxY: convertListStringToListDouble(_arr).reduce(max),
         ),
       ),
     );
@@ -65,9 +84,9 @@ class _GuessDistributionChart extends StatelessWidget {
 
   FlTitlesData titlesData(BuildContext context) {
     return FlTitlesData(
-      leftTitles: AxisTitles(),
-      rightTitles: AxisTitles(),
-      topTitles: AxisTitles(),
+      leftTitles: const AxisTitles(),
+      rightTitles: const AxisTitles(),
+      topTitles: const AxisTitles(),
       bottomTitles: AxisTitles(
         sideTitles: SideTitles(
           showTitles: true,
@@ -93,48 +112,19 @@ class _GuessDistributionChart extends StatelessWidget {
   }
 
   List<BarChartGroupData> barGroups(BuildContext context) {
-    // TODO: return dyanamic data
-    return <BarChartGroupData>[
-      BarChartGroupData(
-        x: 1,
-        barRods: [
-          BarChartRodData(
-            toY: 25,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ],
-        showingTooltipIndicators: [0],
-      ),
-      BarChartGroupData(
-        x: 2,
-        barRods: [
-          BarChartRodData(
-            toY: 62,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ],
-        showingTooltipIndicators: [0],
-      ),
-      BarChartGroupData(
-        x: 3,
-        barRods: [
-          BarChartRodData(
-            toY: 89,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ],
-        showingTooltipIndicators: [0],
-      ),
-      BarChartGroupData(
-        x: 4,
-        barRods: [
-          BarChartRodData(
-            toY: 41,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ],
-        showingTooltipIndicators: [0],
-      ),
-    ];
+    return _arr
+        .asMap()
+        .entries
+        .map((e) => BarChartGroupData(
+              x: e.key + 1,
+              barRods: [
+                BarChartRodData(
+                  toY: double.parse(e.value),
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ],
+              showingTooltipIndicators: [0],
+            ))
+        .toList();
   }
 }

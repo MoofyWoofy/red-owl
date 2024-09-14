@@ -92,6 +92,7 @@ class Grid extends _$Grid {
               notEnoughCharacters: false,
             );
             _updateKeyboard(keyboardStatusTemp);
+            _updateStatsData(gameWon: true);
           } else if (!result.isWordInList) {
             if (context.mounted) {
               showSnackBar(context, "'$guessWord' is not in wordlist");
@@ -125,6 +126,7 @@ class Grid extends _$Grid {
                 isGameWon: false,
                 isGameOver: true,
               );
+              _updateStatsData(gameWon: false);
             }
             state = state.copyWith(
               column: 0,
@@ -182,7 +184,7 @@ class Grid extends _$Grid {
   void resetGrid() {
     // Clear game state from sharedPrefs
     SharedPreferenceService().remove(SharedPreferencesKeys.gridState);
-    
+
     state = models.Grid(
       column: 0,
       row: 0,
@@ -198,5 +200,42 @@ class Grid extends _$Grid {
 
   void _updateKeyboard(Map<String, LetterStatus> keyboardStatus) {
     state = state.copyWith(keyboardStatus: keyboardStatus);
+  }
+
+  void _updateStatsData({required bool gameWon}) {
+    // Get stats data
+    List<String> statsData = SharedPreferenceService()
+            .getStringList(SharedPreferencesKeys.statsData) ??
+        ['0', '0', '0', '0'];
+    // Get guess chart data
+    List<String> guessDistribution = SharedPreferenceService()
+            .getStringList(SharedPreferencesKeys.guessDistribution) ??
+        ['0', '0', '0', '0', '0', '0'];
+
+    // Update stats data
+    var [gamesPlayed, gamesWon, currentStreak, maxStreak] = statsData;
+
+    gamesPlayed = (int.parse(gamesPlayed) + 1).toString();
+
+    if (gameWon) {
+      gamesWon = (int.parse(gamesWon) + 1).toString();
+      currentStreak = (int.parse(currentStreak) + 1).toString();
+
+      // Update stats guess distribution
+      guessDistribution[state.row] =
+          (int.parse(guessDistribution[state.row]) + 1).toString();
+    } else {
+      currentStreak = '0';
+    }
+
+    maxStreak = int.parse(currentStreak) > int.parse(maxStreak)
+        ? currentStreak
+        : maxStreak;
+
+    // Saving stats
+    SharedPreferenceService().setStringList(SharedPreferencesKeys.statsData,
+        [gamesPlayed, gamesWon, currentStreak, maxStreak]);
+    SharedPreferenceService().setStringList(
+        SharedPreferencesKeys.guessDistribution, guessDistribution);
   }
 }

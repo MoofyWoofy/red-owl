@@ -1,12 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:red_owl/config/shared.dart' show SharedPreferencesKeys;
 import 'package:red_owl/routes/stats/widgets/shared.dart';
+import 'package:red_owl/util/shared.dart' show SharedPreferenceService;
 
-class StatsInfo extends StatelessWidget {
+class StatsInfo extends StatefulWidget {
   const StatsInfo({super.key});
 
   @override
+  State<StatsInfo> createState() => _StatsInfoState();
+}
+
+class _StatsInfoState extends State<StatsInfo> {
+  late List<String> arr;
+
+  @override
+  void initState() {
+    super.initState();
+    arr = SharedPreferenceService()
+            .getStringList(SharedPreferencesKeys.statsData) ??
+        ['0', '0', '0', '0'];
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Row(
@@ -15,32 +32,32 @@ class StatsInfo extends StatelessWidget {
           children: [
             Expanded(
               child: StatsText(
-                text: '59',
+                text: arr[0],
                 isTopText: true,
               ),
             ),
             Expanded(
               child: StatsText(
-                text: '85',
+                text: _getWonPercentage(arr[1], arr[0]),
                 isTopText: true,
               ),
             ),
             Expanded(
               child: StatsText(
-                text: '4',
+                text: arr[2],
                 isTopText: true,
               ),
             ),
             Expanded(
               child: StatsText(
-                text: '17',
+                text: arr[3],
                 isTopText: true,
               ),
             ),
           ],
         ),
-        SizedBox(height: 4),
-        Row(
+        const SizedBox(height: 4),
+        const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.max,
           children: [
@@ -72,5 +89,13 @@ class StatsInfo extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+String _getWonPercentage(String wins, String games) {
+  if (wins == '0' && games == '0') {
+    return '0';
+  } else {
+    return (double.parse(wins) / double.parse(games) * 100).round().toString();
   }
 }
