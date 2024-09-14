@@ -24,6 +24,7 @@ samples, guidance on mobile development, and a full API reference.
 
 ## TODO Features:
 - Stats page
+- If today is played show grid result, if user changes to custom word list, it should only go into effect the next day.
 
 
 ## Goals
