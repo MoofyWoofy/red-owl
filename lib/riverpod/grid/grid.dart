@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/widgets.dart' show BuildContext;
+import 'package:red_owl/database/database.dart';
 import 'package:red_owl/util/shared.dart'
     show
         SharedPreferenceService,
@@ -93,6 +94,7 @@ class Grid extends _$Grid {
             );
             _updateKeyboard(keyboardStatusTemp);
             _updateStatsData(gameWon: true);
+            await _addToDatabase(gameWon: true);
           } else if (!result.isWordInList) {
             if (context.mounted) {
               showSnackBar(context, "'$guessWord' is not in wordlist");
@@ -127,6 +129,7 @@ class Grid extends _$Grid {
                 isGameOver: true,
               );
               _updateStatsData(gameWon: false);
+              await _addToDatabase(gameWon: false);
             }
             state = state.copyWith(
               column: 0,
@@ -237,5 +240,15 @@ class Grid extends _$Grid {
         [gamesPlayed, gamesWon, currentStreak, maxStreak]);
     SharedPreferenceService().setStringList(
         SharedPreferencesKeys.guessDistribution, guessDistribution);
+  }
+
+  Future<void> _addToDatabase({required bool gameWon}) async {
+    final database = AppDatabase();
+    await database.into(database.history).insert(HistoryCompanion.insert(
+          word: WordleService().wordOfTheDay.toUpperCase(),
+          date: getDateOnly(DateTime.now()),
+          guessCorrect: gameWon,
+        ));
+    database.close();
   }
 }

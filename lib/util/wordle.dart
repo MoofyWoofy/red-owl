@@ -17,6 +17,8 @@ class WordleService {
   factory WordleService() => _instance;
   WordleService._internal();
 
+  String get wordOfTheDay => _wordOfTheDay;
+
   Future<void> init() async {
     _wordOfTheDay = await _getWordOfTheDay();
     print('wordle ans: $_wordOfTheDay');
@@ -30,8 +32,8 @@ class WordleService {
   }
 
   Future<List<String>> get getWordList async {
-    var useCustomList = SharedPreferenceService()
-        .getBool(SharedPreferencesKeys.useCustomList);
+    var useCustomList =
+        SharedPreferenceService().getBool(SharedPreferencesKeys.useCustomList);
     if (useCustomList != null && useCustomList) {
       Directory directory = await getApplicationDocumentsDirectory();
       try {
