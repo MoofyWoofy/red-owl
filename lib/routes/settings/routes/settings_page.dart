@@ -195,6 +195,7 @@ class SettingsPage extends ConsumerWidget {
                 context: context,
                 applicationIcon: const Logo(size: 75),
                 applicationLegalese: 'Yet another wordle app',
+                applicationVersion: '1.0.0',
               ),
               child: const Padding(
                 padding: EdgeInsets.all(8.0),
