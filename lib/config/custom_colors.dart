@@ -62,8 +62,4 @@ class CustomColors extends ThemeExtension<CustomColors> {
       borderActive: Color.lerp(borderActive, other.borderActive, t),
     );
   }
-
-  // Optional
-  @override
-  String toString() => 'MyColors()';
 }

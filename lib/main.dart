@@ -74,7 +74,7 @@ class HomePage extends StatelessWidget {
                             builder: (context) => const StatsPage()),
                       );
                     },
-                    label: const Text('Status'),
+                    label: const Text('Stats'),
                     icon: const Icon(Icons.bar_chart),
                   ),
                 ],

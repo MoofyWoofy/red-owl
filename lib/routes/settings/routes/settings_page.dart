@@ -8,7 +8,7 @@ import 'package:red_owl/config/shared.dart'
     show SharedPreferencesKeys, BoolFamilyProviderIDs;
 import 'package:red_owl/riverpod/shared.dart'
     show gridProvider, boolFamilyNotifierProvider;
-import 'package:red_owl/routes/settings/routes/view_custom_list.dart';
+import 'package:red_owl/routes/settings/routes/view_custom_wordlist.dart';
 import 'package:red_owl/routes/settings/widgets/shared.dart'
     show GameInProgressDialog, SwitchItem;
 import 'package:red_owl/util/shared.dart' show WordleService;
@@ -194,6 +194,7 @@ class SettingsPage extends ConsumerWidget {
               onPressed: () => showAboutDialog(
                 context: context,
                 applicationIcon: const Logo(size: 75),
+                applicationLegalese: 'Yet another wordle app',
               ),
               child: const Padding(
                 padding: EdgeInsets.all(8.0),

@@ -12,7 +12,6 @@ class WordleService {
   /// Word of the day
   late String _wordOfTheDay;
 
-  // ? WTF is this magic
   static final WordleService _instance = WordleService._internal();
   factory WordleService() => _instance;
   WordleService._internal();
@@ -21,7 +20,6 @@ class WordleService {
 
   Future<void> init() async {
     _wordOfTheDay = await _getWordOfTheDay();
-    print('wordle ans: $_wordOfTheDay');
   }
 
   Future<String> _getWordOfTheDay() async {
