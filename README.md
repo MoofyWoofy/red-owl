@@ -8,11 +8,7 @@ Yet another wordle app. Red owl is an angram of wordle.
 - View stats
 - Light/Dark mode
 
-## Goals
-- learn test library
 
-- deploy on 
-  1. android (Play store & F-droid)
-  2. windows
-  3. linux
-  4. web (wasm)
+Inspired from
+- [NYT Games](https://play.google.com/store/apps/details?id=com.nytimes.crossword)
+- [Wordly](https://play.google.com/store/apps/details?id=com.appchirp.wordle)

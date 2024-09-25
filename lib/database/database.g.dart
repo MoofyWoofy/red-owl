@@ -87,8 +87,13 @@ class $HistoryTable extends History with TableInfo<$HistoryTable, HistoryData> {
 }
 
 class HistoryData extends DataClass implements Insertable<HistoryData> {
+  /// The wordle word.
   final String word;
+
+  /// Did user guess correctly?
   final bool guessCorrect;
+
+  /// The date the game was played.
   final DateTime date;
   const HistoryData(
       {required this.word, required this.guessCorrect, required this.date});

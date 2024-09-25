@@ -11,6 +11,7 @@ import 'package:red_owl/riverpod/shared.dart'
 import 'package:red_owl/routes/settings/routes/view_custom_wordlist.dart';
 import 'package:red_owl/routes/settings/widgets/shared.dart'
     show GameInProgressDialog, SwitchItem;
+import 'package:red_owl/util/misc.dart' show isGameInProgress;
 import 'package:red_owl/util/shared.dart' show WordleService;
 import 'package:red_owl/widgets/shared.dart' show Logo, appBar;
 
@@ -50,7 +51,7 @@ class SettingsPage extends ConsumerWidget {
                       callback: (value) async {
                         var grid = ref.watch(gridProvider);
                         bool updateCustomList = true;
-                        if (grid.tiles.isNotEmpty && !grid.isGameOver) {
+                        if (isGameInProgress(grid)) {
                           updateCustomList = await showDialog(
                                 context: context,
                                 builder: (_) => const GameInProgressDialog(
@@ -89,7 +90,7 @@ class SettingsPage extends ConsumerWidget {
                             onPressed: () async {
                               var grid = ref.watch(gridProvider);
                               bool importCustomList = true;
-                              if (grid.tiles.isNotEmpty && !grid.isGameOver) {
+                              if (isGameInProgress(grid)) {
                                 importCustomList = await showDialog(
                                   context: context,
                                   builder: (_) => const GameInProgressDialog(
