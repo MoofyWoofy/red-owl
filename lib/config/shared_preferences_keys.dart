@@ -14,8 +14,5 @@ enum SharedPreferencesKeys {
   guessDistribution,
 
   /// Use standard wordle list or custom list
-  useCustomList;
-
-  @override
-  String toString() => name;
+  useCustomList,
 }

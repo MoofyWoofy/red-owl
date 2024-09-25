@@ -16,36 +16,36 @@ class SharedPreferenceService {
       cacheOptions: SharedPreferencesWithCacheOptions(
         // When an allowlist is included, any keys that aren't included cannot be used.
         allowList:
-            SharedPreferencesKeys.values.map((e) => e.toString()).toSet(),
+            SharedPreferencesKeys.values.map((e) => e.name).toSet(),
       ),
     );
   }
 
   Future<void> remove(SharedPreferencesKeys key) async {
-    await _prefs.remove(key.toString());
+    await _prefs.remove(key.name);
   }
 
   bool? getBool(SharedPreferencesKeys key) {
-    return _prefs.getBool(key.toString());
+    return _prefs.getBool(key.name);
   }
 
   void setBool(SharedPreferencesKeys key, bool val) {
-    _prefs.setBool(key.toString(), val);
+    _prefs.setBool(key.name, val);
   }
 
   String? getString(SharedPreferencesKeys key) {
-    return _prefs.getString(key.toString());
+    return _prefs.getString(key.name);
   }
 
   void setString(SharedPreferencesKeys key, String val) {
-    _prefs.setString(key.toString(), val);
+    _prefs.setString(key.name, val);
   }
 
   List<String>? getStringList(SharedPreferencesKeys key) {
-    return _prefs.getStringList(key.toString());
+    return _prefs.getStringList(key.name);
   }
 
   void setStringList(SharedPreferencesKeys key, List<String> val) {
-    _prefs.setStringList(key.toString(), val);
+    _prefs.setStringList(key.name, val);
   }
 }
