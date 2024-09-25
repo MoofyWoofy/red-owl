@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:red_owl/config/shared.dart'
     show SharedPreferencesKeys, BoolFamilyProviderIDs;
@@ -192,12 +193,17 @@ class SettingsPage extends ConsumerWidget {
                 splashFactory: NoSplash.splashFactory,
                 overlayColor: Colors.transparent,
               ),
-              onPressed: () => showAboutDialog(
-                context: context,
-                applicationIcon: const Logo(size: 75),
-                applicationLegalese: 'Yet another wordle app',
-                applicationVersion: '1.0.0',
-              ),
+              onPressed: () async {
+                PackageInfo packageInfo = await PackageInfo.fromPlatform();
+                if (context.mounted) {
+                  showAboutDialog(
+                    context: context,
+                    applicationIcon: const Logo(size: 75),
+                    applicationLegalese: 'Yet another wordle app',
+                    applicationVersion: packageInfo.version,
+                  );
+                }
+              },
               child: const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Text('About'),
