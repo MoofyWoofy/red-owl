@@ -16,22 +16,21 @@ class $HistoryTable extends History with TableInfo<$HistoryTable, HistoryData> {
           GeneratedColumn.checkTextLength(minTextLength: 5, maxTextLength: 5),
       type: DriftSqlType.string,
       requiredDuringInsert: true);
-  static const VerificationMeta _guessCorrectMeta =
-      const VerificationMeta('guessCorrect');
+  static const VerificationMeta _gameStateMeta =
+      const VerificationMeta('gameState');
   @override
-  late final GeneratedColumn<bool> guessCorrect = GeneratedColumn<bool>(
-      'guess_correct', aliasedName, false,
-      type: DriftSqlType.bool,
-      requiredDuringInsert: true,
-      defaultConstraints: GeneratedColumn.constraintIsAlways(
-          'CHECK ("guess_correct" IN (0, 1))'));
+  late final GeneratedColumn<String> gameState = GeneratedColumn<String>(
+      'game_state', aliasedName, false,
+      check: () => gameState.isIn(GameState.values.map((v) => v.name).toList()),
+      type: DriftSqlType.string,
+      requiredDuringInsert: true);
   static const VerificationMeta _dateMeta = const VerificationMeta('date');
   @override
   late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
       'date', aliasedName, false,
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
   @override
-  List<GeneratedColumn> get $columns => [word, guessCorrect, date];
+  List<GeneratedColumn> get $columns => [word, gameState, date];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -48,13 +47,11 @@ class $HistoryTable extends History with TableInfo<$HistoryTable, HistoryData> {
     } else if (isInserting) {
       context.missing(_wordMeta);
     }
-    if (data.containsKey('guess_correct')) {
-      context.handle(
-          _guessCorrectMeta,
-          guessCorrect.isAcceptableOrUnknown(
-              data['guess_correct']!, _guessCorrectMeta));
+    if (data.containsKey('game_state')) {
+      context.handle(_gameStateMeta,
+          gameState.isAcceptableOrUnknown(data['game_state']!, _gameStateMeta));
     } else if (isInserting) {
-      context.missing(_guessCorrectMeta);
+      context.missing(_gameStateMeta);
     }
     if (data.containsKey('date')) {
       context.handle(
@@ -73,8 +70,8 @@ class $HistoryTable extends History with TableInfo<$HistoryTable, HistoryData> {
     return HistoryData(
       word: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}word'])!,
-      guessCorrect: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}guess_correct'])!,
+      gameState: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}game_state'])!,
       date: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}date'])!,
     );
@@ -91,17 +88,17 @@ class HistoryData extends DataClass implements Insertable<HistoryData> {
   final String word;
 
   /// Did user guess correctly?
-  final bool guessCorrect;
+  final String gameState;
 
   /// The date the game was played.
   final DateTime date;
   const HistoryData(
-      {required this.word, required this.guessCorrect, required this.date});
+      {required this.word, required this.gameState, required this.date});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['word'] = Variable<String>(word);
-    map['guess_correct'] = Variable<bool>(guessCorrect);
+    map['game_state'] = Variable<String>(gameState);
     map['date'] = Variable<DateTime>(date);
     return map;
   }
@@ -109,7 +106,7 @@ class HistoryData extends DataClass implements Insertable<HistoryData> {
   HistoryCompanion toCompanion(bool nullToAbsent) {
     return HistoryCompanion(
       word: Value(word),
-      guessCorrect: Value(guessCorrect),
+      gameState: Value(gameState),
       date: Value(date),
     );
   }
@@ -119,7 +116,7 @@ class HistoryData extends DataClass implements Insertable<HistoryData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return HistoryData(
       word: serializer.fromJson<String>(json['word']),
-      guessCorrect: serializer.fromJson<bool>(json['guessCorrect']),
+      gameState: serializer.fromJson<String>(json['gameState']),
       date: serializer.fromJson<DateTime>(json['date']),
     );
   }
@@ -128,23 +125,21 @@ class HistoryData extends DataClass implements Insertable<HistoryData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'word': serializer.toJson<String>(word),
-      'guessCorrect': serializer.toJson<bool>(guessCorrect),
+      'gameState': serializer.toJson<String>(gameState),
       'date': serializer.toJson<DateTime>(date),
     };
   }
 
-  HistoryData copyWith({String? word, bool? guessCorrect, DateTime? date}) =>
+  HistoryData copyWith({String? word, String? gameState, DateTime? date}) =>
       HistoryData(
         word: word ?? this.word,
-        guessCorrect: guessCorrect ?? this.guessCorrect,
+        gameState: gameState ?? this.gameState,
         date: date ?? this.date,
       );
   HistoryData copyWithCompanion(HistoryCompanion data) {
     return HistoryData(
       word: data.word.present ? data.word.value : this.word,
-      guessCorrect: data.guessCorrect.present
-          ? data.guessCorrect.value
-          : this.guessCorrect,
+      gameState: data.gameState.present ? data.gameState.value : this.gameState,
       date: data.date.present ? data.date.value : this.date,
     );
   }
@@ -153,51 +148,51 @@ class HistoryData extends DataClass implements Insertable<HistoryData> {
   String toString() {
     return (StringBuffer('HistoryData(')
           ..write('word: $word, ')
-          ..write('guessCorrect: $guessCorrect, ')
+          ..write('gameState: $gameState, ')
           ..write('date: $date')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(word, guessCorrect, date);
+  int get hashCode => Object.hash(word, gameState, date);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is HistoryData &&
           other.word == this.word &&
-          other.guessCorrect == this.guessCorrect &&
+          other.gameState == this.gameState &&
           other.date == this.date);
 }
 
 class HistoryCompanion extends UpdateCompanion<HistoryData> {
   final Value<String> word;
-  final Value<bool> guessCorrect;
+  final Value<String> gameState;
   final Value<DateTime> date;
   final Value<int> rowid;
   const HistoryCompanion({
     this.word = const Value.absent(),
-    this.guessCorrect = const Value.absent(),
+    this.gameState = const Value.absent(),
     this.date = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   HistoryCompanion.insert({
     required String word,
-    required bool guessCorrect,
+    required String gameState,
     required DateTime date,
     this.rowid = const Value.absent(),
   })  : word = Value(word),
-        guessCorrect = Value(guessCorrect),
+        gameState = Value(gameState),
         date = Value(date);
   static Insertable<HistoryData> custom({
     Expression<String>? word,
-    Expression<bool>? guessCorrect,
+    Expression<String>? gameState,
     Expression<DateTime>? date,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (word != null) 'word': word,
-      if (guessCorrect != null) 'guess_correct': guessCorrect,
+      if (gameState != null) 'game_state': gameState,
       if (date != null) 'date': date,
       if (rowid != null) 'rowid': rowid,
     });
@@ -205,12 +200,12 @@ class HistoryCompanion extends UpdateCompanion<HistoryData> {
 
   HistoryCompanion copyWith(
       {Value<String>? word,
-      Value<bool>? guessCorrect,
+      Value<String>? gameState,
       Value<DateTime>? date,
       Value<int>? rowid}) {
     return HistoryCompanion(
       word: word ?? this.word,
-      guessCorrect: guessCorrect ?? this.guessCorrect,
+      gameState: gameState ?? this.gameState,
       date: date ?? this.date,
       rowid: rowid ?? this.rowid,
     );
@@ -222,8 +217,8 @@ class HistoryCompanion extends UpdateCompanion<HistoryData> {
     if (word.present) {
       map['word'] = Variable<String>(word.value);
     }
-    if (guessCorrect.present) {
-      map['guess_correct'] = Variable<bool>(guessCorrect.value);
+    if (gameState.present) {
+      map['game_state'] = Variable<String>(gameState.value);
     }
     if (date.present) {
       map['date'] = Variable<DateTime>(date.value);
@@ -238,7 +233,7 @@ class HistoryCompanion extends UpdateCompanion<HistoryData> {
   String toString() {
     return (StringBuffer('HistoryCompanion(')
           ..write('word: $word, ')
-          ..write('guessCorrect: $guessCorrect, ')
+          ..write('gameState: $gameState, ')
           ..write('date: $date, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -259,13 +254,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 
 typedef $$HistoryTableCreateCompanionBuilder = HistoryCompanion Function({
   required String word,
-  required bool guessCorrect,
+  required String gameState,
   required DateTime date,
   Value<int> rowid,
 });
 typedef $$HistoryTableUpdateCompanionBuilder = HistoryCompanion Function({
   Value<String> word,
-  Value<bool> guessCorrect,
+  Value<String> gameState,
   Value<DateTime> date,
   Value<int> rowid,
 });
@@ -278,8 +273,8 @@ class $$HistoryTableFilterComposer
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
-  ColumnFilters<bool> get guessCorrect => $state.composableBuilder(
-      column: $state.table.guessCorrect,
+  ColumnFilters<String> get gameState => $state.composableBuilder(
+      column: $state.table.gameState,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
@@ -297,8 +292,8 @@ class $$HistoryTableOrderingComposer
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
-  ColumnOrderings<bool> get guessCorrect => $state.composableBuilder(
-      column: $state.table.guessCorrect,
+  ColumnOrderings<String> get gameState => $state.composableBuilder(
+      column: $state.table.gameState,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
@@ -329,25 +324,25 @@ class $$HistoryTableTableManager extends RootTableManager<
               $$HistoryTableOrderingComposer(ComposerState(db, table)),
           updateCompanionCallback: ({
             Value<String> word = const Value.absent(),
-            Value<bool> guessCorrect = const Value.absent(),
+            Value<String> gameState = const Value.absent(),
             Value<DateTime> date = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               HistoryCompanion(
             word: word,
-            guessCorrect: guessCorrect,
+            gameState: gameState,
             date: date,
             rowid: rowid,
           ),
           createCompanionCallback: ({
             required String word,
-            required bool guessCorrect,
+            required String gameState,
             required DateTime date,
             Value<int> rowid = const Value.absent(),
           }) =>
               HistoryCompanion.insert(
             word: word,
-            guessCorrect: guessCorrect,
+            gameState: gameState,
             date: date,
             rowid: rowid,
           ),

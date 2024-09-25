@@ -19,13 +19,14 @@ class WordleService {
   String get wordOfTheDay => _wordOfTheDay;
 
   Future<void> init() async {
-    _wordOfTheDay = await _getWordOfTheDay();
+    _wordOfTheDay = await getWordOfTheDay();
   }
 
-  Future<String> _getWordOfTheDay() async {
+  /// if [wordDate] is null, get today's word else get word for that particular date.
+  Future<String> getWordOfTheDay([DateTime? wordDate]) async {
     final wordlist = await getWordList;
-    final random =
-        math.Random(int.parse(DateFormat('yyyyMMdd').format(DateTime.now())));
+    final date = wordDate ?? DateTime.now();
+    final random = math.Random(int.parse(DateFormat('yyyyMMdd').format(date)));
     return wordlist[random.nextInt(wordlist.length)].trim().toUpperCase();
   }
 

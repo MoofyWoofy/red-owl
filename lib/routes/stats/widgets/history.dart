@@ -82,16 +82,39 @@ class _HistoryCard extends ConsumerWidget {
       sharedPrefsKey: SharedPreferencesKeys.isDarkMode,
     ));
 
+    Color? backgroundColor;
+    final gameState = GameState.values.byName(historyItem.gameState);
+
+    if (isDarkMode) {
+      switch (gameState) {
+        case GameState.won:
+          backgroundColor = const Color.fromRGBO(0, 76, 48, 1);
+          break;
+        case GameState.lost:
+          backgroundColor = const Color.fromRGBO(101, 10, 30, 1);
+          break;
+        case GameState.incomplete:
+          backgroundColor = const Color.fromRGBO(180, 145, 0, 1);
+          break;
+      }
+    } else {
+      switch (gameState) {
+        case GameState.won:
+          backgroundColor = const Color.fromRGBO(72, 199, 142, 1);
+          break;
+        case GameState.lost:
+          backgroundColor = const Color.fromRGBO(255, 82, 113, 1);
+          break;
+        case GameState.incomplete:
+          backgroundColor = const Color.fromRGBO(255, 193, 0, 1);
+          break;
+      }
+    }
+
     return Container(
       decoration: BoxDecoration(
           //* Testing colors
-          color: historyItem.guessCorrect
-              ? (isDarkMode
-                  ? const Color.fromRGBO(0, 76, 48, 1)
-                  : const Color.fromRGBO(72, 199, 142, 1))
-              : (isDarkMode
-                  ? const Color.fromRGBO(101, 10, 30, 1)
-                  : const Color.fromRGBO(255, 82, 113, 1)),
+          color: backgroundColor,
           borderRadius: BorderRadius.circular(4)),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       margin: const EdgeInsets.symmetric(horizontal: 8),

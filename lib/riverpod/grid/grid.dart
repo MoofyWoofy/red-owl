@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/widgets.dart' show BuildContext;
 import 'package:red_owl/database/database.dart';
+import 'package:red_owl/util/misc.dart';
 import 'package:red_owl/util/shared.dart'
     show
         SharedPreferenceService,
@@ -34,6 +35,21 @@ class Grid extends _$Grid {
     DateTime today = getDateOnly(DateTime.now());
 
     if (gameDate != today) {
+      if (gridBase64 != null) {
+        // Fail safe check ^^^, probably not needed
+        String gridJsonString = utf8.decode(base64.decode(gridBase64));
+        final grid = models.Grid.fromJson(jsonDecode(gridJsonString));
+        if (!grid.isGameOver) {
+          // if game is not over, save game history to db as incomplete
+          _addToDatabase(gameState: GameState.incomplete, date: gameDate);
+        }
+      }
+
+      // Set gameDate to today in Share prefs & variable
+      SharedPreferenceService().setString(
+          SharedPreferencesKeys.gameDate, dateToString(DateTime.now()));
+      gameDate = getDateOnly(DateTime.now());
+
       gridBase64 = null;
       // Clear shared prefs
       SharedPreferenceService().remove(SharedPreferencesKeys.gridState);
@@ -94,7 +110,7 @@ class Grid extends _$Grid {
             );
             _updateKeyboard(keyboardStatusTemp);
             _updateStatsData(gameWon: true);
-            await _addToDatabase(gameWon: true);
+            await _addToDatabase(gameState: GameState.won);
           } else if (!result.isWordInList) {
             if (context.mounted) {
               showSnackBar(context, "'$guessWord' is not in wordlist");
@@ -129,7 +145,7 @@ class Grid extends _$Grid {
                 isGameOver: true,
               );
               _updateStatsData(gameWon: false);
-              await _addToDatabase(gameWon: false);
+              await _addToDatabase(gameState: GameState.lost);
             }
             state = state.copyWith(
               column: 0,
@@ -242,12 +258,17 @@ class Grid extends _$Grid {
         SharedPreferencesKeys.guessDistribution, guessDistribution);
   }
 
-  Future<void> _addToDatabase({required bool gameWon}) async {
+  Future<void> _addToDatabase({
+    required GameState gameState,
+    DateTime? date,
+  }) async {
+    final word = await WordleService().getWordOfTheDay(date);
+
     final database = AppDatabase();
     await database.into(database.history).insert(HistoryCompanion.insert(
-          word: WordleService().wordOfTheDay.toUpperCase(),
-          date: getDateOnly(DateTime.now()),
-          guessCorrect: gameWon,
+          word: word,
+          date: getDateOnly(date ?? DateTime.now()),
+          gameState: gameState.name,
         ));
     database.close();
   }
