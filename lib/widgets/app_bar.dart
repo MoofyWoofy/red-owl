@@ -8,6 +8,7 @@ AppBar appBar({
   bool automaticallyImplyLeading = true,
   bool centerTitle = true,
   bool showCancelIcon = false,
+  List<Widget> widgets = const [],
 }) {
   return AppBar(
     title: Text(title),
@@ -15,6 +16,7 @@ AppBar appBar({
     automaticallyImplyLeading: automaticallyImplyLeading,
     elevation: 4,
     actions: [
+      ...widgets,
       if (showSettingIcon) ...[
         IconButton(
           icon: const Icon(Icons.settings),

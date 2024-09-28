@@ -20,3 +20,12 @@ List<double> convertListStringToListDouble(List<String> arg) =>
 bool isGameInProgress(Grid grid) {
   return grid.tiles.isNotEmpty && !grid.isGameOver;
 }
+
+/// returns win rate from 0 - 100... eg: 75
+String getWinRate(String wins, String games) {
+  if (wins == '0' && games == '0') {
+    return '0';
+  } else {
+    return (double.parse(wins) / double.parse(games) * 100).round().toString();
+  }
+}

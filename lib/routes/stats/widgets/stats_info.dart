@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:red_owl/config/shared.dart' show SharedPreferencesKeys;
 import 'package:red_owl/routes/stats/widgets/shared.dart';
-import 'package:red_owl/util/shared.dart' show SharedPreferenceService;
+import 'package:red_owl/util/shared.dart'
+    show SharedPreferenceService, getWinRate;
 
 class StatsInfo extends StatefulWidget {
   const StatsInfo({super.key});
@@ -38,7 +39,7 @@ class _StatsInfoState extends State<StatsInfo> {
             ),
             Expanded(
               child: StatsText(
-                text: _getWonPercentage(arr[1], arr[0]),
+                text: getWinRate(arr[1], arr[0]),
                 isTopText: true,
               ),
             ),
@@ -89,13 +90,5 @@ class _StatsInfoState extends State<StatsInfo> {
         ),
       ],
     );
-  }
-}
-
-String _getWonPercentage(String wins, String games) {
-  if (wins == '0' && games == '0') {
-    return '0';
-  } else {
-    return (double.parse(wins) / double.parse(games) * 100).round().toString();
   }
 }
