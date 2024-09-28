@@ -3,12 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart'
     show KeyDownEvent, KeyRepeatEvent, KeyUpEvent, ServicesBinding;
 import 'package:red_owl/config/shared.dart'
-    show LetterStatus, animationTiming, keyboardStatus;
+    show CustomColors, LetterStatus, animationTiming, keyboardStatus;
 import 'package:red_owl/riverpod/shared.dart' show gridProvider;
-import 'package:red_owl/routes/game/widgets/shared.dart'
-    show BounceAnimation, KeyboardRow, PopInAnimation, ShakeAnimation, Tile;
+import 'package:red_owl/routes/game/widgets/shared.dart';
 import 'package:red_owl/util/shared.dart' show dateToString;
-import 'package:red_owl/widgets/shared.dart' show appBar;
+import 'package:red_owl/widgets/shared.dart' show HelpIconButton, appBar;
 
 class WordlePage extends ConsumerStatefulWidget {
   const WordlePage({super.key, required this.gameType});
@@ -53,6 +52,118 @@ class _WordlePageState extends ConsumerState<WordlePage> {
         context: context,
         title: dateToString(DateTime.now()),
         showSettingIcon: true,
+        widgets: [
+          HelpIconButton(
+            title: "HOW TO PLAY",
+            body: [
+              const Text('You have 6 tries to guess the word.'),
+              const SizedBox(height: 10),
+              const Text(
+                  'The color of the letters will change to show how if they are correct.'),
+              const SizedBox(height: 10),
+              const Divider(),
+              const Text('Example:'),
+              const SizedBox(height: 5),
+              Row(
+                children: [
+                  HelpTile(
+                      background: Theme.of(context)
+                          .extension<CustomColors>()!
+                          .notInWord!,
+                      letter: 'S'),
+                  const SizedBox(width: 5),
+                  HelpTile(
+                      background: Theme.of(context)
+                          .extension<CustomColors>()!
+                          .notInWord!,
+                      letter: 'T'),
+                  const SizedBox(width: 5),
+                  HelpTile(
+                      background:
+                          Theme.of(context).extension<CustomColors>()!.green!,
+                      letter: 'A'),
+                  const SizedBox(width: 5),
+                  HelpTile(
+                      background:
+                          Theme.of(context).extension<CustomColors>()!.yellow!,
+                      letter: 'R'),
+                  const SizedBox(width: 5),
+                  HelpTile(
+                      background: Theme.of(context)
+                          .extension<CustomColors>()!
+                          .notInWord!,
+                      letter: 'E'),
+                ],
+              ),
+              RichText(
+                text: TextSpan(
+                  style: Theme.of(context).textTheme.bodyLarge,
+                  children: [
+                    TextSpan(
+                      text: 'A',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                    const TextSpan(
+                      text:
+                          ' is green, because it is in the word and in the correct spot.',
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              RichText(
+                text: TextSpan(
+                  style: Theme.of(context).textTheme.bodyLarge,
+                  children: [
+                    TextSpan(
+                      text: 'R',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                    const TextSpan(
+                      text:
+                          ' is yellow, because it is in the word but in the wrong spot.',
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              RichText(
+                text: TextSpan(
+                  style: Theme.of(context).textTheme.bodyLarge,
+                  children: [
+                    TextSpan(
+                      text: 'S',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                    const TextSpan(text: ', '),
+                    TextSpan(
+                      text: 'T',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                    const TextSpan(text: ', '),
+                    TextSpan(
+                      text: 'E',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                    const TextSpan(
+                      text: ' are gray, because they are not in the word.',
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          )
+        ],
       ),
       body: Column(
         children: [

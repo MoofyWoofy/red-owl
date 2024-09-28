@@ -4,3 +4,4 @@ export 'letter.dart';
 export 'animations/pop_in.dart';
 export 'animations/bounce.dart';
 export 'animations/shake.dart';
+export 'help_tile.dart';
