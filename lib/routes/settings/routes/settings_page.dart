@@ -15,6 +15,7 @@ import 'package:red_owl/routes/settings/widgets/shared.dart'
 import 'package:red_owl/util/misc.dart' show isGameInProgress;
 import 'package:red_owl/util/shared.dart' show WordleService;
 import 'package:red_owl/widgets/shared.dart' show Logo, appBar;
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -199,8 +200,23 @@ class SettingsPage extends ConsumerWidget {
                   showAboutDialog(
                     context: context,
                     applicationIcon: const Logo(size: 75),
-                    applicationLegalese: 'Yet another wordle app',
                     applicationVersion: packageInfo.version,
+                    children: [
+                      const Text(
+                        'Yet another wordle app',
+                        textAlign: TextAlign.center,
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          final uri = Uri.parse(
+                              'https://moofywoofy.github.io/red-owl/');
+                          if (!await launchUrl(uri)) {
+                            throw Exception('Could not launch $uri');
+                          }
+                        },
+                        child: const Text('Privacy Policy'),
+                      )
+                    ],
                   );
                 }
               },
