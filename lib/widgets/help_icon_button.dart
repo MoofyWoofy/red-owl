@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 class HelpIconButton extends StatelessWidget {
   const HelpIconButton({
     super.key,
-    required this.title,
+    this.title,
     required this.body,
   });
-  final String title;
+  final String? title;
   final List<Widget> body;
 
   @override
@@ -17,7 +17,9 @@ class HelpIconButton extends StatelessWidget {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text(title, textAlign: TextAlign.center),
+              title: title == null
+                  ? null
+                  : Text(title!, textAlign: TextAlign.center),
               content: SingleChildScrollView(
                 child: ListBody(
                   children: body,

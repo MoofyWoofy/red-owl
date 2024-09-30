@@ -9,6 +9,9 @@ class CustomColors extends ThemeExtension<CustomColors> {
     required this.notInWord,
     required this.borderInactive,
     required this.borderActive,
+    required this.historyGreen,
+    required this.historyRed,
+    required this.historyYellow,
   });
 
   /// Initial color for keyboard
@@ -29,6 +32,10 @@ class CustomColors extends ThemeExtension<CustomColors> {
   /// Border colors for tile
   final Color? borderActive;
 
+  final Color? historyGreen;
+  final Color? historyRed;
+  final Color? historyYellow;
+
   @override
   CustomColors copyWith({
     Color? initial,
@@ -37,6 +44,9 @@ class CustomColors extends ThemeExtension<CustomColors> {
     Color? notInWord,
     Color? borderInactive,
     Color? borderActive,
+    Color? historyGreen,
+    Color? historyRed,
+    Color? historyYellow,
   }) {
     return CustomColors(
       initial: initial ?? this.initial,
@@ -45,6 +55,9 @@ class CustomColors extends ThemeExtension<CustomColors> {
       notInWord: notInWord ?? this.notInWord,
       borderInactive: borderInactive ?? this.borderInactive,
       borderActive: borderActive ?? this.borderActive,
+      historyGreen: historyGreen ?? this.historyGreen,
+      historyRed: historyRed ?? this.historyRed,
+      historyYellow: historyYellow ?? this.historyYellow,
     );
   }
 
@@ -60,6 +73,9 @@ class CustomColors extends ThemeExtension<CustomColors> {
       notInWord: Color.lerp(notInWord, other.notInWord, t),
       borderInactive: Color.lerp(borderInactive, other.borderInactive, t),
       borderActive: Color.lerp(borderActive, other.borderActive, t),
+      historyGreen: Color.lerp(historyGreen, other.historyGreen, t),
+      historyRed: Color.lerp(historyRed, other.historyGreen, t),
+      historyYellow: Color.lerp(historyYellow, other.historyGreen, t),
     );
   }
 }
