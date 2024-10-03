@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:red_owl/config/shared.dart' show CustomColors, LetterStatus;
+import 'package:red_owl/config/shared.dart' show GameColors, LetterStatus;
 import 'package:red_owl/riverpod/shared.dart';
 
 class Letter extends ConsumerWidget {
@@ -14,20 +14,20 @@ class Letter extends ConsumerWidget {
     var grid = ref.watch(gridProvider);
     switch (grid.keyboardStatus[letter]) {
       case LetterStatus.initial:
-        backgroundColor = Theme.of(context).extension<CustomColors>()?.initial;
+        backgroundColor = Theme.of(context).extension<GameColors>()?.initial;
         break;
       case LetterStatus.green:
-        backgroundColor = Theme.of(context).extension<CustomColors>()?.green;
+        backgroundColor = Theme.of(context).extension<GameColors>()?.green;
         textColor = Colors.white;
         break;
       case LetterStatus.yellow:
-        backgroundColor = Theme.of(context).extension<CustomColors>()?.yellow;
+        backgroundColor = Theme.of(context).extension<GameColors>()?.yellow;
         textColor = Colors.white;
         break;
       case LetterStatus.notInWord:
       case null:
         backgroundColor =
-            Theme.of(context).extension<CustomColors>()?.notInWord;
+            Theme.of(context).extension<GameColors>()?.notInWord;
         textColor = Colors.white;
         break;
     }

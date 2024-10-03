@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart'
     show KeyDownEvent, KeyRepeatEvent, KeyUpEvent, ServicesBinding;
 import 'package:red_owl/config/shared.dart'
-    show CustomColors, LetterStatus, animationTiming, keyboardStatus;
+    show GameColors, LetterStatus, animationTiming, keyboardStatus;
 import 'package:red_owl/riverpod/shared.dart' show gridProvider;
 import 'package:red_owl/routes/game/widgets/shared.dart';
 import 'package:red_owl/util/shared.dart' show dateToString;
@@ -68,29 +68,29 @@ class _WordlePageState extends ConsumerState<WordlePage> {
                 children: [
                   HelpTile(
                       background: Theme.of(context)
-                          .extension<CustomColors>()!
+                          .extension<GameColors>()!
                           .notInWord!,
                       letter: 'S'),
                   const SizedBox(width: 5),
                   HelpTile(
                       background: Theme.of(context)
-                          .extension<CustomColors>()!
+                          .extension<GameColors>()!
                           .notInWord!,
                       letter: 'T'),
                   const SizedBox(width: 5),
                   HelpTile(
                       background:
-                          Theme.of(context).extension<CustomColors>()!.green!,
+                          Theme.of(context).extension<GameColors>()!.green!,
                       letter: 'A'),
                   const SizedBox(width: 5),
                   HelpTile(
                       background:
-                          Theme.of(context).extension<CustomColors>()!.yellow!,
+                          Theme.of(context).extension<GameColors>()!.yellow!,
                       letter: 'R'),
                   const SizedBox(width: 5),
                   HelpTile(
                       background: Theme.of(context)
-                          .extension<CustomColors>()!
+                          .extension<GameColors>()!
                           .notInWord!,
                       letter: 'E'),
                 ],

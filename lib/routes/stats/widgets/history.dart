@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
-import 'package:red_owl/config/shared.dart' show CustomColors;
+import 'package:red_owl/config/shared.dart' show HistoryColors;
 import 'package:red_owl/database/database.dart';
 import 'package:red_owl/routes/stats/widgets/history_tile.dart';
 import 'package:red_owl/util/shared.dart' show dateToString;
@@ -67,15 +67,15 @@ class _HistoryState extends State<History> {
             switch (gameState) {
               case GameState.won:
                 backgroundColor =
-                    Theme.of(context).extension<CustomColors>()!.historyGreen!;
+                    Theme.of(context).extension<HistoryColors>()!.green!;
                 break;
               case GameState.lost:
                 backgroundColor =
-                    Theme.of(context).extension<CustomColors>()!.historyRed!;
+                    Theme.of(context).extension<HistoryColors>()!.red!;
                 break;
               case GameState.incomplete:
                 backgroundColor =
-                    Theme.of(context).extension<CustomColors>()!.historyYellow!;
+                    Theme.of(context).extension<HistoryColors>()!.yellow!;
                 break;
             }
 

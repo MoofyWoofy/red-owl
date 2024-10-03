@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:red_owl/config/shared.dart'
-    show CustomColors, SharedPreferencesKeys;
+    show HistoryColors, SharedPreferencesKeys;
 import 'package:red_owl/routes/stats/widgets/shared.dart';
 import 'package:red_owl/util/shared.dart'
     show SharedPreferenceService, getWinRate;
@@ -48,8 +48,8 @@ Check out my Wordle! stats!
                       text: 'Green',
                       style: TextStyle(
                           backgroundColor: Theme.of(context)
-                              .extension<CustomColors>()!
-                              .historyGreen),
+                              .extension<HistoryColors>()!
+                              .green),
                     ),
                     TextSpan(
                       text: ' means you guessed correctly.',
@@ -67,8 +67,8 @@ Check out my Wordle! stats!
                       text: 'Yellow',
                       style: TextStyle(
                           backgroundColor: Theme.of(context)
-                              .extension<CustomColors>()!
-                              .historyYellow),
+                              .extension<HistoryColors>()!
+                              .yellow),
                     ),
                     TextSpan(
                       text: ' means the game was incomplete.',
@@ -86,8 +86,8 @@ Check out my Wordle! stats!
                       text: 'Red',
                       style: TextStyle(
                           backgroundColor: Theme.of(context)
-                              .extension<CustomColors>()!
-                              .historyRed),
+                              .extension<HistoryColors>()!
+                              .red),
                     ),
                     TextSpan(
                       text: " means you didn't guess the word.",
@@ -105,21 +105,21 @@ Check out my Wordle! stats!
                 dateString: '2024-05-23',
                 word: 'BURNT',
                 backgroundColor:
-                    Theme.of(context).extension<CustomColors>()!.historyGreen!,
+                    Theme.of(context).extension<HistoryColors>()!.green!,
               ),
               const SizedBox(height: 8),
               HistoryTile(
                 dateString: '2024-05-22',
                 word: 'WHISK',
                 backgroundColor:
-                    Theme.of(context).extension<CustomColors>()!.historyYellow!,
+                    Theme.of(context).extension<HistoryColors>()!.yellow!,
               ),
               const SizedBox(height: 8),
               HistoryTile(
                 dateString: '2024-05-21',
                 word: 'IDEAS',
                 backgroundColor:
-                    Theme.of(context).extension<CustomColors>()!.historyRed!,
+                    Theme.of(context).extension<HistoryColors>()!.red!,
               ),
             ],
           ),

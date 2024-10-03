@@ -4,7 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:red_owl/config/shared.dart'
-    show CustomColors, LetterStatus, SharedPreferencesKeys, animationTiming;
+    show GameColors, LetterStatus, SharedPreferencesKeys, animationTiming;
 import 'package:red_owl/riverpod/shared.dart' show gridProvider;
 import 'package:red_owl/models/shared.dart' show Grid;
 import 'package:red_owl/util/shared.dart'
@@ -48,7 +48,7 @@ class _TileState extends ConsumerState<Tile>
   Widget build(BuildContext context) {
     Grid grid = ref.watch(gridProvider);
     Color borderColor =
-        Theme.of(context).extension<CustomColors>()!.borderInactive!;
+        Theme.of(context).extension<GameColors>()!.borderInactive!;
     bool hasFlipAnimationPlayed = widget.hasFlipAnimationPlayed;
 
     if (widget.index < grid.tiles.length) {
@@ -88,22 +88,22 @@ class _TileState extends ConsumerState<Tile>
         case LetterStatus.initial:
           backgroundColor = null;
           borderColor =
-              Theme.of(context).extension<CustomColors>()!.borderActive!;
+              Theme.of(context).extension<GameColors>()!.borderActive!;
           break;
         case LetterStatus.green:
-          backgroundColor = Theme.of(context).extension<CustomColors>()!.green!;
+          backgroundColor = Theme.of(context).extension<GameColors>()!.green!;
           borderColor = Colors.transparent;
           textColor = Colors.white;
           break;
         case LetterStatus.yellow:
           backgroundColor =
-              Theme.of(context).extension<CustomColors>()!.yellow!;
+              Theme.of(context).extension<GameColors>()!.yellow!;
           borderColor = Colors.transparent;
           textColor = Colors.white;
           break;
         case LetterStatus.notInWord:
           backgroundColor =
-              Theme.of(context).extension<CustomColors>()!.notInWord!;
+              Theme.of(context).extension<GameColors>()!.notInWord!;
           borderColor = Colors.transparent;
           textColor = Colors.white;
           break;
@@ -112,7 +112,7 @@ class _TileState extends ConsumerState<Tile>
       // Set default values to variables so that tile rebuilds.
       // By default it does not when Navigator pops settingsPage back to GamePage
       backgroundColor = null;
-      borderColor = Theme.of(context).extension<CustomColors>()!.borderActive!;
+      borderColor = Theme.of(context).extension<GameColors>()!.borderActive!;
       hasFlipAnimationPlayed = false;
     }
 
