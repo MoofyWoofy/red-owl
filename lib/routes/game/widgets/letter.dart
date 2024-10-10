@@ -26,8 +26,7 @@ class Letter extends ConsumerWidget {
         break;
       case LetterStatus.notInWord:
       case null:
-        backgroundColor =
-            Theme.of(context).extension<GameColors>()?.notInWord;
+        backgroundColor = Theme.of(context).extension<GameColors>()?.notInWord;
         textColor = Colors.white;
         break;
     }
@@ -50,6 +49,13 @@ class Letter extends ConsumerWidget {
             decoration: BoxDecoration(
               color: backgroundColor,
               borderRadius: BorderRadius.circular(4),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  blurRadius: 2,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: letter != "DELETE"
                 ? Text(
