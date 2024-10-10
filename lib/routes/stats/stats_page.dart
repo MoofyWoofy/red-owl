@@ -102,21 +102,21 @@ Check out my Wordle! stats!
               const Text('Example:'),
               const SizedBox(height: 5),
               HistoryTile(
-                dateString: '2024-05-23',
+                date: DateTime(2024, 5, 23),
                 word: 'BURNT',
                 backgroundColor:
                     Theme.of(context).extension<HistoryColors>()!.green!,
               ),
               const SizedBox(height: 8),
               HistoryTile(
-                dateString: '2024-05-22',
+                date: DateTime(2024, 5, 22),
                 word: 'WHISK',
                 backgroundColor:
                     Theme.of(context).extension<HistoryColors>()!.yellow!,
               ),
               const SizedBox(height: 8),
               HistoryTile(
-                dateString: '2024-05-21',
+                date: DateTime(2024, 5, 21),
                 word: 'IDEAS',
                 backgroundColor:
                     Theme.of(context).extension<HistoryColors>()!.red!,

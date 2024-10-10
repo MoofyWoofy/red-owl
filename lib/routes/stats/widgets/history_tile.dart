@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:red_owl/util/shared.dart' show dateToString;
 
 class HistoryTile extends StatelessWidget {
   const HistoryTile({
     super.key,
     required this.backgroundColor,
-    required this.dateString,
+    required this.date,
     required this.word,
   });
 
   final Color backgroundColor;
-  final String dateString;
+  final DateTime date;
   final String word;
 
   @override
@@ -23,7 +24,7 @@ class HistoryTile extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            dateString,
+            dateToString(date),
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w500,
