@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:red_owl/config/shared.dart' show HistoryColors;
 import 'package:red_owl/database/database.dart';
 import 'package:red_owl/routes/stats/widgets/history_tile.dart';
-import 'package:red_owl/util/shared.dart' show dateToString;
+import 'package:red_owl/util/shared.dart' show Localization, dateToString;
 
 class History extends StatefulWidget {
   const History({super.key});
@@ -48,7 +48,7 @@ class _HistoryState extends State<History> {
           return const Center(child: Text('snapshot has no data.'));
         }
         if (snapshot.data!.isEmpty) {
-          return const Center(child: Text('Play a game first.'));
+          return Center(child: Text(context.l10n.playGameFirst));
         }
 
         final historyItems = snapshot.data!;
@@ -81,7 +81,7 @@ class _HistoryState extends State<History> {
 
             return HistoryTile(
               backgroundColor: backgroundColor,
-              dateString: dateToString(historyItem.date),
+              date: historyItem.date,
               word: historyItem.word,
             );
           },

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:red_owl/config/shared.dart' show SharedPreferencesKeys;
 import 'package:red_owl/routes/stats/widgets/shared.dart';
 import 'package:red_owl/util/shared.dart'
-    show SharedPreferenceService, getWinRate;
+    show Localization, SharedPreferenceService, getWinRate;
 
 class StatsInfo extends StatefulWidget {
   const StatsInfo({super.key});
@@ -58,31 +58,31 @@ class _StatsInfoState extends State<StatsInfo> {
           ],
         ),
         const SizedBox(height: 4),
-        const Row(
+        Row(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.max,
           children: [
             Expanded(
               child: StatsText(
-                text: 'Played',
+                text: context.l10n.played,
                 isTopText: false,
               ),
             ),
             Expanded(
               child: StatsText(
-                text: 'Win %',
+                text: context.l10n.win,
                 isTopText: false,
               ),
             ),
             Expanded(
               child: StatsText(
-                text: 'Current Streak',
+                text: context.l10n.currentStreak,
                 isTopText: false,
               ),
             ),
             Expanded(
               child: StatsText(
-                text: 'Max Streak',
+                text: context.l10n.maxStreak,
                 isTopText: false,
               ),
             ),

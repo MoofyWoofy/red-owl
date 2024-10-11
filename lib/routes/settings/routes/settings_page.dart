@@ -13,7 +13,7 @@ import 'package:red_owl/routes/settings/routes/view_custom_wordlist.dart';
 import 'package:red_owl/routes/settings/widgets/shared.dart'
     show GameInProgressDialog, SwitchItem;
 import 'package:red_owl/util/misc.dart' show isGameInProgress;
-import 'package:red_owl/util/shared.dart' show WordleService;
+import 'package:red_owl/util/shared.dart' show Localization, WordleService;
 import 'package:red_owl/widgets/shared.dart' show Logo, appBar;
 import 'package:url_launcher/url_launcher.dart';
 
@@ -25,7 +25,7 @@ class SettingsPage extends ConsumerWidget {
     return Scaffold(
       appBar: appBar(
         context: context,
-        title: 'Settings',
+        title: context.l10n.settings,
         showCancelIcon: true,
         automaticallyImplyLeading: false,
       ),
@@ -38,15 +38,15 @@ class SettingsPage extends ConsumerWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const SwitchItem(
-                      title: 'Dark Mode',
+                    SwitchItem(
+                      title: context.l10n.darkMode,
                       icon: Icons.contrast,
                       boolProviderId: BoolFamilyProviderIDs.isDarkMode,
                       sharedPrefsKey: SharedPreferencesKeys.isDarkMode,
                     ),
                     const SizedBox(height: 20),
                     SwitchItem(
-                      title: 'Use custom word list',
+                      title: context.l10n.customWordList,
                       icon: Icons.list_alt,
                       boolProviderId: BoolFamilyProviderIDs.useCustomList,
                       sharedPrefsKey: SharedPreferencesKeys.useCustomList,
@@ -56,9 +56,10 @@ class SettingsPage extends ConsumerWidget {
                         if (isGameInProgress(grid)) {
                           updateCustomList = await showDialog(
                                 context: context,
-                                builder: (_) => const GameInProgressDialog(
+                                builder: (_) => GameInProgressDialog(
                                     content:
-                                        'Game in progress, changing word list will reset the game'),
+                                        context
+                                        .l10n.gameInProgressChangingWordList),
                               ) ??
                               false;
                           // If user selected 'yes' then reset grid
@@ -95,9 +96,10 @@ class SettingsPage extends ConsumerWidget {
                               if (isGameInProgress(grid)) {
                                 importCustomList = await showDialog(
                                   context: context,
-                                  builder: (_) => const GameInProgressDialog(
+                                  builder: (_) => GameInProgressDialog(
                                     content:
-                                        'Game in progress, importing word list will reset the game',
+                                      context
+                                        .l10n.gameInProgressImportingWordList,
                                   ),
                                 );
                               }
@@ -152,10 +154,10 @@ class SettingsPage extends ConsumerWidget {
 
                                   if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        duration: Duration(seconds: 3),
+                                      SnackBar(
+                                        duration: const Duration(seconds: 3),
                                         content: Text(
-                                          'Success',
+                                          context.l10n.success,
                                           textAlign: TextAlign.center,
                                         ),
                                         behavior: SnackBarBehavior.floating,
@@ -168,7 +170,7 @@ class SettingsPage extends ConsumerWidget {
                               }
                             },
                             icon: const Icon(Icons.file_upload_outlined),
-                            label: const Text('Import'),
+                            label: Text(context.l10n.import),
                           ),
                           const SizedBox(width: 16),
                           OutlinedButton.icon(
@@ -181,7 +183,7 @@ class SettingsPage extends ConsumerWidget {
                               );
                             },
                             icon: const Icon(Icons.list),
-                            label: const Text('View'),
+                            label: Text(context.l10n.view),
                           ),
                         ],
                       ),
@@ -202,8 +204,8 @@ class SettingsPage extends ConsumerWidget {
                     applicationIcon: const Logo(size: 75),
                     applicationVersion: packageInfo.version,
                     children: [
-                      const Text(
-                        'Yet another wordle app',
+                      Text(
+                        context.l10n.yetAnotherWordApp,
                         textAlign: TextAlign.center,
                       ),
                       TextButton(
@@ -214,15 +216,15 @@ class SettingsPage extends ConsumerWidget {
                             throw Exception('Could not launch $uri');
                           }
                         },
-                        child: const Text('Privacy Policy'),
+                        child: Text(context.l10n.privacyPolicy),
                       )
                     ],
                   );
                 }
               },
-              child: const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text('About'),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(context.l10n.about),
               ),
             ),
           ],

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:red_owl/riverpod/shared.dart' show boolFamilyNotifierProvider;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:red_owl/routes/shared.dart';
 import 'package:red_owl/config/shared.dart'
     show lightTheme, darkTheme, SharedPreferencesKeys, BoolFamilyProviderIDs;
 import 'package:red_owl/util/shared.dart'
-    show SharedPreferenceService, WordleService;
+    show Localization, SharedPreferenceService, WordleService;
 import 'package:red_owl/widgets/shared.dart' show Logo, appBar;
 
 Future<void> main() async {
@@ -31,6 +32,8 @@ class App extends ConsumerWidget {
       darkTheme: darkTheme,
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       home: const HomePage(title: 'Red Owl'),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
     );
   }
 }
@@ -59,10 +62,10 @@ class HomePage extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
-                                const WordlePage(gameType: "Daily")),
+                                WordlePage(gameType: context.l10n.daily)),
                       );
                     },
-                    label: const Text('Daily'),
+                    label: Text(context.l10n.daily),
                     icon: const Icon(Icons.calendar_today),
                   ),
                   const SizedBox(height: 20),
@@ -74,11 +77,11 @@ class HomePage extends StatelessWidget {
                             builder: (context) => const StatsPage()),
                       );
                     },
-                    label: const Text('Stats'),
+                    label: Text(context.l10n.stats),
                     icon: const Icon(Icons.bar_chart),
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ),

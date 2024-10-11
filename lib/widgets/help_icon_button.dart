@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:red_owl/util/shared.dart' show Localization;
 
 class HelpIconButton extends StatelessWidget {
   const HelpIconButton({
@@ -12,6 +13,7 @@ class HelpIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
+      tooltip: context.l10n.help,
       onPressed: () {
         showDialog<void>(
           context: context,
@@ -27,7 +29,7 @@ class HelpIconButton extends StatelessWidget {
               ),
               actions: <Widget>[
                 TextButton(
-                  child: const Text('Close'),
+                  child: Text(context.l10n.close),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },

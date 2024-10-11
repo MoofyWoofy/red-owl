@@ -6,7 +6,7 @@ import 'package:red_owl/config/shared.dart'
     show GameColors, LetterStatus, animationTiming, keyboardStatus;
 import 'package:red_owl/riverpod/shared.dart' show gridProvider;
 import 'package:red_owl/routes/game/widgets/shared.dart';
-import 'package:red_owl/util/shared.dart' show dateToString;
+import 'package:red_owl/util/shared.dart' show Localization, dateToString;
 import 'package:red_owl/widgets/shared.dart' show HelpIconButton, appBar;
 
 class WordlePage extends ConsumerStatefulWidget {
@@ -54,28 +54,25 @@ class _WordlePageState extends ConsumerState<WordlePage> {
         showSettingIcon: true,
         widgets: [
           HelpIconButton(
-            title: "HOW TO PLAY",
+            title: context.l10n.howToPlay,
             body: [
-              const Text('You have 6 tries to guess the word.'),
+              Text(context.l10n.sixTries),
               const SizedBox(height: 10),
-              const Text(
-                  'The color of the letters will change to show how if they are correct.'),
+              Text(context.l10n.helpLine0),
               const SizedBox(height: 10),
               const Divider(),
-              const Text('Example:'),
+              Text('${context.l10n.example}:'),
               const SizedBox(height: 5),
               Row(
                 children: [
                   HelpTile(
-                      background: Theme.of(context)
-                          .extension<GameColors>()!
-                          .notInWord!,
+                      background:
+                          Theme.of(context).extension<GameColors>()!.notInWord!,
                       letter: 'S'),
                   const SizedBox(width: 5),
                   HelpTile(
-                      background: Theme.of(context)
-                          .extension<GameColors>()!
-                          .notInWord!,
+                      background:
+                          Theme.of(context).extension<GameColors>()!.notInWord!,
                       letter: 'T'),
                   const SizedBox(width: 5),
                   HelpTile(
@@ -89,9 +86,8 @@ class _WordlePageState extends ConsumerState<WordlePage> {
                       letter: 'R'),
                   const SizedBox(width: 5),
                   HelpTile(
-                      background: Theme.of(context)
-                          .extension<GameColors>()!
-                          .notInWord!,
+                      background:
+                          Theme.of(context).extension<GameColors>()!.notInWord!,
                       letter: 'E'),
                 ],
               ),
@@ -105,9 +101,8 @@ class _WordlePageState extends ConsumerState<WordlePage> {
                         color: Theme.of(context).colorScheme.error,
                       ),
                     ),
-                    const TextSpan(
-                      text:
-                          ' is green, because it is in the word and in the correct spot.',
+                    TextSpan(
+                      text: ' ${context.l10n.helpLine1}.',
                     ),
                   ],
                 ),
@@ -123,9 +118,8 @@ class _WordlePageState extends ConsumerState<WordlePage> {
                         color: Theme.of(context).colorScheme.error,
                       ),
                     ),
-                    const TextSpan(
-                      text:
-                          ' is yellow, because it is in the word but in the wrong spot.',
+                    TextSpan(
+                      text: ' ${context.l10n.helpLine2}.',
                     ),
                   ],
                 ),
@@ -155,8 +149,8 @@ class _WordlePageState extends ConsumerState<WordlePage> {
                         color: Theme.of(context).colorScheme.error,
                       ),
                     ),
-                    const TextSpan(
-                      text: ' are gray, because they are not in the word.',
+                    TextSpan(
+                      text: ' ${context.l10n.helpLine3}.',
                     ),
                   ],
                 ),

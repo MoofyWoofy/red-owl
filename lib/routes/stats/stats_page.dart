@@ -3,7 +3,7 @@ import 'package:red_owl/config/shared.dart'
     show HistoryColors, SharedPreferencesKeys;
 import 'package:red_owl/routes/stats/widgets/shared.dart';
 import 'package:red_owl/util/shared.dart'
-    show SharedPreferenceService, getWinRate;
+    show Localization, SharedPreferenceService, getWinRate;
 import 'package:red_owl/widgets/shared.dart' show HelpIconButton, appBar;
 import 'package:share_plus/share_plus.dart';
 
@@ -14,11 +14,12 @@ class StatsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar(
-        title: 'Stats',
+        title: context.l10n.stats,
         context: context,
         showSettingIcon: true,
         widgets: [
           IconButton(
+            tooltip: context.l10n.share,
             onPressed: () {
               // Get Stats from shared Prefs, if null default is ['0', '0', '0', '0']
               final [gamesPlayed, gamesWon, _, maxStreak] =
@@ -29,10 +30,10 @@ class StatsPage extends StatelessWidget {
               final winRate = getWinRate(gamesWon, gamesPlayed);
 
               final String shareText = """
-Check out my Wordle! stats!
-🔠 $gamesWon Words Guessed
-🏆 $winRate% Win Rate
-🔥 $maxStreak Max Streak
+${context.l10n.checkOutWordleStats}!
+🔠 $gamesWon ${context.l10n.wordsGuessed}
+🏆 $winRate% ${context.l10n.winRate}
+🔥 $maxStreak ${context.l10n.maxStreak}
 """;
 
               Share.share(shareText);
@@ -45,14 +46,14 @@ Check out my Wordle! stats!
                 text: TextSpan(
                   children: [
                     TextSpan(
-                      text: 'Green',
+                      text: context.l10n.green,
                       style: TextStyle(
                           backgroundColor: Theme.of(context)
                               .extension<HistoryColors>()!
                               .green),
                     ),
                     TextSpan(
-                      text: ' means you guessed correctly.',
+                      text: ' ${context.l10n.helpGuessCorrect}.',
                       style: TextStyle(
                           color: Theme.of(context).textTheme.bodyMedium?.color),
                     ),
@@ -64,14 +65,14 @@ Check out my Wordle! stats!
                 text: TextSpan(
                   children: [
                     TextSpan(
-                      text: 'Yellow',
+                      text: context.l10n.yellow,
                       style: TextStyle(
                           backgroundColor: Theme.of(context)
                               .extension<HistoryColors>()!
                               .yellow),
                     ),
                     TextSpan(
-                      text: ' means the game was incomplete.',
+                      text: ' ${context.l10n.helpGameIncomplete}',
                       style: TextStyle(
                           color: Theme.of(context).textTheme.bodyMedium?.color),
                     ),
@@ -83,14 +84,14 @@ Check out my Wordle! stats!
                 text: TextSpan(
                   children: [
                     TextSpan(
-                      text: 'Red',
+                      text: context.l10n.red,
                       style: TextStyle(
                           backgroundColor: Theme.of(context)
                               .extension<HistoryColors>()!
                               .red),
                     ),
                     TextSpan(
-                      text: " means you didn't guess the word.",
+                      text: " ${context.l10n.helpGuessWrong}.",
                       style: TextStyle(
                           color: Theme.of(context).textTheme.bodyMedium?.color),
                     ),
@@ -99,25 +100,25 @@ Check out my Wordle! stats!
               ),
               const SizedBox(height: 10),
               const Divider(),
-              const Text('Example:'),
+              Text('${context.l10n.example}:'),
               const SizedBox(height: 5),
               HistoryTile(
                 date: DateTime(2024, 5, 23),
-                word: 'BURNT',
+                word: context.l10n.burnt,
                 backgroundColor:
                     Theme.of(context).extension<HistoryColors>()!.green!,
               ),
               const SizedBox(height: 8),
               HistoryTile(
                 date: DateTime(2024, 5, 22),
-                word: 'WHISK',
+                word: context.l10n.whisk,
                 backgroundColor:
                     Theme.of(context).extension<HistoryColors>()!.yellow!,
               ),
               const SizedBox(height: 8),
               HistoryTile(
                 date: DateTime(2024, 5, 21),
-                word: 'IDEAS',
+                word: context.l10n.ideas,
                 backgroundColor:
                     Theme.of(context).extension<HistoryColors>()!.red!,
               ),
@@ -125,14 +126,14 @@ Check out my Wordle! stats!
           ),
         ],
       ),
-      body: const Column(
+      body: Column(
         children: [
-          StatsHeading(text: 'Statistics'),
-          StatsInfo(),
-          StatsHeading(text: 'Guess Distribution'),
-          StatsGraph(),
-          StatsHeading(text: 'History'),
-          Expanded(
+          StatsHeading(text: context.l10n.statistics),
+          const StatsInfo(),
+          StatsHeading(text: context.l10n.guessDistribution),
+          const StatsGraph(),
+          StatsHeading(text: context.l10n.history),
+          const Expanded(
             child: History(),
           )
         ],

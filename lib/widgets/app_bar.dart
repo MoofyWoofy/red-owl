@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:red_owl/routes/shared.dart' show SettingsPage;
+import 'package:red_owl/util/shared.dart' show Localization;
 
 AppBar appBar({
   required BuildContext context,
@@ -20,7 +21,7 @@ AppBar appBar({
       if (showSettingIcon) ...[
         IconButton(
           icon: const Icon(Icons.settings),
-          tooltip: 'Settings',
+          tooltip: context.l10n.settings,
           onPressed: () {
             Navigator.push(
               context,
@@ -31,7 +32,7 @@ AppBar appBar({
       ] else if (showCancelIcon) ...[
         IconButton(
           icon: const Icon(Icons.clear),
-          tooltip: 'Exit',
+          tooltip: context.l10n.exit,
           onPressed: () {
             Navigator.pop(context);
           },
