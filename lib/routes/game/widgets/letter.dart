@@ -63,10 +63,11 @@ class Letter extends ConsumerWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(color: textColor),
                   )
-                : const FittedBox(
+                : FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Icon(
                       Icons.backspace_outlined,
+                      color: Theme.of(context).textTheme.bodyMedium!.color,
                     ),
                   ),
           ),
