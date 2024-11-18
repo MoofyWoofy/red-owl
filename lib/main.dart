@@ -58,12 +58,8 @@ class HomePage extends StatelessWidget {
                   OutlinedButton.icon(
                     onPressed: () {
                       // daily word from API
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                WordlePage(gameType: context.l10n.daily)),
-                      );
+                      Navigator.of(context).push(_createRouteTo(
+                          const WordlePage(), const Offset(1.0, 0.0)));
                     },
                     label: Text(context.l10n.daily),
                     icon: const Icon(Icons.calendar_today),
@@ -71,11 +67,8 @@ class HomePage extends StatelessWidget {
                   const SizedBox(height: 20),
                   OutlinedButton.icon(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const StatsPage()),
-                      );
+                      Navigator.of(context).push(_createRouteTo(
+                          const StatsPage(), const Offset(0.0, 1.0)));
                     },
                     label: Text(context.l10n.stats),
                     icon: const Icon(Icons.bar_chart),
@@ -86,6 +79,27 @@ class HomePage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Route _createRouteTo(Widget page, Offset begin) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const end = Offset.zero;
+        const curve = Curves.easeIn;
+
+        final tween = Tween(begin: begin, end: end);
+        final curvedAnimation = CurvedAnimation(
+          parent: animation,
+          curve: curve,
+        );
+
+        return SlideTransition(
+          position: tween.animate(curvedAnimation),
+          child: child,
+        );
+      },
     );
   }
 }

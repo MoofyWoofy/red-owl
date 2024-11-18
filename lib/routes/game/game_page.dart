@@ -10,8 +10,7 @@ import 'package:red_owl/util/shared.dart' show Localization, dateToString;
 import 'package:red_owl/widgets/shared.dart' show HelpIconButton, appBar;
 
 class WordlePage extends ConsumerStatefulWidget {
-  const WordlePage({super.key, required this.gameType});
-  final String gameType;
+  const WordlePage({super.key});
 
   @override
   ConsumerState<WordlePage> createState() => _WordlePageState();
