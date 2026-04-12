@@ -1,3 +1,4 @@
 export 'grid/grid.dart';
 export 'tile/tile.dart';
-export 'guess_result/guess_result.dart' show GuessResult;
+export 'guess_result/guess_result.dart'
+    show GuessResult, CharacterInfo, CharacterScoring;

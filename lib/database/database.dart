@@ -2,6 +2,7 @@
 
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 
 part 'database.g.dart';
 
@@ -23,6 +24,9 @@ class History extends Table {
 @DriftDatabase(tables: [History])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
+
+  @visibleForTesting
+  AppDatabase.forTesting(super.executor);
 
   @override
   int get schemaVersion => 1;

@@ -2,7 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:red_owl/config/shared.dart' show SharedPreferencesKeys;
 
 class SharedPreferenceService {
-  late final SharedPreferencesWithCache _prefs;
+  late SharedPreferencesWithCache _prefs;
 
   static final SharedPreferenceService _instance =
       SharedPreferenceService._internal();
