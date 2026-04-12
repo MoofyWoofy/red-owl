@@ -3,8 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:red_owl/config/shared.dart' show GameColors, LetterStatus;
 import 'package:red_owl/riverpod/shared.dart';
 
+/// A single key on the on-screen keyboard.
+///
+/// Colours itself based on the [LetterStatus] stored in the grid's
+/// [keyboardStatus] map so that already-evaluated letters are highlighted
+/// green, yellow, or grey. Interaction is disabled once the game is over
+/// via [IgnorePointer].
+///
+/// The DELETE key renders a backspace icon instead of the raw text string.
 class Letter extends ConsumerWidget {
   const Letter({super.key, required this.letter});
+
+  /// The key label (uppercase letter, `'ENTER'`, or `'DELETE'`).
   final String letter;
 
   @override
@@ -12,6 +22,8 @@ class Letter extends ConsumerWidget {
     Color? backgroundColor;
     Color? textColor;
     var grid = ref.watch(gridProvider);
+
+    // Determine background and text color from the current keyboard status.
     switch (grid.keyboardStatus[letter]) {
       case LetterStatus.initial:
         backgroundColor = Theme.of(context).extension<GameColors>()?.initial;
@@ -26,12 +38,14 @@ class Letter extends ConsumerWidget {
         break;
       case LetterStatus.notInWord:
       case null:
+        // null can occur for ENTER/DELETE which are not in keyboardStatus.
         backgroundColor = Theme.of(context).extension<GameColors>()?.notInWord;
         textColor = Colors.white;
         break;
     }
 
     return IgnorePointer(
+      // Disable all keys once the game is finished.
       ignoring: grid.isGameOver,
       child: Padding(
         padding: const EdgeInsets.only(right: 5),
@@ -51,12 +65,13 @@ class Letter extends ConsumerWidget {
               borderRadius: BorderRadius.circular(4),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
+                  color: Colors.grey.withValues(alpha: 0.5),
                   blurRadius: 2,
                   offset: const Offset(0, 4),
                 ),
               ],
             ),
+            // Show a backspace icon for DELETE, plain text for all other keys.
             child: letter != "DELETE"
                 ? Text(
                     letter,

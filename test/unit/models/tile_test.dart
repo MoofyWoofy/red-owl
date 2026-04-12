@@ -1,3 +1,7 @@
+// Unit tests for the Tile Freezed model.
+//
+// Covers: construction, equality, copyWith, JSON round-trip for all
+// LetterStatus values, toString output, and hashCode consistency.
 import 'package:flutter_test/flutter_test.dart';
 import 'package:red_owl/config/shared.dart' show LetterStatus;
 import 'package:red_owl/models/shared.dart' show Tile;

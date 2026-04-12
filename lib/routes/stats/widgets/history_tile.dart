@@ -1,16 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:red_owl/util/shared.dart' show dateToString;
 
+/// A single row in the Stats page history list.
+///
+/// Renders the game date (ISO format) and the answer word side by side on a
+/// solid [backgroundColor] that indicates the game outcome:
+/// - Green  → player won
+/// - Red    → player lost
+/// - Yellow → game was incomplete (abandoned at day rollover)
 class HistoryTile extends StatelessWidget {
   const HistoryTile({
     super.key,
+    /// Background color communicating the game outcome.
     required this.backgroundColor,
+    /// The calendar date the game was played.
     required this.date,
+    /// The 5-letter answer word for that day (uppercase).
     required this.word,
   });
 
+  /// Solid background color indicating the game result.
   final Color backgroundColor;
+
+  /// Date the game was played — displayed as `yyyy-MM-dd`.
   final DateTime date;
+
+  /// The Wordle answer for that day.
   final String word;
 
   @override

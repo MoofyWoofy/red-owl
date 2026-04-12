@@ -1,3 +1,11 @@
+// Unit tests for the Drift AppDatabase and GameState enum.
+//
+// Each test uses an in-memory SQLite database (via NativeDatabase.memory())
+// created fresh in setUp and closed in tearDown to ensure full isolation.
+//
+// Covers: insert/retrieve for all three GameState values, primary-key
+// uniqueness enforcement, word-length constraints, deletion, and the
+// GameState name property.
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:red_owl/database/database.dart';

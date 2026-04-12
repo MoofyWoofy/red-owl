@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:red_owl/util/shared.dart' show WordleService;
 import 'package:red_owl/widgets/shared.dart' show appBar;
 
+/// Displays the currently active word list (standard or custom) as a
+/// scrollable list of words.
+///
+/// Loads the word list asynchronously via [WordleService.getWordList] so the
+/// user can inspect which words are loaded before starting a game.
+/// Useful for verifying that a freshly imported custom list was saved correctly.
 class ViewCustomListPage extends StatefulWidget {
   const ViewCustomListPage({super.key});
 
@@ -10,11 +16,13 @@ class ViewCustomListPage extends StatefulWidget {
 }
 
 class _ViewCustomListPageState extends State<ViewCustomListPage> {
+  /// Async future resolving to the list of words to display.
   Future<List<String>>? _words;
 
   @override
   void initState() {
     super.initState();
+    // Load the word list once when the page opens.
     _words = WordleService().getWordList;
   }
 
@@ -29,6 +37,7 @@ class _ViewCustomListPageState extends State<ViewCustomListPage> {
           future: _words,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
+              // Re-throw so the framework's error boundary can catch it.
               throw snapshot.error!;
             }
             if (snapshot.connectionState != ConnectionState.done) {
@@ -36,6 +45,7 @@ class _ViewCustomListPageState extends State<ViewCustomListPage> {
             }
             List<String> words = snapshot.data!;
 
+            // Use prototypeItem for O(1) layout — all list tiles are identical height.
             return ListView.builder(
               itemCount: words.length,
               prototypeItem: ListTile(

@@ -5,8 +5,17 @@ import 'package:red_owl/routes/stats/widgets/shared.dart';
 import 'package:red_owl/util/shared.dart'
     show Localization, SharedPreferenceService, getWinRate;
 import 'package:red_owl/widgets/shared.dart' show HelpIconButton, appBar;
-import 'package:share_plus/share_plus.dart';
+import 'package:share_plus/share_plus.dart' show SharePlus, ShareParams;
 
+/// The Statistics page reachable from the Home screen or from any settings
+/// gear action.
+///
+/// Layout (top-to-bottom):
+/// 1. **AppBar** with a share icon (exports a text summary) and a help icon
+///    (explains the history row color coding).
+/// 2. **"Statistics"** heading + [StatsInfo] — four key metrics.
+/// 3. **"Guess Distribution"** heading + [StatsGraph] — bar chart.
+/// 4. **"History"** heading + [History] (Expanded) — scrollable game log.
 class StatsPage extends StatelessWidget {
   const StatsPage({super.key});
 
@@ -18,10 +27,11 @@ class StatsPage extends StatelessWidget {
         context: context,
         showSettingIcon: true,
         widgets: [
+          // ── Share button ─────────────────────────────────────────────────
           IconButton(
             tooltip: context.l10n.share,
             onPressed: () {
-              // Get Stats from shared Prefs, if null default is ['0', '0', '0', '0']
+              // Build a short shareable text from the stored stats.
               final [gamesPlayed, gamesWon, _, maxStreak] =
                   SharedPreferenceService()
                           .getStringList(SharedPreferencesKeys.statsData) ??
@@ -36,12 +46,14 @@ ${context.l10n.checkOutWordleStats}!
 🔥 $maxStreak ${context.l10n.maxStreak}
 """;
 
-              Share.share(shareText);
+              SharePlus.instance.share(ShareParams(text: shareText));
             },
             icon: const Icon(Icons.share),
           ),
+          // ── Help button — explains history row colors ─────────────────────
           HelpIconButton(
             body: [
+              // Green row legend.
               RichText(
                 text: TextSpan(
                   children: [
@@ -61,6 +73,7 @@ ${context.l10n.checkOutWordleStats}!
                 ),
               ),
               const SizedBox(height: 4),
+              // Yellow row legend.
               RichText(
                 text: TextSpan(
                   children: [
@@ -80,6 +93,7 @@ ${context.l10n.checkOutWordleStats}!
                 ),
               ),
               const SizedBox(height: 4),
+              // Red row legend.
               RichText(
                 text: TextSpan(
                   children: [
@@ -100,6 +114,7 @@ ${context.l10n.checkOutWordleStats}!
               ),
               const SizedBox(height: 10),
               const Divider(),
+              // Example history tiles showing each color in context.
               Text('${context.l10n.example}:'),
               const SizedBox(height: 5),
               HistoryTile(
@@ -133,6 +148,7 @@ ${context.l10n.checkOutWordleStats}!
           StatsHeading(text: context.l10n.guessDistribution),
           const StatsGraph(),
           StatsHeading(text: context.l10n.history),
+          // History list takes all remaining vertical space.
           const Expanded(
             child: History(),
           )

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,10 +15,20 @@ import 'package:shared_preferences_platform_interface/in_memory_shared_preferenc
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:shared_preferences_platform_interface/types.dart';
 
-/// Fake [PathProviderPlatform] that returns a temporary directory.
+/// Fake [PathProviderPlatform] backed by a caller-supplied [Directory].
+///
+/// Registers itself as the active platform instance via
+/// [PathProviderPlatform.instance] so that `path_provider` calls such as
+/// [getApplicationDocumentsDirectory] resolve to the provided temp directory
+/// instead of a real OS path.
+///
+/// Mixed in with [MockPlatformInterfaceMixin] to satisfy the plugin interface
+/// contract that normally prevents non-production implementations.
 class FakePathProvider extends PathProviderPlatform
     with MockPlatformInterfaceMixin {
   FakePathProvider(this.directory);
+
+  /// The temporary directory returned for every platform path query.
   final Directory directory;
 
   @override
@@ -43,11 +52,23 @@ class FakePathProvider extends PathProviderPlatform
   Future<String?> getExternalStoragePath() async => directory.path;
 }
 
-/// Fake SharedPreferencesAsync platform backed by in-memory storage.
+/// Fake [SharedPreferencesAsyncPlatform] backed by an in-memory store.
+///
+/// [SharedPreferencesWithCache] (used by [SharedPreferenceService]) reads
+/// through the async platform interface, not the legacy synchronous one.
+/// The standard `SharedPreferences.setMockInitialValues` only patches the
+/// legacy interface, so tests that exercise [SharedPreferenceService] also
+/// need this class to be installed as [SharedPreferencesAsyncPlatform.instance].
+///
+/// Uses [InMemorySharedPreferencesAsync.withData] so the initial values are
+/// available synchronously as soon as [SharedPreferencesWithCache.create]
+/// resolves — no extra async priming step needed.
 base class FakeSharedPreferencesAsync
     extends SharedPreferencesAsyncPlatform {
   FakeSharedPreferencesAsync([Map<String, Object> initialData = const {}])
       : backend = InMemorySharedPreferencesAsync.withData(initialData);
+
+  /// Underlying in-memory store; all methods delegate to this.
   final InMemorySharedPreferencesAsync backend;
 
   @override
@@ -103,15 +124,23 @@ base class FakeSharedPreferencesAsync
       backend.setStringList(key, value, options);
 }
 
-/// Sets up both the legacy and async SharedPreferences platforms for testing.
+/// Installs both the legacy and async SharedPreferences fakes so that both
+/// [SharedPreferences] and [SharedPreferencesWithCache] return [initialValues].
+///
+/// Call this in `setUp` before calling `SharedPreferenceService().init()`.
 void setSharedPreferencesMock([Map<String, Object> initialValues = const {}]) {
+  // Legacy interface used by SharedPreferences.getInstance().
   SharedPreferences.setMockInitialValues(initialValues);
+  // Async interface used by SharedPreferencesWithCache.create().
   SharedPreferencesAsyncPlatform.instance =
       FakeSharedPreferencesAsync(initialValues);
 }
 
-/// Installs a [FakePathProvider] backed by a fresh temporary directory.
-/// Returns the directory so callers can write fixture files into it.
+/// Creates a temporary directory, registers a [FakePathProvider] pointing to
+/// it, and schedules its deletion via [addTearDown].
+///
+/// Returns the directory so test code can place fixture files inside it
+/// (e.g. a custom word list).
 Future<Directory> installFakePathProvider() async {
   final dir = await Directory.systemTemp.createTemp('red_owl_test_');
   PathProviderPlatform.instance = FakePathProvider(dir);
@@ -123,8 +152,14 @@ Future<Directory> installFakePathProvider() async {
   return dir;
 }
 
-/// Mocks the asset bundle so rootBundle.loadString('assets/word_list.txt')
-/// returns [wordList] joined by newlines.
+/// Installs a fake asset bundle that responds to `assets/word_list.txt`
+/// with the given [wordList] joined by newlines.
+///
+/// Pass `null` for [wordList] to remove any previously installed handler and
+/// restore the real asset bundle behaviour.
+///
+/// Implemented by intercepting the `flutter/assets` platform message channel
+/// — the same channel [rootBundle] uses internally.
 void setAssetBundleMock(List<String>? wordList) {
   final binding = TestDefaultBinaryMessengerBinding.instance;
   binding.defaultBinaryMessenger.setMockMessageHandler(
@@ -142,9 +177,13 @@ void setAssetBundleMock(List<String>? wordList) {
   );
 }
 
-/// Wraps [child] in ProviderScope + MaterialApp with localization.
-/// Uses [lightTheme] by default so GameColors/HistoryColors theme
-/// extensions are always available.
+/// Wraps [child] in [ProviderScope] + [MaterialApp] + [Scaffold].
+///
+/// [child] is placed as the body of a [Scaffold] so it has a full Material
+/// context (theme extensions, localization, media query, etc.).
+///
+/// Use this for testing individual widgets that expect a scaffold parent.
+/// Use [makeTestAppRaw] when the widget IS the scaffold (e.g. a full page).
 Widget makeTestApp({
   required Widget child,
   List<Override> overrides = const [],
@@ -153,6 +192,8 @@ Widget makeTestApp({
   return ProviderScope(
     overrides: overrides,
     child: MaterialApp(
+      // Always use the light theme so GameColors/HistoryColors extensions
+      // are available in every test without additional setup.
       theme: theme ?? lightTheme,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
@@ -162,7 +203,10 @@ Widget makeTestApp({
   );
 }
 
-/// Same as [makeTestApp] but the child IS the home Scaffold, not wrapped.
+/// Same as [makeTestApp] but [child] is used as the [MaterialApp.home]
+/// directly (not wrapped in an extra [Scaffold]).
+///
+/// Use this for full-page widgets that supply their own [Scaffold].
 Widget makeTestAppRaw({
   required Widget child,
   List<Override> overrides = const [],

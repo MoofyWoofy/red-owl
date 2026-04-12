@@ -17,6 +17,21 @@ import 'package:red_owl/util/shared.dart' show Localization, WordleService;
 import 'package:red_owl/widgets/shared.dart' show Logo, appBar;
 import 'package:url_launcher/url_launcher.dart';
 
+/// The Settings page, accessible from the gear icon in any [AppBar].
+///
+/// Contains:
+/// - **Dark Mode** toggle — switches between [lightTheme] and [darkTheme].
+/// - **Use custom word list** toggle — switches the active word list source.
+///   When enabled, two additional action buttons appear:
+///   - **Import** — opens a file picker to load a `.txt` word list. Each
+///     word must be exactly 5 alphabetic characters; any invalid line aborts
+///     the import with a snack bar message.
+///   - **View** — navigates to [ViewCustomListPage].
+/// - **About** button at the bottom — opens a system [AboutDialog] with the
+///   app version and privacy policy link.
+///
+/// Destructive operations (toggling or importing when a game is in progress)
+/// first show a [GameInProgressDialog] and only proceed if the user confirms.
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
@@ -26,6 +41,7 @@ class SettingsPage extends ConsumerWidget {
       appBar: appBar(
         context: context,
         title: context.l10n.settings,
+        // Show ✕ instead of a gear icon (this page IS the settings page).
         showCancelIcon: true,
         automaticallyImplyLeading: false,
       ),
@@ -38,6 +54,7 @@ class SettingsPage extends ConsumerWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    // ── Dark Mode ────────────────────────────────────────────
                     SwitchItem(
                       title: context.l10n.darkMode,
                       icon: Icons.contrast,
@@ -45,11 +62,14 @@ class SettingsPage extends ConsumerWidget {
                       sharedPrefsKey: SharedPreferencesKeys.isDarkMode,
                     ),
                     const SizedBox(height: 20),
+                    // ── Custom Word List ─────────────────────────────────────
                     SwitchItem(
                       title: context.l10n.customWordList,
                       icon: Icons.list_alt,
                       boolProviderId: BoolFamilyProviderIDs.useCustomList,
                       sharedPrefsKey: SharedPreferencesKeys.useCustomList,
+                      // Custom callback: warn the player if a game is in progress
+                      // before switching word lists (the board will be reset).
                       callback: (value) async {
                         var grid = ref.watch(gridProvider);
                         bool updateCustomList = true;
@@ -62,7 +82,7 @@ class SettingsPage extends ConsumerWidget {
                                         .l10n.gameInProgressChangingWordList),
                               ) ??
                               false;
-                          // If user selected 'yes' then reset grid
+                          // Reset the board only if the user confirmed.
                           if (updateCustomList) {
                             ref.read(gridProvider.notifier).resetGrid();
                           }
@@ -77,10 +97,13 @@ class SettingsPage extends ConsumerWidget {
                               ).notifier)
                               .updateBoolean(
                                   SharedPreferencesKeys.useCustomList, value);
+                          // Re-initialise WordleService to pick a word from the
+                          // newly selected list.
                           await WordleService().init();
                         }
                       },
                     ),
+                    // ── Import / View buttons (visible only when custom list is on) ──
                     if (ref.watch(
                       boolFamilyProvider(
                         id: BoolFamilyProviderIDs.useCustomList,
@@ -90,10 +113,12 @@ class SettingsPage extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          // Import button: opens file picker and validates the file.
                           OutlinedButton.icon(
                             onPressed: () async {
                               var grid = ref.watch(gridProvider);
                               bool importCustomList = true;
+                              // Warn the user if a game is currently in progress.
                               if (isGameInProgress(grid)) {
                                 importCustomList = await showDialog(
                                   context: context,
@@ -114,7 +139,7 @@ class SettingsPage extends ConsumerWidget {
                                 if (result != null) {
                                   File file = File(result.files.single.path!);
 
-                                  // Validate file to ensure data is clean
+                                  // Validate every word: must be exactly 5 ASCII letters.
                                   final contents = await file.readAsString();
                                   List<String> words = contents
                                       .split('\n')
@@ -124,7 +149,7 @@ class SettingsPage extends ConsumerWidget {
 
                                   for (var i = 0; i < words.length; i++) {
                                     if (!regExp.hasMatch(words[i])) {
-                                      // if word is invalid, show snackbar
+                                      // Invalid word found — show which line and abort.
                                       if (context.mounted) {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
@@ -143,14 +168,16 @@ class SettingsPage extends ConsumerWidget {
                                     }
                                   }
 
+                                  // All words valid — copy to the app documents directory.
                                   Directory directory =
                                       await getApplicationDocumentsDirectory();
 
                                   file.copy(
                                       '${directory.path}/custom_list.txt');
                                   file.delete();
+                                  // Reinitialise service to load the new word.
                                   await WordleService().init();
-                                  // Reset grid
+                                  // Reset the board since the word list changed.
                                   ref.read(gridProvider.notifier).resetGrid();
 
                                   if (context.mounted) {
@@ -165,15 +192,15 @@ class SettingsPage extends ConsumerWidget {
                                       ),
                                     );
                                   }
-                                } else {
-                                  // User canceled the picker
                                 }
+                                // else: user cancelled the picker — no action needed.
                               }
                             },
                             icon: const Icon(Icons.file_upload_outlined),
                             label: Text(context.l10n.import),
                           ),
                           const SizedBox(width: 16),
+                          // View button: navigate to the word list viewer.
                           OutlinedButton.icon(
                             onPressed: () {
                               Navigator.push(
@@ -192,6 +219,7 @@ class SettingsPage extends ConsumerWidget {
                 ),
               ),
             ),
+            // ── About button ─────────────────────────────────────────────────
             TextButton(
               style: TextButton.styleFrom(
                 splashFactory: NoSplash.splashFactory,

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:red_owl/config/shared.dart' show GameColors, HistoryColors;
 
+/// Light theme used when dark mode is off.
+///
+/// Registers [GameColors] and [HistoryColors] theme extensions so that game
+/// widgets can look up the correct tile and history row colors without
+/// hard-coding them. The seed color is [Colors.red] to match the app icon.
 final lightTheme = ThemeData(
   colorScheme: ColorScheme.fromSeed(
     seedColor: Colors.red,
@@ -24,6 +29,11 @@ final lightTheme = ThemeData(
   ],
 );
 
+/// Dark theme used when dark mode is on.
+///
+/// Uses the same [GameColors] / [HistoryColors] structure as [lightTheme]
+/// but with muted, darker variants of each color so the interface remains
+/// legible in low-light environments.
 final darkTheme = ThemeData(
   colorScheme: ColorScheme.fromSeed(
     seedColor: Colors.red,

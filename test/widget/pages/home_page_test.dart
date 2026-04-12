@@ -1,3 +1,7 @@
+// Widget tests for the HomePage (home screen).
+//
+// Verifies: Red Owl title, Daily/Stats buttons with icons, Logo presence,
+// OutlinedButton widgets, and settings gear icon in the AppBar.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:red_owl/main.dart';

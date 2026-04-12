@@ -1,7 +1,15 @@
 import 'package:red_owl/config/letter_status.dart';
 
+/// Default keyboard status map for a QWERTY layout.
+///
+/// Each key maps to its current [LetterStatus] (initial, green, yellow, or
+/// notInWord). The order matches the three physical keyboard rows so that
+/// [KeyboardRow] can slice the map by index range to render each row.
+///
+/// This map is mutable so it can be reset at the start of each game via
+/// `updateAll` in [_WordlePageState.initState].
 Map<String, LetterStatus> keyboardStatus = {
-  // First Row
+  // ── Row 1 ──
   'Q': LetterStatus.initial,
   'W': LetterStatus.initial,
   'E': LetterStatus.initial,
@@ -12,7 +20,7 @@ Map<String, LetterStatus> keyboardStatus = {
   'I': LetterStatus.initial,
   'O': LetterStatus.initial,
   'P': LetterStatus.initial,
-  // Second Row
+  // ── Row 2 ──
   'A': LetterStatus.initial,
   'S': LetterStatus.initial,
   'D': LetterStatus.initial,
@@ -22,7 +30,7 @@ Map<String, LetterStatus> keyboardStatus = {
   'J': LetterStatus.initial,
   'K': LetterStatus.initial,
   'L': LetterStatus.initial,
-  // Third Row
+  // ── Row 3 (with ENTER and DELETE action keys) ──
   'ENTER': LetterStatus.initial,
   'Z': LetterStatus.initial,
   'X': LetterStatus.initial,

@@ -1,3 +1,10 @@
+// Unit tests for the GameColors and HistoryColors theme extensions.
+//
+// Verifies:
+// - Field storage (all constructor arguments are retained).
+// - copyWith produces a new instance with only the specified fields changed.
+// - lerp interpolates between two instances at t=0, 0.5, and 1.0.
+// - lerp returns `this` unchanged when `other` is not the same type.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:red_owl/config/shared.dart' show GameColors, HistoryColors;

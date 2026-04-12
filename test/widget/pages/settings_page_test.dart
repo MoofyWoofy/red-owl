@@ -1,3 +1,7 @@
+// Widget tests for the SettingsPage.
+//
+// Verifies: Settings title, Dark Mode and custom word list switches,
+// SwitchListTile count, dark-mode toggle behavior, and the contrast icon.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:red_owl/routes/shared.dart' show SettingsPage;

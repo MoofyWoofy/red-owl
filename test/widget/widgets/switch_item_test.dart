@@ -1,3 +1,7 @@
+// Widget tests for the SwitchItem widget.
+//
+// Verifies: title and icon rendering, SwitchListTile presence, default value,
+// toggle state update via provider, and custom callback invocation.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:red_owl/config/shared.dart'

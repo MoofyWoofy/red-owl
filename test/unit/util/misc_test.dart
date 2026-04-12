@@ -1,3 +1,7 @@
+// Unit tests for the utility functions in lib/util/misc.dart.
+//
+// Covers: dateToString, stringToDate, getDateOnly,
+// convertListStringToListDouble, isGameInProgress, and getWinRate.
 import 'package:flutter_test/flutter_test.dart';
 import 'package:red_owl/config/shared.dart' show LetterStatus, keyboardStatus;
 import 'package:red_owl/models/shared.dart' show Grid, Tile;

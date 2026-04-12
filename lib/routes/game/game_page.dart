@@ -9,6 +9,19 @@ import 'package:red_owl/routes/game/widgets/shared.dart';
 import 'package:red_owl/util/shared.dart' show Localization, dateToString;
 import 'package:red_owl/widgets/shared.dart' show HelpIconButton, appBar;
 
+/// The main Wordle gameplay screen.
+///
+/// Layout:
+/// - **AppBar**: shows today's date, a help button (opens instructions dialog),
+///   and a settings gear icon.
+/// - **Grid** (flex 5): a 5×6 [GridView] of [Tile] widgets. Each tile can be
+///   animated with [PopInAnimation], [BounceAnimation], and [ShakeAnimation].
+/// - **Keyboard** (flex 2): three [KeyboardRow] rows rendered in a column.
+///
+/// Hardware keyboard input is captured via [ServicesBinding.keyboard] so that
+/// desktop and web users can type letters, ENTER, and BACKSPACE directly.
+/// The keyboard status map is reset to [LetterStatus.initial] on every page
+/// open so stale colors from a previous session don't bleed through.
 class WordlePage extends ConsumerStatefulWidget {
   const WordlePage({super.key});
 
@@ -17,15 +30,16 @@ class WordlePage extends ConsumerStatefulWidget {
 }
 
 class _WordlePageState extends ConsumerState<WordlePage> {
+  /// Handler registered with [ServicesBinding.keyboard] to intercept
+  /// physical key events. Returns `false` so the event continues propagating
+  /// to other handlers (e.g. scroll view focus).
   bool _onKey(KeyEvent event) {
-    final key = event.logicalKey.keyLabel;
-
     if (event is KeyDownEvent) {
-      // print("Key down: $key");
+      // Key pressed — could forward to onKeyboardPressed here if needed.
     } else if (event is KeyUpEvent) {
-      // print("Key up: $key");
+      // Key released.
     } else if (event is KeyRepeatEvent) {
-      // print("Key repeat: $key");
+      // Key held down and auto-repeating.
     }
 
     return false;
@@ -34,13 +48,16 @@ class _WordlePageState extends ConsumerState<WordlePage> {
   @override
   void initState() {
     super.initState();
+    // Register hardware keyboard handler for desktop/web support.
     ServicesBinding.instance.keyboard.addHandler(_onKey);
+    // Reset all key colors to their default state at the start of each session.
     keyboardStatus.updateAll((key, val) => LetterStatus.initial);
   }
 
   @override
   void dispose() {
     super.dispose();
+    // Always deregister to avoid memory leaks and stale callbacks.
     ServicesBinding.instance.keyboard.removeHandler(_onKey);
   }
 
@@ -49,6 +66,7 @@ class _WordlePageState extends ConsumerState<WordlePage> {
     return Scaffold(
       appBar: appBar(
         context: context,
+        // Display the current date (ISO format) as the page title.
         title: dateToString(DateTime.now()),
         showSettingIcon: true,
         widgets: [
@@ -60,6 +78,7 @@ class _WordlePageState extends ConsumerState<WordlePage> {
               Text(context.l10n.helpLine0),
               const SizedBox(height: 10),
               const Divider(),
+              // Example word "STARE" with color-coded tiles.
               Text('${context.l10n.example}:'),
               const SizedBox(height: 5),
               Row(
@@ -90,6 +109,7 @@ class _WordlePageState extends ConsumerState<WordlePage> {
                       letter: 'E'),
                 ],
               ),
+              // Explanation for each letter color using RichText highlights.
               RichText(
                 text: TextSpan(
                   style: Theme.of(context).textTheme.bodyLarge,
@@ -160,11 +180,13 @@ class _WordlePageState extends ConsumerState<WordlePage> {
       ),
       body: Column(
         children: [
+          // ── Tile grid (5 columns × 6 rows = 30 cells) ───────────────────
           Expanded(
             flex: 5,
             child: GridView.builder(
                 itemCount: 30,
                 padding: const EdgeInsets.all(40),
+                // Non-scrollable: the entire grid always fits in the viewport.
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 5,
@@ -176,15 +198,20 @@ class _WordlePageState extends ConsumerState<WordlePage> {
                       animateBounceEffect = false,
                       animateShakeEffect = false;
                   final grid = ref.watch(gridProvider);
+                  // gridIndex is the flat index of the most recently typed tile.
                   int gridIndex = (grid.row * 5 + grid.column) - 1;
                   int bounceDelay = animationTiming.bounce.initialDelay!;
+                  // All tile indexes in the current (active) row.
                   var currentTilesRowIndexes =
                       List.generate(5, (i) => (grid.row * 5) + i);
+
+                  // Pop-in: only the tile that was just typed (not on ENTER/DELETE).
                   if (gridIndex == index &&
                       !grid.isEnterOrDeletePressed &&
                       !grid.notEnoughCharacters) {
                     animatePopInEffect = true;
                   }
+                  // Bounce: all tiles in the winning row, staggered left-to-right.
                   if (grid.isGameWon) {
                     if (currentTilesRowIndexes.contains(index)) {
                       animateBounceEffect = true;
@@ -192,6 +219,7 @@ class _WordlePageState extends ConsumerState<WordlePage> {
                           animationTiming.bounce.intervalDelay! * (index % 5);
                     }
                   }
+                  // Shake: all tiles in the current row on invalid submission.
                   if (grid.notEnoughCharacters) {
                     if (currentTilesRowIndexes.contains(index)) {
                       animateShakeEffect = true;
@@ -216,16 +244,20 @@ class _WordlePageState extends ConsumerState<WordlePage> {
                   );
                 }),
           ),
+          // ── On-screen keyboard ──────────────────────────────────────────
           const Expanded(
             flex: 2,
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 12.0),
               child: Column(
                 children: [
+                  // Row 1: Q W E R T Y U I O P
                   KeyboardRow(minIndex: 0, maxIndex: 10),
                   SizedBox(height: 8),
+                  // Row 2: A S D F G H J K L (centered with spacers)
                   KeyboardRow(minIndex: 11, maxIndex: 19, addSpacer: true),
                   SizedBox(height: 8),
+                  // Row 3: ENTER Z X C V B N M DELETE
                   KeyboardRow(minIndex: 20, maxIndex: 29),
                 ],
               ),

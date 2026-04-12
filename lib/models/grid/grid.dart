@@ -5,36 +5,51 @@ import 'package:red_owl/config/shared.dart' show LetterStatus;
 part 'grid.freezed.dart';
 part 'grid.g.dart';
 
+/// Immutable snapshot of the entire game board at a point in time.
+///
+/// Managed by the [Grid] Riverpod notifier. All UI is rebuilt reactively
+/// whenever a new [Grid] value is emitted. The object is also serialised to
+/// Base64-encoded JSON and persisted to SharedPreferences after each move so
+/// the game can be resumed across app restarts.
 @freezed
 abstract class Grid with _$Grid {
   const factory Grid({
-    /// current grid column.
+    /// Zero-based column index of the tile that will receive the next key press.
+    /// Resets to 0 after ENTER or DELETE.
     required int column,
 
-    /// current grid row.
+    /// Zero-based row index of the current guess (0–5).
+    /// Incremented after each valid guess is submitted.
     required int row,
 
-    /// List of all tiles in grid.
+    /// All tiles that have been placed so far.
+    /// Length grows as the player types letters and shrinks on DELETE.
+    /// A full board has exactly 30 tiles (5 columns × 6 rows).
     required List<Tile> tiles,
 
-    /// Keyboard status, green/yellow etc.
+    /// Per-key evaluation status used to colour the on-screen keyboard.
+    /// Mirrors the QWERTY layout from [keyboardStatus].
     required Map<String, LetterStatus> keyboardStatus,
 
-    /// Run flip animation (when checking word).
+    /// True while the tile flip animation should be (re-)started.
+    /// Set to false once all tiles in the row have animated.
     required bool runFlipAnimation,
 
-    /// Check if letter pressed is ENTER or DELETE.
+    /// True when the last key pressed was ENTER or DELETE.
+    /// Suppresses the pop-in animation on the next rebuild.
     required bool isEnterOrDeletePressed,
 
-    /// Did player win the game?
+    /// Whether the player solved the puzzle in the current session.
     required bool isGameWon,
 
-    /// Is the game over?
+    /// Whether the game has ended (either won or all 6 rows used up).
     required bool isGameOver,
 
-    /// Does the row have 5 character to check word?
+    /// True when the player presses ENTER on a row with fewer than 5 letters.
+    /// Triggers the shake animation on the current row.
     required bool notEnoughCharacters,
   }) = _Grid;
 
+  /// Creates a [Grid] from a JSON map produced by [toJson].
   factory Grid.fromJson(Map<String, Object?> json) => _$GridFromJson(json);
 }

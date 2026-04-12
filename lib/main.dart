@@ -9,6 +9,15 @@ import 'package:red_owl/util/shared.dart'
     show Localization, SharedPreferenceService, WordleService;
 import 'package:red_owl/widgets/shared.dart' show Logo, appBar;
 
+/// Application entry point.
+///
+/// Initialises services that must be ready before the first frame:
+/// 1. [SharedPreferenceService] — loads the persisted key-value store so the
+///    dark-mode toggle and grid state are available synchronously in [build].
+/// 2. [WordleService] — resolves today's word from the active word list.
+///
+/// Wraps the widget tree in a [ProviderScope] so all Riverpod providers are
+/// accessible throughout the app.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharedPreferenceService().init();
@@ -16,6 +25,10 @@ Future<void> main() async {
   runApp(const ProviderScope(child: App()));
 }
 
+/// Root widget that wires up theming and localization.
+///
+/// Watches the [boolFamilyProvider] for dark-mode so the whole app
+/// re-themes reactively whenever the user toggles the setting in [SettingsPage].
 class App extends ConsumerWidget {
   const App({super.key});
 
@@ -31,6 +44,7 @@ class App extends ConsumerWidget {
       title: 'Red Owl',
       theme: lightTheme,
       darkTheme: darkTheme,
+      // Switch between light and dark theme based on the user's preference.
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       home: const HomePage(title: 'Red Owl'),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -39,8 +53,19 @@ class App extends ConsumerWidget {
   }
 }
 
+/// The landing screen shown immediately after the splash.
+///
+/// Provides two navigation paths:
+/// - **Daily** → [WordlePage] (slides in from the right).
+/// - **Stats** → [StatsPage] (slides up from the bottom).
+///
+/// Both transitions use a custom [PageRouteBuilder] with a [SlideTransition]
+/// so the navigation direction communicates the spatial relationship between
+/// screens.
 class HomePage extends StatelessWidget {
   const HomePage({super.key, required this.title});
+
+  /// The string displayed in the [AppBar] title.
   final String title;
 
   @override
@@ -53,12 +78,13 @@ class HomePage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              // App logo centered above the action buttons.
               const Logo(),
               Column(
                 children: [
                   OutlinedButton.icon(
                     onPressed: () {
-                      // daily word from API
+                      // WordlePage slides in from the right (Offset(1.0, 0.0)).
                       Navigator.of(context).push(_createRouteTo(
                           const WordlePage(), const Offset(1.0, 0.0)));
                     },
@@ -68,6 +94,7 @@ class HomePage extends StatelessWidget {
                   const SizedBox(height: 20),
                   OutlinedButton.icon(
                     onPressed: () {
+                      // StatsPage slides up from the bottom (Offset(0.0, 1.0)).
                       Navigator.of(context).push(_createRouteTo(
                           const StatsPage(), const Offset(0.0, 1.0)));
                     },
@@ -83,6 +110,13 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  /// Creates a [PageRouteBuilder] that slides [page] in from [begin].
+  ///
+  /// [begin] is an [Offset] in fractional page units:
+  /// - `Offset(1.0, 0.0)` slides from the right.
+  /// - `Offset(0.0, 1.0)` slides from the bottom.
+  ///
+  /// Uses [Curves.easeIn] for a snappy but not abrupt feel.
   Route _createRouteTo(Widget page, Offset begin) {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => page,

@@ -2,26 +2,49 @@ import 'package:intl/intl.dart';
 
 import 'package:red_owl/models/shared.dart' show Grid;
 
-/// Convert Date to a String using ISO 8601
+/// Formats [date] as an ISO-8601 date string (`yyyy-MM-dd`).
+///
+/// Example: `DateTime(2024, 5, 23)` → `'2024-05-23'`.
+/// Used when persisting [SharedPreferencesKeys.gameDate] and when displaying
+/// the current date in the GamePage AppBar.
 String dateToString(DateTime date) => DateFormat('yyyy-MM-dd').format(date);
 
-/// Convert Date to a String using ISO 8601
+/// Parses an ISO-8601 date string (`yyyy-MM-dd`) back into a [DateTime].
+///
+/// The inverse of [dateToString]. Throws if the string is not valid ISO-8601.
 DateTime stringToDate(String date) => DateTime.parse(date);
 
-/// return [date] with time set to 00:00:00.000
+/// Strips the time portion from [date], returning midnight on the same day.
+///
+/// Allows safe date-equality comparisons regardless of the time component.
+/// Example: `getDateOnly(DateTime(2024, 5, 23, 14, 30))` → `DateTime(2024, 5, 23)`.
 DateTime getDateOnly(DateTime date) =>
     DateTime(date.year, date.month, date.day);
 
-/// converts ['1','2','3'] to [1.0, 2.0, 3.0]
+/// Converts a list of string-encoded numbers to a list of doubles.
+///
+/// Used to convert the raw `guessDistribution` strings stored in
+/// SharedPreferences into numeric values accepted by the fl_chart library.
+///
+/// Example: `['1', '2', '3']` → `[1.0, 2.0, 3.0]`.
 List<double> convertListStringToListDouble(List<String> arg) =>
     arg.map((e) => double.parse(e)).toList();
 
-/// returns true if game is in progress
+/// Returns `true` if the player has started but not finished today's game.
+///
+/// A game is considered in-progress when the board has at least one tile
+/// AND the game-over flag is not set. This is used by the Settings page to
+/// warn the player before destructive actions (e.g. changing the word list).
 bool isGameInProgress(Grid grid) {
   return grid.tiles.isNotEmpty && !grid.isGameOver;
 }
 
-/// returns win rate from 0 - 100... eg: 75
+/// Computes the win rate as an integer percentage string (0–100).
+///
+/// Returns `'0'` when [wins] and [games] are both `'0'` to avoid
+/// division-by-zero. Otherwise, rounds the result to the nearest integer.
+///
+/// Example: `getWinRate('7', '10')` → `'70'`.
 String getWinRate(String wins, String games) {
   if (wins == '0' && games == '0') {
     return '0';

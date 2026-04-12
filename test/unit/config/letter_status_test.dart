@@ -1,3 +1,7 @@
+// Unit tests for config enums and the keyboard status map.
+//
+// Covers LetterStatus values, keyboardStatus layout (28 keys, correct rows),
+// SharedPreferencesKeys completeness, and BoolFamilyProviderIDs.
 import 'package:flutter_test/flutter_test.dart';
 import 'package:red_owl/config/shared.dart'
     show LetterStatus, keyboardStatus, BoolFamilyProviderIDs, SharedPreferencesKeys;

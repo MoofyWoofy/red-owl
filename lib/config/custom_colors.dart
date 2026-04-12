@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart' show Color, ThemeExtension, immutable;
 
+/// Theme extension that carries the six game-specific colors used on the
+/// tile grid and the on-screen keyboard.
+///
+/// Both [lightTheme] and [darkTheme] register their own [GameColors] instance
+/// inside `ThemeData.extensions`. Widgets retrieve them via
+/// `Theme.of(context).extension<GameColors>()!`.
 @immutable
 class GameColors extends ThemeExtension<GameColors> {
   const GameColors({
@@ -11,24 +17,26 @@ class GameColors extends ThemeExtension<GameColors> {
     required this.borderActive,
   });
 
-  /// Initial color for keyboard
+  /// Background color for a letter key / tile that has not yet been evaluated.
   final Color? initial;
 
-  /// Correct letter & position
+  /// Background used when a letter is in the correct position in the answer.
   final Color? green;
 
-  /// Correct letter but wrong position
+  /// Background used when a letter exists in the answer but is misplaced.
   final Color? yellow;
 
-  /// Letter is not in word
+  /// Background used when a letter does not appear in the answer at all.
   final Color? notInWord;
 
-  /// Border colors for tile
+  /// Border color for an empty tile that is not the current active position.
   final Color? borderInactive;
 
-  /// Border colors for tile
+  /// Border color for the tile at the current cursor position (letter just typed).
   final Color? borderActive;
 
+  /// Returns a new [GameColors] with the specified fields replaced.
+  /// Fields not provided fall back to the existing values.
   @override
   GameColors copyWith({
     Color? initial,
@@ -48,6 +56,9 @@ class GameColors extends ThemeExtension<GameColors> {
     );
   }
 
+  /// Linearly interpolates between this and [other] at fraction [t].
+  /// Returns `this` unchanged if [other] is not a [GameColors] instance
+  /// (required by the [ThemeExtension] contract).
   @override
   GameColors lerp(GameColors? other, double t) {
     if (other is! GameColors) {
@@ -64,6 +75,10 @@ class GameColors extends ThemeExtension<GameColors> {
   }
 }
 
+/// Theme extension that carries the three history-row background colors
+/// shown on the Stats page.
+///
+/// Each row in the history list is colored to indicate the game outcome.
 class HistoryColors extends ThemeExtension<HistoryColors> {
   const HistoryColors({
     required this.green,
@@ -71,15 +86,16 @@ class HistoryColors extends ThemeExtension<HistoryColors> {
     required this.red,
   });
 
-  /// When user guessed word correctly
+  /// Background used when the player successfully guessed the word.
   final Color? green;
 
-  /// When game is incomplete
+  /// Background used when a game was abandoned mid-play (incomplete).
   final Color? yellow;
 
-  /// When user did not guess word correctly
+  /// Background used when the player ran out of guesses without solving it.
   final Color? red;
 
+  /// Returns a new [HistoryColors] with the specified fields replaced.
   @override
   HistoryColors copyWith({
     Color? green,
@@ -93,6 +109,8 @@ class HistoryColors extends ThemeExtension<HistoryColors> {
     );
   }
 
+  /// Linearly interpolates between this and [other] at fraction [t].
+  /// Returns `this` unchanged if [other] is not a [HistoryColors] instance.
   @override
   HistoryColors lerp(HistoryColors? other, double t) {
     if (other is! HistoryColors) {

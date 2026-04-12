@@ -1,3 +1,7 @@
+// Widget tests for the HelpIconButton widget.
+//
+// Verifies: help icon rendering, dialog open/dismiss, optional title,
+// and multiple body widgets displayed in the dialog.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:red_owl/widgets/shared.dart' show HelpIconButton;

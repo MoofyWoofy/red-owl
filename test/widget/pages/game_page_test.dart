@@ -1,3 +1,8 @@
+// Widget tests for WordlePage (the main game screen).
+//
+// Verifies: 30-tile 5×6 grid, three keyboard rows, GridView presence,
+// current date in AppBar, settings/help icons, and HOW TO PLAY dialog.
+// Uses a larger viewport (1080×1920) so the GridView renders all 30 tiles.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:red_owl/routes/game/widgets/shared.dart'

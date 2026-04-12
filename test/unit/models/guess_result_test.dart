@@ -1,3 +1,9 @@
+// Unit tests for the GuessResult, CharacterInfo, and CharacterScoring models.
+//
+// JSON keys use snake_case (@JsonKey annotations), so tests verify both the
+// Dart field names and the serialized JSON key names.
+// Round-trips use jsonDecode(jsonEncode(...)) to exercise the full Freezed
+// serialization pipeline including nested objects.
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';

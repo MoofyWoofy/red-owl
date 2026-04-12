@@ -1,3 +1,6 @@
+// Widget tests for the Logo widget.
+//
+// Verifies rendering, default/custom size, rounded clipping, and asset source.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:red_owl/widgets/shared.dart' show Logo;

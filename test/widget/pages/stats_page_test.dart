@@ -1,3 +1,11 @@
+// Widget tests for the StatsPage.
+//
+// Uses pump(Duration) instead of pumpAndSettle because fl_chart bar chart
+// animations run indefinitely and would cause a timeout.
+// Uses a 1080×1920 viewport so the full page fits without overflow.
+//
+// Verifies: Statistics/Guess Distribution/History headings, share/help/settings
+// icons, zero-stats state, stats seeded from SharedPreferences, and help dialog.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:red_owl/routes/shared.dart' show StatsPage;

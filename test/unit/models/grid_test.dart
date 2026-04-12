@@ -1,3 +1,8 @@
+// Unit tests for the Grid Freezed model.
+//
+// Covers: construction, keyboard status defaults, equality, copyWith for
+// tiles/keyboard/game-state fields, JSON round-trip via jsonEncode/jsonDecode,
+// and a 30-tile full-board scenario.
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';

@@ -5,6 +5,14 @@ import 'package:red_owl/database/database.dart';
 import 'package:red_owl/routes/stats/widgets/history_tile.dart';
 import 'package:red_owl/util/shared.dart' show Localization;
 
+/// Fetches and displays the full game history from the Drift database as a
+/// scrollable list of [HistoryTile] widgets.
+///
+/// Records are ordered newest-first. Each tile's background color is chosen
+/// from the [HistoryColors] theme extension based on the stored [GameState].
+///
+/// The database connection is opened in [initState] and closed in [dispose]
+/// to avoid connection leaks.
 class History extends StatefulWidget {
   const History({super.key});
 
@@ -13,13 +21,17 @@ class History extends StatefulWidget {
 }
 
 class _HistoryState extends State<History> {
+  /// Future that resolves to all history rows, ordered by date descending.
   Future<List<HistoryData>>? _historyData;
+
+  /// The database instance used only while this widget is alive.
   late AppDatabase _database;
 
   @override
   void initState() {
     super.initState();
     _database = AppDatabase();
+    // Select all rows, most recent first.
     _historyData = (_database.select(_database.history)
           ..orderBy([
             (t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc),
@@ -29,6 +41,7 @@ class _HistoryState extends State<History> {
 
   @override
   void dispose() {
+    // Always close the database connection when the widget is removed.
     _database.close();
     super.dispose();
   }
@@ -48,6 +61,7 @@ class _HistoryState extends State<History> {
           return const Center(child: Text('snapshot has no data.'));
         }
         if (snapshot.data!.isEmpty) {
+          // Friendly prompt when the player has not finished any game yet.
           return Center(child: Text(context.l10n.playGameFirst));
         }
 
@@ -58,9 +72,9 @@ class _HistoryState extends State<History> {
           separatorBuilder: (BuildContext context, int index) =>
               const SizedBox(height: 8),
           itemBuilder: (_, index) {
-            // Each individual history item
             final historyItem = historyItems[index];
 
+            // Map the stored game state string to a background color.
             Color backgroundColor;
             final gameState = GameState.values.byName(historyItem.gameState);
 
