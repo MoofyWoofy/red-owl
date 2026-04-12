@@ -6,7 +6,7 @@ part 'guess_result.freezed.dart';
 part 'guess_result.g.dart';
 
 @freezed
-class GuessResult with _$GuessResult {
+abstract class GuessResult with _$GuessResult {
   const factory GuessResult({
     required String guess,
     @JsonKey(name: "is_correct") required bool isCorrect,
@@ -20,7 +20,7 @@ class GuessResult with _$GuessResult {
 }
 
 @freezed
-class CharacterInfo with _$CharacterInfo {
+abstract class CharacterInfo with _$CharacterInfo {
   const factory CharacterInfo(
       {required String char,
       required CharacterScoring scoring}) = _CharacterInfo;
@@ -30,7 +30,7 @@ class CharacterInfo with _$CharacterInfo {
 }
 
 @freezed
-class CharacterScoring with _$CharacterScoring {
+abstract class CharacterScoring with _$CharacterScoring {
   const factory CharacterScoring({
     @JsonKey(name: "in_word") required bool inWord,
     @JsonKey(name: "correct_idx") required bool correctIndex,

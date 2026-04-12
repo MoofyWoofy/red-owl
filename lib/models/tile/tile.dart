@@ -5,7 +5,7 @@ part 'tile.freezed.dart';
 part 'tile.g.dart';
 
 @freezed
-class Tile with _$Tile {
+abstract class Tile with _$Tile {
   const factory Tile({
     /// Letter
     required String letter,

@@ -8,7 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:red_owl/config/shared.dart'
     show SharedPreferencesKeys, BoolFamilyProviderIDs;
 import 'package:red_owl/riverpod/shared.dart'
-    show gridProvider, boolFamilyNotifierProvider;
+    show gridProvider, boolFamilyProvider;
 import 'package:red_owl/routes/settings/routes/view_custom_wordlist.dart';
 import 'package:red_owl/routes/settings/widgets/shared.dart'
     show GameInProgressDialog, SwitchItem;
@@ -69,7 +69,8 @@ class SettingsPage extends ConsumerWidget {
                         }
                         if (updateCustomList) {
                           ref
-                              .read(boolFamilyNotifierProvider(
+                              .read(
+                                boolFamilyProvider(
                                 id: BoolFamilyProviderIDs.useCustomList,
                                 sharedPrefsKey:
                                     SharedPreferencesKeys.useCustomList,
@@ -81,7 +82,7 @@ class SettingsPage extends ConsumerWidget {
                       },
                     ),
                     if (ref.watch(
-                      boolFamilyNotifierProvider(
+                      boolFamilyProvider(
                         id: BoolFamilyProviderIDs.useCustomList,
                         sharedPrefsKey: SharedPreferencesKeys.useCustomList,
                       ),
@@ -105,7 +106,7 @@ class SettingsPage extends ConsumerWidget {
                               }
                               if (importCustomList) {
                                 FilePickerResult? result =
-                                    await FilePicker.platform.pickFiles(
+                                    await FilePicker.pickFiles(
                                   type: FileType.custom,
                                   allowedExtensions: ['txt'],
                                 );

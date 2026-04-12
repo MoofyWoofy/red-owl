@@ -6,7 +6,7 @@ part 'grid.freezed.dart';
 part 'grid.g.dart';
 
 @freezed
-class Grid with _$Grid {
+abstract class Grid with _$Grid {
   const factory Grid({
     /// current grid column.
     required int column,

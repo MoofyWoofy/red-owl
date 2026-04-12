@@ -1,0 +1,150 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Dutch Flemish (`nl`).
+class AppLocalizationsNl extends AppLocalizations {
+  AppLocalizationsNl([String locale = 'nl']) : super(locale);
+
+  @override
+  String get appName => 'Rode Uil';
+
+  @override
+  String get daily => 'Dagelijks';
+
+  @override
+  String get stats => 'Statistieken';
+
+  @override
+  String get howToPlay => 'HOE TE SPELEN';
+
+  @override
+  String get sixTries => 'Je hebt 6 pogingen om het woord te raden.';
+
+  @override
+  String get helpLine0 =>
+      'De kleur van de letters verandert om aan te geven of ze correct zijn.';
+
+  @override
+  String get example => 'Voorbeeld';
+
+  @override
+  String get helpLine1 =>
+      'is groen, omdat het in het woord zit en op de juiste plek staat';
+
+  @override
+  String get helpLine2 =>
+      'is geel, omdat het in het woord zit maar op de verkeerde plek staat';
+
+  @override
+  String get helpLine3 => 'zijn grijs, omdat ze niet in het woord zitten';
+
+  @override
+  String get close => 'Sluiten';
+
+  @override
+  String get exit => 'Afsluiten';
+
+  @override
+  String get help => 'Help';
+
+  @override
+  String get share => 'Delen';
+
+  @override
+  String get settings => 'Instellingen';
+
+  @override
+  String get darkMode => 'Donkere modus';
+
+  @override
+  String get customWordList => 'Gebruik aangepaste woordenlijst';
+
+  @override
+  String get gameInProgressChangingWordList =>
+      'Spel bezig, het wijzigen van de woordenlijst zal het spel resetten';
+
+  @override
+  String get gameInProgressImportingWordList =>
+      'Spel bezig, het importeren van de woordenlijst zal het spel resetten';
+
+  @override
+  String get success => 'Succes';
+
+  @override
+  String get import => 'Importeren';
+
+  @override
+  String get view => 'Bekijken';
+
+  @override
+  String get yetAnotherWordApp => 'Nog een Wordle-app';
+
+  @override
+  String get privacyPolicy => 'Privacybeleid';
+
+  @override
+  String get about => 'Over';
+
+  @override
+  String get checkOutWordleStats => 'Bekijk mijn Wordle! statistieken';
+
+  @override
+  String get wordsGuessed => 'Woorden Geraden';
+
+  @override
+  String get winRate => 'Winstpercentage';
+
+  @override
+  String get maxStreak => 'Maximale Reeks';
+
+  @override
+  String get green => 'Groen';
+
+  @override
+  String get helpGuessCorrect => 'betekent dat je correct hebt geraden';
+
+  @override
+  String get yellow => 'Geel';
+
+  @override
+  String get helpGameIncomplete => 'betekent dat het spel niet voltooid was';
+
+  @override
+  String get red => 'Rood';
+
+  @override
+  String get helpGuessWrong => 'betekent dat je het woord niet hebt geraden';
+
+  @override
+  String get burnt => 'VERBRAND';
+
+  @override
+  String get whisk => 'GARD';
+
+  @override
+  String get ideas => 'IDEËEN';
+
+  @override
+  String get statistics => 'Statistieken';
+
+  @override
+  String get guessDistribution => 'Gokverdeling';
+
+  @override
+  String get history => 'Geschiedenis';
+
+  @override
+  String get played => 'Gespeeld';
+
+  @override
+  String get win => 'Winst %';
+
+  @override
+  String get currentStreak => 'Huidige Reeks';
+
+  @override
+  String get playGameFirst => 'Speel eerst een spel.';
+}

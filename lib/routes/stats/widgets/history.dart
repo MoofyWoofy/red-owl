@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:red_owl/config/shared.dart' show HistoryColors;
 import 'package:red_owl/database/database.dart';
 import 'package:red_owl/routes/stats/widgets/history_tile.dart';
-import 'package:red_owl/util/shared.dart' show Localization, dateToString;
+import 'package:red_owl/util/shared.dart' show Localization;
 
 class History extends StatefulWidget {
   const History({super.key});

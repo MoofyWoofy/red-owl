@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:red_owl/riverpod/shared.dart' show boolFamilyNotifierProvider;
+import 'package:red_owl/riverpod/shared.dart' show boolFamilyProvider;
 import 'package:red_owl/config/shared.dart'
     show SharedPreferencesKeys, BoolFamilyProviderIDs;
 
@@ -27,7 +27,7 @@ class _SwitchItemState extends ConsumerState<SwitchItem> {
 
   @override
   Widget build(BuildContext context) {
-    bool toggle = ref.watch(boolFamilyNotifierProvider(
+    bool toggle = ref.watch(boolFamilyProvider(
       id: widget.boolProviderId,
       sharedPrefsKey: widget.sharedPrefsKey,
     ));
@@ -39,7 +39,7 @@ class _SwitchItemState extends ConsumerState<SwitchItem> {
       onChanged: widget.callback ??
           (value) {
         ref
-            .read(boolFamilyNotifierProvider(
+            .read(boolFamilyProvider(
               id: widget.boolProviderId,
               sharedPrefsKey: widget.sharedPrefsKey,
             ).notifier)

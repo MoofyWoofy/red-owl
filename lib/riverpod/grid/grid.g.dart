@@ -6,19 +6,56 @@ part of 'grid.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$gridHash() => r'70033062f95b3df6d99b91f1ab647d65e4b83acf';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [Grid].
 @ProviderFor(Grid)
-final gridProvider = AutoDisposeNotifierProvider<Grid, models.Grid>.internal(
-  Grid.new,
-  name: r'gridProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$gridHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final gridProvider = GridProvider._();
 
-typedef _$Grid = AutoDisposeNotifier<models.Grid>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+final class GridProvider extends $NotifierProvider<Grid, models.Grid> {
+  GridProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'gridProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$gridHash();
+
+  @$internal
+  @override
+  Grid create() => Grid();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(models.Grid value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<models.Grid>(value),
+    );
+  }
+}
+
+String _$gridHash() => r'5d27f1c1fe8b0c0b076c1a4bbf8631a009f4a27f';
+
+abstract class _$Grid extends $Notifier<models.Grid> {
+  models.Grid build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<models.Grid, models.Grid>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<models.Grid, models.Grid>,
+              models.Grid,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,206 +9,281 @@ part of 'tile.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-Tile _$TileFromJson(Map<String, dynamic> json) {
-  return _Tile.fromJson(json);
-}
 
 /// @nodoc
 mixin _$Tile {
-  /// Letter
-  String get letter => throw _privateConstructorUsedError;
 
-  /// Tile status
-  LetterStatus get status => throw _privateConstructorUsedError;
-
-  /// did tile play Flip animation before
-  bool get hasFlipAnimationPlayed => throw _privateConstructorUsedError;
+/// Letter
+ String get letter;/// Tile status
+ LetterStatus get status;/// did tile play Flip animation before
+ bool get hasFlipAnimationPlayed;
+/// Create a copy of Tile
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TileCopyWith<Tile> get copyWith => _$TileCopyWithImpl<Tile>(this as Tile, _$identity);
 
   /// Serializes this Tile to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of Tile
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $TileCopyWith<Tile> get copyWith => throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Tile&&(identical(other.letter, letter) || other.letter == letter)&&(identical(other.status, status) || other.status == status)&&(identical(other.hasFlipAnimationPlayed, hasFlipAnimationPlayed) || other.hasFlipAnimationPlayed == hasFlipAnimationPlayed));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,letter,status,hasFlipAnimationPlayed);
+
+@override
+String toString() {
+  return 'Tile(letter: $letter, status: $status, hasFlipAnimationPlayed: $hasFlipAnimationPlayed)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $TileCopyWith<$Res> {
-  factory $TileCopyWith(Tile value, $Res Function(Tile) then) =
-      _$TileCopyWithImpl<$Res, Tile>;
-  @useResult
-  $Res call({String letter, LetterStatus status, bool hasFlipAnimationPlayed});
-}
+abstract mixin class $TileCopyWith<$Res>  {
+  factory $TileCopyWith(Tile value, $Res Function(Tile) _then) = _$TileCopyWithImpl;
+@useResult
+$Res call({
+ String letter, LetterStatus status, bool hasFlipAnimationPlayed
+});
 
+
+
+
+}
 /// @nodoc
-class _$TileCopyWithImpl<$Res, $Val extends Tile>
+class _$TileCopyWithImpl<$Res>
     implements $TileCopyWith<$Res> {
-  _$TileCopyWithImpl(this._value, this._then);
+  _$TileCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final Tile _self;
+  final $Res Function(Tile) _then;
 
-  /// Create a copy of Tile
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? letter = null,
-    Object? status = null,
-    Object? hasFlipAnimationPlayed = null,
-  }) {
-    return _then(_value.copyWith(
-      letter: null == letter
-          ? _value.letter
-          : letter // ignore: cast_nullable_to_non_nullable
-              as String,
-      status: null == status
-          ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
-              as LetterStatus,
-      hasFlipAnimationPlayed: null == hasFlipAnimationPlayed
-          ? _value.hasFlipAnimationPlayed
-          : hasFlipAnimationPlayed // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ) as $Val);
-  }
+/// Create a copy of Tile
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? letter = null,Object? status = null,Object? hasFlipAnimationPlayed = null,}) {
+  return _then(_self.copyWith(
+letter: null == letter ? _self.letter : letter // ignore: cast_nullable_to_non_nullable
+as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as LetterStatus,hasFlipAnimationPlayed: null == hasFlipAnimationPlayed ? _self.hasFlipAnimationPlayed : hasFlipAnimationPlayed // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
 }
 
-/// @nodoc
-abstract class _$$TileImplCopyWith<$Res> implements $TileCopyWith<$Res> {
-  factory _$$TileImplCopyWith(
-          _$TileImpl value, $Res Function(_$TileImpl) then) =
-      __$$TileImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({String letter, LetterStatus status, bool hasFlipAnimationPlayed});
 }
 
-/// @nodoc
-class __$$TileImplCopyWithImpl<$Res>
-    extends _$TileCopyWithImpl<$Res, _$TileImpl>
-    implements _$$TileImplCopyWith<$Res> {
-  __$$TileImplCopyWithImpl(_$TileImpl _value, $Res Function(_$TileImpl) _then)
-      : super(_value, _then);
 
-  /// Create a copy of Tile
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? letter = null,
-    Object? status = null,
-    Object? hasFlipAnimationPlayed = null,
-  }) {
-    return _then(_$TileImpl(
-      letter: null == letter
-          ? _value.letter
-          : letter // ignore: cast_nullable_to_non_nullable
-              as String,
-      status: null == status
-          ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
-              as LetterStatus,
-      hasFlipAnimationPlayed: null == hasFlipAnimationPlayed
-          ? _value.hasFlipAnimationPlayed
-          : hasFlipAnimationPlayed // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ));
-  }
+/// Adds pattern-matching-related methods to [Tile].
+extension TilePatterns on Tile {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _Tile value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _Tile() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _Tile value)  $default,){
+final _that = this;
+switch (_that) {
+case _Tile():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _Tile value)?  $default,){
+final _that = this;
+switch (_that) {
+case _Tile() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String letter,  LetterStatus status,  bool hasFlipAnimationPlayed)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _Tile() when $default != null:
+return $default(_that.letter,_that.status,_that.hasFlipAnimationPlayed);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String letter,  LetterStatus status,  bool hasFlipAnimationPlayed)  $default,) {final _that = this;
+switch (_that) {
+case _Tile():
+return $default(_that.letter,_that.status,_that.hasFlipAnimationPlayed);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String letter,  LetterStatus status,  bool hasFlipAnimationPlayed)?  $default,) {final _that = this;
+switch (_that) {
+case _Tile() when $default != null:
+return $default(_that.letter,_that.status,_that.hasFlipAnimationPlayed);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$TileImpl implements _Tile {
-  const _$TileImpl(
-      {required this.letter,
-      required this.status,
-      required this.hasFlipAnimationPlayed});
 
-  factory _$TileImpl.fromJson(Map<String, dynamic> json) =>
-      _$$TileImplFromJson(json);
+class _Tile implements Tile {
+  const _Tile({required this.letter, required this.status, required this.hasFlipAnimationPlayed});
+  factory _Tile.fromJson(Map<String, dynamic> json) => _$TileFromJson(json);
 
-  /// Letter
-  @override
-  final String letter;
+/// Letter
+@override final  String letter;
+/// Tile status
+@override final  LetterStatus status;
+/// did tile play Flip animation before
+@override final  bool hasFlipAnimationPlayed;
 
-  /// Tile status
-  @override
-  final LetterStatus status;
+/// Create a copy of Tile
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$TileCopyWith<_Tile> get copyWith => __$TileCopyWithImpl<_Tile>(this, _$identity);
 
-  /// did tile play Flip animation before
-  @override
-  final bool hasFlipAnimationPlayed;
-
-  @override
-  String toString() {
-    return 'Tile(letter: $letter, status: $status, hasFlipAnimationPlayed: $hasFlipAnimationPlayed)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$TileImpl &&
-            (identical(other.letter, letter) || other.letter == letter) &&
-            (identical(other.status, status) || other.status == status) &&
-            (identical(other.hasFlipAnimationPlayed, hasFlipAnimationPlayed) ||
-                other.hasFlipAnimationPlayed == hasFlipAnimationPlayed));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode =>
-      Object.hash(runtimeType, letter, status, hasFlipAnimationPlayed);
-
-  /// Create a copy of Tile
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$TileImplCopyWith<_$TileImpl> get copyWith =>
-      __$$TileImplCopyWithImpl<_$TileImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$TileImplToJson(
-      this,
-    );
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$TileToJson(this, );
 }
 
-abstract class _Tile implements Tile {
-  const factory _Tile(
-      {required final String letter,
-      required final LetterStatus status,
-      required final bool hasFlipAnimationPlayed}) = _$TileImpl;
-
-  factory _Tile.fromJson(Map<String, dynamic> json) = _$TileImpl.fromJson;
-
-  /// Letter
-  @override
-  String get letter;
-
-  /// Tile status
-  @override
-  LetterStatus get status;
-
-  /// did tile play Flip animation before
-  @override
-  bool get hasFlipAnimationPlayed;
-
-  /// Create a copy of Tile
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$TileImplCopyWith<_$TileImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Tile&&(identical(other.letter, letter) || other.letter == letter)&&(identical(other.status, status) || other.status == status)&&(identical(other.hasFlipAnimationPlayed, hasFlipAnimationPlayed) || other.hasFlipAnimationPlayed == hasFlipAnimationPlayed));
 }
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,letter,status,hasFlipAnimationPlayed);
+
+@override
+String toString() {
+  return 'Tile(letter: $letter, status: $status, hasFlipAnimationPlayed: $hasFlipAnimationPlayed)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$TileCopyWith<$Res> implements $TileCopyWith<$Res> {
+  factory _$TileCopyWith(_Tile value, $Res Function(_Tile) _then) = __$TileCopyWithImpl;
+@override @useResult
+$Res call({
+ String letter, LetterStatus status, bool hasFlipAnimationPlayed
+});
+
+
+
+
+}
+/// @nodoc
+class __$TileCopyWithImpl<$Res>
+    implements _$TileCopyWith<$Res> {
+  __$TileCopyWithImpl(this._self, this._then);
+
+  final _Tile _self;
+  final $Res Function(_Tile) _then;
+
+/// Create a copy of Tile
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? letter = null,Object? status = null,Object? hasFlipAnimationPlayed = null,}) {
+  return _then(_Tile(
+letter: null == letter ? _self.letter : letter // ignore: cast_nullable_to_non_nullable
+as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as LetterStatus,hasFlipAnimationPlayed: null == hasFlipAnimationPlayed ? _self.hasFlipAnimationPlayed : hasFlipAnimationPlayed // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+
+}
+
+// dart format on

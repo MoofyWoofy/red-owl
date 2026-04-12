@@ -175,7 +175,7 @@ class _WordlePageState extends ConsumerState<WordlePage> {
                   bool animatePopInEffect = false,
                       animateBounceEffect = false,
                       animateShakeEffect = false;
-                  var grid = ref.watch(gridProvider);
+                  final grid = ref.watch(gridProvider);
                   int gridIndex = (grid.row * 5 + grid.column) - 1;
                   int bounceDelay = animationTiming.bounce.initialDelay!;
                   var currentTilesRowIndexes =

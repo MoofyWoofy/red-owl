@@ -11,24 +11,37 @@ class $HistoryTable extends History with TableInfo<$HistoryTable, HistoryData> {
   static const VerificationMeta _wordMeta = const VerificationMeta('word');
   @override
   late final GeneratedColumn<String> word = GeneratedColumn<String>(
-      'word', aliasedName, false,
-      additionalChecks:
-          GeneratedColumn.checkTextLength(minTextLength: 5, maxTextLength: 5),
-      type: DriftSqlType.string,
-      requiredDuringInsert: true);
-  static const VerificationMeta _gameStateMeta =
-      const VerificationMeta('gameState');
+    'word',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 5,
+      maxTextLength: 5,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _gameStateMeta = const VerificationMeta(
+    'gameState',
+  );
   @override
   late final GeneratedColumn<String> gameState = GeneratedColumn<String>(
-      'game_state', aliasedName, false,
-      check: () => gameState.isIn(GameState.values.map((v) => v.name).toList()),
-      type: DriftSqlType.string,
-      requiredDuringInsert: true);
+    'game_state',
+    aliasedName,
+    false,
+    check: () => gameState.isIn(GameState.values.map((v) => v.name).toList()),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _dateMeta = const VerificationMeta('date');
   @override
   late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
-      'date', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+    'date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
   @override
   List<GeneratedColumn> get $columns => [word, gameState, date];
   @override
@@ -37,25 +50,33 @@ class $HistoryTable extends History with TableInfo<$HistoryTable, HistoryData> {
   String get actualTableName => $name;
   static const String $name = 'history';
   @override
-  VerificationContext validateIntegrity(Insertable<HistoryData> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<HistoryData> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('word')) {
       context.handle(
-          _wordMeta, word.isAcceptableOrUnknown(data['word']!, _wordMeta));
+        _wordMeta,
+        word.isAcceptableOrUnknown(data['word']!, _wordMeta),
+      );
     } else if (isInserting) {
       context.missing(_wordMeta);
     }
     if (data.containsKey('game_state')) {
-      context.handle(_gameStateMeta,
-          gameState.isAcceptableOrUnknown(data['game_state']!, _gameStateMeta));
+      context.handle(
+        _gameStateMeta,
+        gameState.isAcceptableOrUnknown(data['game_state']!, _gameStateMeta),
+      );
     } else if (isInserting) {
       context.missing(_gameStateMeta);
     }
     if (data.containsKey('date')) {
       context.handle(
-          _dateMeta, date.isAcceptableOrUnknown(data['date']!, _dateMeta));
+        _dateMeta,
+        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+      );
     } else if (isInserting) {
       context.missing(_dateMeta);
     }
@@ -68,12 +89,18 @@ class $HistoryTable extends History with TableInfo<$HistoryTable, HistoryData> {
   HistoryData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return HistoryData(
-      word: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}word'])!,
-      gameState: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}game_state'])!,
-      date: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}date'])!,
+      word: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}word'],
+      )!,
+      gameState: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}game_state'],
+      )!,
+      date: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}date'],
+      )!,
     );
   }
 
@@ -87,13 +114,16 @@ class HistoryData extends DataClass implements Insertable<HistoryData> {
   /// The wordle word.
   final String word;
 
-  /// Did user guess correctly?
+  /// Did user guess correctly? Or was the game incomplete.
   final String gameState;
 
   /// The date the game was played.
   final DateTime date;
-  const HistoryData(
-      {required this.word, required this.gameState, required this.date});
+  const HistoryData({
+    required this.word,
+    required this.gameState,
+    required this.date,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -111,8 +141,10 @@ class HistoryData extends DataClass implements Insertable<HistoryData> {
     );
   }
 
-  factory HistoryData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory HistoryData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return HistoryData(
       word: serializer.fromJson<String>(json['word']),
@@ -181,9 +213,9 @@ class HistoryCompanion extends UpdateCompanion<HistoryData> {
     required String gameState,
     required DateTime date,
     this.rowid = const Value.absent(),
-  })  : word = Value(word),
-        gameState = Value(gameState),
-        date = Value(date);
+  }) : word = Value(word),
+       gameState = Value(gameState),
+       date = Value(date);
   static Insertable<HistoryData> custom({
     Expression<String>? word,
     Expression<String>? gameState,
@@ -198,11 +230,12 @@ class HistoryCompanion extends UpdateCompanion<HistoryData> {
     });
   }
 
-  HistoryCompanion copyWith(
-      {Value<String>? word,
-      Value<String>? gameState,
-      Value<DateTime>? date,
-      Value<int>? rowid}) {
+  HistoryCompanion copyWith({
+    Value<String>? word,
+    Value<String>? gameState,
+    Value<DateTime>? date,
+    Value<int>? rowid,
+  }) {
     return HistoryCompanion(
       word: word ?? this.word,
       gameState: gameState ?? this.gameState,
@@ -252,118 +285,165 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [history];
 }
 
-typedef $$HistoryTableCreateCompanionBuilder = HistoryCompanion Function({
-  required String word,
-  required String gameState,
-  required DateTime date,
-  Value<int> rowid,
-});
-typedef $$HistoryTableUpdateCompanionBuilder = HistoryCompanion Function({
-  Value<String> word,
-  Value<String> gameState,
-  Value<DateTime> date,
-  Value<int> rowid,
-});
+typedef $$HistoryTableCreateCompanionBuilder =
+    HistoryCompanion Function({
+      required String word,
+      required String gameState,
+      required DateTime date,
+      Value<int> rowid,
+    });
+typedef $$HistoryTableUpdateCompanionBuilder =
+    HistoryCompanion Function({
+      Value<String> word,
+      Value<String> gameState,
+      Value<DateTime> date,
+      Value<int> rowid,
+    });
 
 class $$HistoryTableFilterComposer
-    extends FilterComposer<_$AppDatabase, $HistoryTable> {
-  $$HistoryTableFilterComposer(super.$state);
-  ColumnFilters<String> get word => $state.composableBuilder(
-      column: $state.table.word,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+    extends Composer<_$AppDatabase, $HistoryTable> {
+  $$HistoryTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get word => $composableBuilder(
+    column: $table.word,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<String> get gameState => $state.composableBuilder(
-      column: $state.table.gameState,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<String> get gameState => $composableBuilder(
+    column: $table.gameState,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  ColumnFilters<DateTime> get date => $state.composableBuilder(
-      column: $state.table.date,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<DateTime> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$HistoryTableOrderingComposer
-    extends OrderingComposer<_$AppDatabase, $HistoryTable> {
-  $$HistoryTableOrderingComposer(super.$state);
-  ColumnOrderings<String> get word => $state.composableBuilder(
-      column: $state.table.word,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+    extends Composer<_$AppDatabase, $HistoryTable> {
+  $$HistoryTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get word => $composableBuilder(
+    column: $table.word,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<String> get gameState => $state.composableBuilder(
-      column: $state.table.gameState,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get gameState => $composableBuilder(
+    column: $table.gameState,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  ColumnOrderings<DateTime> get date => $state.composableBuilder(
-      column: $state.table.date,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<DateTime> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
-class $$HistoryTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $HistoryTable,
-    HistoryData,
-    $$HistoryTableFilterComposer,
-    $$HistoryTableOrderingComposer,
-    $$HistoryTableCreateCompanionBuilder,
-    $$HistoryTableUpdateCompanionBuilder,
-    (HistoryData, BaseReferences<_$AppDatabase, $HistoryTable, HistoryData>),
-    HistoryData,
-    PrefetchHooks Function()> {
+class $$HistoryTableAnnotationComposer
+    extends Composer<_$AppDatabase, $HistoryTable> {
+  $$HistoryTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get word =>
+      $composableBuilder(column: $table.word, builder: (column) => column);
+
+  GeneratedColumn<String> get gameState =>
+      $composableBuilder(column: $table.gameState, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+}
+
+class $$HistoryTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $HistoryTable,
+          HistoryData,
+          $$HistoryTableFilterComposer,
+          $$HistoryTableOrderingComposer,
+          $$HistoryTableAnnotationComposer,
+          $$HistoryTableCreateCompanionBuilder,
+          $$HistoryTableUpdateCompanionBuilder,
+          (
+            HistoryData,
+            BaseReferences<_$AppDatabase, $HistoryTable, HistoryData>,
+          ),
+          HistoryData,
+          PrefetchHooks Function()
+        > {
   $$HistoryTableTableManager(_$AppDatabase db, $HistoryTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
-          filteringComposer:
-              $$HistoryTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $$HistoryTableOrderingComposer(ComposerState(db, table)),
-          updateCompanionCallback: ({
-            Value<String> word = const Value.absent(),
-            Value<String> gameState = const Value.absent(),
-            Value<DateTime> date = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              HistoryCompanion(
-            word: word,
-            gameState: gameState,
-            date: date,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            required String word,
-            required String gameState,
-            required DateTime date,
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              HistoryCompanion.insert(
-            word: word,
-            gameState: gameState,
-            date: date,
-            rowid: rowid,
-          ),
+          createFilteringComposer: () =>
+              $$HistoryTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$HistoryTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$HistoryTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> word = const Value.absent(),
+                Value<String> gameState = const Value.absent(),
+                Value<DateTime> date = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => HistoryCompanion(
+                word: word,
+                gameState: gameState,
+                date: date,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String word,
+                required String gameState,
+                required DateTime date,
+                Value<int> rowid = const Value.absent(),
+              }) => HistoryCompanion.insert(
+                word: word,
+                gameState: gameState,
+                date: date,
+                rowid: rowid,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$HistoryTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $HistoryTable,
-    HistoryData,
-    $$HistoryTableFilterComposer,
-    $$HistoryTableOrderingComposer,
-    $$HistoryTableCreateCompanionBuilder,
-    $$HistoryTableUpdateCompanionBuilder,
-    (HistoryData, BaseReferences<_$AppDatabase, $HistoryTable, HistoryData>),
-    HistoryData,
-    PrefetchHooks Function()>;
+typedef $$HistoryTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $HistoryTable,
+      HistoryData,
+      $$HistoryTableFilterComposer,
+      $$HistoryTableOrderingComposer,
+      $$HistoryTableAnnotationComposer,
+      $$HistoryTableCreateCompanionBuilder,
+      $$HistoryTableUpdateCompanionBuilder,
+      (HistoryData, BaseReferences<_$AppDatabase, $HistoryTable, HistoryData>),
+      HistoryData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;

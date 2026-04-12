@@ -93,9 +93,9 @@ class _GuessDistributionChartState extends State<_GuessDistributionChart> {
           getTitlesWidget: (val, meta) => RotatedBox(
             quarterTurns: 0,
             child: SideTitleWidget(
+              meta: meta,
               angle:
                   4.7123889803847, // Rotate 270 degrees counter-clockwise (in radians)
-              axisSide: AxisSide.left,
               child: Text(
                 '${(val.toInt())}',
                 style: TextStyle(

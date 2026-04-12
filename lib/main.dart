@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:red_owl/riverpod/shared.dart' show boolFamilyNotifierProvider;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:red_owl/riverpod/shared.dart' show boolFamilyProvider;
+import 'package:red_owl/l10n/app_localizations.dart';
 import 'package:red_owl/routes/shared.dart';
 import 'package:red_owl/config/shared.dart'
     show lightTheme, darkTheme, SharedPreferencesKeys, BoolFamilyProviderIDs;
@@ -21,7 +21,8 @@ class App extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    bool isDarkMode = ref.watch(boolFamilyNotifierProvider(
+    bool isDarkMode = ref.watch(
+      boolFamilyProvider(
       id: BoolFamilyProviderIDs.isDarkMode,
       sharedPrefsKey: SharedPreferencesKeys.isDarkMode,
     ));
