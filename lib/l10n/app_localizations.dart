@@ -212,6 +212,66 @@ abstract class AppLocalizations {
   /// **'System default'**
   String get systemDefault;
 
+  /// No description provided for @fontSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Text size'**
+  String get fontSize;
+
+  /// No description provided for @fontSizeSmall.
+  ///
+  /// In en, this message translates to:
+  /// **'Small'**
+  String get fontSizeSmall;
+
+  /// No description provided for @fontSizeNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get fontSizeNormal;
+
+  /// No description provided for @fontSizeLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Large'**
+  String get fontSizeLarge;
+
+  /// No description provided for @fontSizeExtraLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra large'**
+  String get fontSizeExtraLarge;
+
+  /// No description provided for @animationSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Animation speed'**
+  String get animationSpeed;
+
+  /// No description provided for @motionReduced.
+  ///
+  /// In en, this message translates to:
+  /// **'Reduced'**
+  String get motionReduced;
+
+  /// No description provided for @motionFast.
+  ///
+  /// In en, this message translates to:
+  /// **'Fast'**
+  String get motionFast;
+
+  /// No description provided for @motionNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get motionNormal;
+
+  /// No description provided for @motionSlow.
+  ///
+  /// In en, this message translates to:
+  /// **'Slow'**
+  String get motionSlow;
+
   /// No description provided for @customWordList.
   ///
   /// In en, this message translates to:

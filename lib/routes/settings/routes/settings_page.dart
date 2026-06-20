@@ -9,7 +9,15 @@ import 'package:path/path.dart' as path;
 import 'package:red_owl/config/shared.dart'
     show SharedPreferencesKeys, BoolFamilyProviderIDs;
 import 'package:red_owl/riverpod/shared.dart'
-    show gridProvider, boolFamilyProvider, localeProvider, systemLocaleCode;
+    show
+        gridProvider,
+        boolFamilyProvider,
+        localeProvider,
+        systemLocaleCode,
+        fontScaleProvider,
+        fontScaleCodes,
+        motionSpeedProvider,
+        motionSpeedCodes;
 import 'package:red_owl/routes/settings/routes/view_custom_wordlist.dart';
 import 'package:red_owl/routes/settings/widgets/shared.dart'
     show GameInProgressDialog, SwitchItem;
@@ -58,8 +66,15 @@ class SettingsPage extends ConsumerWidget {
         child: Column(
           children: [
             Expanded(
-              child: Center(
-                child: Column(
+              // Scroll when the settings list is taller than the viewport (small
+              // screens, large text scale), but keep it vertically centred when
+              // it fits.
+              child: LayoutBuilder(
+                builder: (context, constraints) => SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints:
+                        BoxConstraints(minHeight: constraints.maxHeight),
+                    child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // ── Dark Mode ────────────────────────────────────────────
@@ -89,6 +104,22 @@ class SettingsPage extends ConsumerWidget {
                         ),
                       ),
                       onTap: () => _pickLanguage(context, ref),
+                    ),
+                    // ── Text size ────────────────────────────────────────────
+                    ListTile(
+                      leading: const Icon(Icons.format_size),
+                      title: Text(context.l10n.fontSize),
+                      trailing:
+                          Text(_fontScaleLabel(context, ref.watch(fontScaleProvider))),
+                      onTap: () => _pickFontScale(context, ref),
+                    ),
+                    // ── Animation speed ──────────────────────────────────────
+                    ListTile(
+                      leading: const Icon(Icons.speed),
+                      title: Text(context.l10n.animationSpeed),
+                      trailing: Text(
+                          _motionLabel(context, ref.watch(motionSpeedProvider))),
+                      onTap: () => _pickMotionSpeed(context, ref),
                     ),
                     const SizedBox(height: 20),
                     // ── Custom Word List ─────────────────────────────────────
@@ -186,6 +217,8 @@ class SettingsPage extends ConsumerWidget {
                       ],
                     ),
                   ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -249,20 +282,22 @@ class SettingsPage extends ConsumerWidget {
     return _languageEndonyms[languageCode] ?? languageCode;
   }
 
-  /// Shows a dialog letting the user choose the UI language (or follow the
-  /// system language) and persists the choice via [localeProvider].
-  Future<void> _pickLanguage(BuildContext context, WidgetRef ref) async {
-    final current = ref.read(localeProvider)?.languageCode ?? systemLocaleCode;
-    // System default first, then every supported locale.
-    final codes = [
-      systemLocaleCode,
-      ...AppLocalizations.supportedLocales.map((l) => l.languageCode),
-    ];
-
-    final selected = await showDialog<String>(
+  /// Generic single-choice picker dialog.
+  ///
+  /// Shows [title] and a radio list built from [codes], with [current]
+  /// pre-selected and each option labelled by [labelBuilder]. Returns the code
+  /// the user chose, or `null` if they dismissed the dialog.
+  Future<String?> _pickCode(
+    BuildContext context, {
+    required String title,
+    required List<String> codes,
+    required String current,
+    required String Function(BuildContext, String) labelBuilder,
+  }) {
+    return showDialog<String>(
       context: context,
       builder: (dialogContext) => SimpleDialog(
-        title: Text(dialogContext.l10n.language),
+        title: Text(title),
         children: [
           RadioGroup<String>(
             groupValue: current,
@@ -273,7 +308,7 @@ class SettingsPage extends ConsumerWidget {
                 for (final code in codes)
                   RadioListTile<String>(
                     value: code,
-                    title: Text(_languageLabel(dialogContext, code)),
+                    title: Text(labelBuilder(dialogContext, code)),
                   ),
               ],
             ),
@@ -281,9 +316,81 @@ class SettingsPage extends ConsumerWidget {
         ],
       ),
     );
+  }
 
+  /// Shows a dialog letting the user choose the UI language (or follow the
+  /// system language) and persists the choice via [localeProvider].
+  Future<void> _pickLanguage(BuildContext context, WidgetRef ref) async {
+    final selected = await _pickCode(
+      context,
+      title: context.l10n.language,
+      // System default first, then every supported locale.
+      codes: [
+        systemLocaleCode,
+        ...AppLocalizations.supportedLocales.map((l) => l.languageCode),
+      ],
+      current: ref.read(localeProvider)?.languageCode ?? systemLocaleCode,
+      labelBuilder: _languageLabel,
+    );
     if (selected != null) {
       ref.read(localeProvider.notifier).setLocale(selected);
+    }
+  }
+
+  /// Localised label for a text-size [code].
+  String _fontScaleLabel(BuildContext context, String code) {
+    switch (code) {
+      case 'small':
+        return context.l10n.fontSizeSmall;
+      case 'large':
+        return context.l10n.fontSizeLarge;
+      case 'xlarge':
+        return context.l10n.fontSizeExtraLarge;
+      default:
+        return context.l10n.fontSizeNormal;
+    }
+  }
+
+  /// Shows the text-size picker and persists the choice via [fontScaleProvider].
+  Future<void> _pickFontScale(BuildContext context, WidgetRef ref) async {
+    final selected = await _pickCode(
+      context,
+      title: context.l10n.fontSize,
+      codes: fontScaleCodes,
+      current: ref.read(fontScaleProvider),
+      labelBuilder: _fontScaleLabel,
+    );
+    if (selected != null) {
+      ref.read(fontScaleProvider.notifier).setScale(selected);
+    }
+  }
+
+  /// Localised label for an animation-speed [code].
+  String _motionLabel(BuildContext context, String code) {
+    switch (code) {
+      case 'reduced':
+        return context.l10n.motionReduced;
+      case 'fast':
+        return context.l10n.motionFast;
+      case 'slow':
+        return context.l10n.motionSlow;
+      default:
+        return context.l10n.motionNormal;
+    }
+  }
+
+  /// Shows the animation-speed picker and persists the choice via
+  /// [motionSpeedProvider].
+  Future<void> _pickMotionSpeed(BuildContext context, WidgetRef ref) async {
+    final selected = await _pickCode(
+      context,
+      title: context.l10n.animationSpeed,
+      codes: motionSpeedCodes,
+      current: ref.read(motionSpeedProvider),
+      labelBuilder: _motionLabel,
+    );
+    if (selected != null) {
+      ref.read(motionSpeedProvider.notifier).setSpeed(selected);
     }
   }
 

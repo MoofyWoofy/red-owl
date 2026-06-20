@@ -103,5 +103,43 @@ void main() {
       expect(find.text('English'), findsOneWidget);
       expect(find.text('Nederlands'), findsOneWidget);
     });
+
+    testWidgets('text-size tile shows Normal and opens a picker',
+        (tester) async {
+      await tester.pumpWidget(
+        makeTestAppRaw(child: const SettingsPage()),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Text size'), findsOneWidget);
+      // No override stored, so the tile shows the normal label.
+      expect(find.text('Normal'), findsWidgets);
+
+      await tester.tap(find.text('Text size'));
+      await tester.pumpAndSettle();
+
+      // The picker lists each supported text size.
+      expect(find.text('Small'), findsOneWidget);
+      expect(find.text('Large'), findsOneWidget);
+      expect(find.text('Extra large'), findsOneWidget);
+    });
+
+    testWidgets('animation-speed tile shows Normal and opens a picker',
+        (tester) async {
+      await tester.pumpWidget(
+        makeTestAppRaw(child: const SettingsPage()),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Animation speed'), findsOneWidget);
+
+      await tester.tap(find.text('Animation speed'));
+      await tester.pumpAndSettle();
+
+      // The picker lists each supported animation speed.
+      expect(find.text('Reduced'), findsOneWidget);
+      expect(find.text('Fast'), findsOneWidget);
+      expect(find.text('Slow'), findsOneWidget);
+    });
   });
 }

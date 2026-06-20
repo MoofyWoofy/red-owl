@@ -69,6 +69,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get systemDefault => 'System default';
 
   @override
+  String get fontSize => 'Text size';
+
+  @override
+  String get fontSizeSmall => 'Small';
+
+  @override
+  String get fontSizeNormal => 'Normal';
+
+  @override
+  String get fontSizeLarge => 'Large';
+
+  @override
+  String get fontSizeExtraLarge => 'Extra large';
+
+  @override
+  String get animationSpeed => 'Animation speed';
+
+  @override
+  String get motionReduced => 'Reduced';
+
+  @override
+  String get motionFast => 'Fast';
+
+  @override
+  String get motionNormal => 'Normal';
+
+  @override
+  String get motionSlow => 'Slow';
+
+  @override
   String get customWordList => 'Use custom word list';
 
   @override

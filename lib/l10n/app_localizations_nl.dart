@@ -69,6 +69,36 @@ class AppLocalizationsNl extends AppLocalizations {
   String get systemDefault => 'Systeemstandaard';
 
   @override
+  String get fontSize => 'Tekstgrootte';
+
+  @override
+  String get fontSizeSmall => 'Klein';
+
+  @override
+  String get fontSizeNormal => 'Normaal';
+
+  @override
+  String get fontSizeLarge => 'Groot';
+
+  @override
+  String get fontSizeExtraLarge => 'Extra groot';
+
+  @override
+  String get animationSpeed => 'Animatiesnelheid';
+
+  @override
+  String get motionReduced => 'Verminderd';
+
+  @override
+  String get motionFast => 'Snel';
+
+  @override
+  String get motionNormal => 'Normaal';
+
+  @override
+  String get motionSlow => 'Langzaam';
+
+  @override
   String get customWordList => 'Gebruik aangepaste woordenlijst';
 
   @override
