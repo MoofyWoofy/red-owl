@@ -9,6 +9,7 @@ import 'package:red_owl/util/shared.dart'
         SharedPreferenceService,
         WordleService,
         getDateOnly,
+        isStreakMilestone,
         showSnackBar,
         stringToDate;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -136,9 +137,6 @@ class Grid extends _$Grid {
               tiles[i] = tiles[i].copyWith(status: LetterStatus.green);
               keyboardStatusTemp[tiles[i].letter] = LetterStatus.green;
             }
-            if (context.mounted) {
-              showSnackBar(context, 'You got it!');
-            }
             state = state.copyWith(
               tiles: tiles,
               runFlipAnimation: true,
@@ -148,6 +146,21 @@ class Grid extends _$Grid {
             );
             _updateKeyboard(keyboardStatusTemp);
             await recordOutcome(gameWon: true);
+            // The (daily-only) updated current streak; a milestone replaces the
+            // generic win message with a celebration.
+            final streak = state.persistState
+                ? int.tryParse(SharedPreferenceService()
+                            .getStringList(SharedPreferencesKeys.statsData)?[2] ??
+                        '0') ??
+                    0
+                : 0;
+            if (context.mounted) {
+              if (isStreakMilestone(streak)) {
+                showSnackBar(context, context.l10n.streakMilestone(streak), 3);
+              } else {
+                showSnackBar(context, 'You got it!');
+              }
+            }
           } else if (!result.isWordInList) {
             // ── Word not in list ───────────────────────────────────────────
             // Reuse the notEnoughCharacters flag to trigger the shake animation.

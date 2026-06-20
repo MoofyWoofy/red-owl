@@ -632,6 +632,12 @@ abstract class AppLocalizations {
   /// **'Current Streak'**
   String get currentStreak;
 
+  /// No description provided for @streakMilestone.
+  ///
+  /// In en, this message translates to:
+  /// **'🔥 {streak}-day streak! Tap share to brag.'**
+  String streakMilestone(int streak);
+
   /// No description provided for @playGameFirst.
   ///
   /// In en, this message translates to:

@@ -133,6 +133,12 @@
   "avgGuesses":"Avg guesses",
   "win":"Win %",
   "currentStreak":"Current Streak",
+  "streakMilestone":"🔥 {streak}-day streak! Tap share to brag.",
+  "@streakMilestone":{
+    "placeholders":{
+      "streak":{"type":"int"}
+    }
+  },
   "playGameFirst":"Play a game first.",
   "yes":"Yes",
   "no":"No",

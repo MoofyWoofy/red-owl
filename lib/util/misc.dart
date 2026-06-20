@@ -39,6 +39,12 @@ bool isGameInProgress(Grid grid) {
   return grid.tiles.isNotEmpty && !grid.isGameOver;
 }
 
+/// Notable streak lengths that earn a celebratory share prompt.
+const Set<int> streakMilestones = {5, 10, 25, 50, 100, 200, 365, 500, 1000};
+
+/// Whether [streak] is a celebrated milestone (see [streakMilestones]).
+bool isStreakMilestone(int streak) => streakMilestones.contains(streak);
+
 /// Computes the average number of guesses across won games from the stored
 /// [guessDistribution] (six string-encoded counts for wins in 1–6 guesses).
 ///

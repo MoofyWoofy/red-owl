@@ -301,6 +301,11 @@ class AppLocalizationsNl extends AppLocalizations {
   String get currentStreak => 'Huidige Reeks';
 
   @override
+  String streakMilestone(int streak) {
+    return '🔥 Reeks van $streak dagen! Tik op delen om op te scheppen.';
+  }
+
+  @override
   String get playGameFirst => 'Speel eerst een spel.';
 
   @override

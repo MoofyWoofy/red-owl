@@ -133,6 +133,12 @@
   "avgGuesses": "Gem. pogingen",
   "win": "Winst %",
   "currentStreak": "Huidige Reeks",
+  "streakMilestone": "🔥 Reeks van {streak} dagen! Tik op delen om op te scheppen.",
+  "@streakMilestone": {
+    "placeholders": {
+      "streak": {"type": "int"}
+    }
+  },
   "playGameFirst": "Speel eerst een spel.",
   "yes": "Ja",
   "no": "Nee",

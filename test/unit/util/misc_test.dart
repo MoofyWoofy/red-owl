@@ -221,4 +221,20 @@ void main() {
       expect(getAverageGuesses(['1', '0', '0', '0', '0', '0']), '1.0');
     });
   });
+
+  group('isStreakMilestone', () {
+    test('recognises notable milestones', () {
+      expect(isStreakMilestone(5), isTrue);
+      expect(isStreakMilestone(10), isTrue);
+      expect(isStreakMilestone(100), isTrue);
+      expect(isStreakMilestone(365), isTrue);
+    });
+
+    test('rejects non-milestone streaks', () {
+      expect(isStreakMilestone(0), isFalse);
+      expect(isStreakMilestone(4), isFalse);
+      expect(isStreakMilestone(7), isFalse);
+      expect(isStreakMilestone(99), isFalse);
+    });
+  });
 }

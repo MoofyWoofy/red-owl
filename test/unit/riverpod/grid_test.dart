@@ -185,6 +185,23 @@ void main() {
       await drainSnackBars(tester);
     });
 
+    testWidgets('winning onto a streak milestone shows a celebratory message',
+        (tester) async {
+      // Seed a current streak of 4 so this win lands on the 5-day milestone.
+      SharedPreferenceService()
+          .setStringList(SharedPreferencesKeys.statsData, ['4', '4', '4', '4']);
+      await pumpHost(tester);
+
+      await type(WordleService().wordOfTheDay);
+      await enter();
+      // On a milestone win the single win snack bar is the celebration.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 750));
+
+      expect(find.textContaining('5-day streak'), findsOneWidget);
+      await drainSnackBars(tester);
+    });
+
     testWidgets('a valid wrong guess colours the keyboard and advances the row',
         (tester) async {
       await pumpHost(tester);

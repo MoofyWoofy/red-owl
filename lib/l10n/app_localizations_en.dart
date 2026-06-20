@@ -300,6 +300,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currentStreak => 'Current Streak';
 
   @override
+  String streakMilestone(int streak) {
+    return '🔥 $streak-day streak! Tap share to brag.';
+  }
+
+  @override
   String get playGameFirst => 'Play a game first.';
 
   @override
