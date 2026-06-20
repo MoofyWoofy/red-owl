@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:red_owl/config/shared.dart' show GameColors;
 import 'package:red_owl/routes/game/widgets/shared.dart'
-    show GameBoard, GameStatusAnnouncer, HelpTile;
+    show GameBoard, GameStatusAnnouncer, HelpTile, HintButton;
 import 'package:red_owl/util/shared.dart' show Localization;
 import 'package:red_owl/widgets/shared.dart' show HelpIconButton, appBar;
 
@@ -30,6 +30,7 @@ class WordlePage extends StatelessWidget {
         title: MaterialLocalizations.of(context).formatCompactDate(DateTime.now()),
         showSettingIcon: true,
         widgets: [
+          const HintButton(),
           HelpIconButton(
             title: context.l10n.howToPlay,
             body: [

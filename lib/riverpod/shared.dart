@@ -1,5 +1,6 @@
 export 'grid/grid.dart';
 export 'practice_grid/practice_grid.dart';
+export 'hint/hint_notifier.dart';
 export 'bool_family_notifier/bool_family_notifier.dart';
 export 'locale/locale_notifier.dart';
 export 'font_scale/font_scale_notifier.dart';

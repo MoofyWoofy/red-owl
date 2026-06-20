@@ -1,6 +1,7 @@
 export 'a11y_labels.dart';
 export 'game_board.dart';
 export 'game_status_announcer.dart';
+export 'hint_button.dart';
 export 'keyboard_row.dart';
 export 'tile.dart';
 export 'letter.dart';

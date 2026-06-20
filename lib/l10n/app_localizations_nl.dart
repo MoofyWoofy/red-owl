@@ -57,6 +57,17 @@ class AppLocalizationsNl extends AppLocalizations {
   String get help => 'Help';
 
   @override
+  String get hint => 'Hint';
+
+  @override
+  String hintReveal(int position, String letter) {
+    return 'Hint: letter $position is $letter';
+  }
+
+  @override
+  String get hintAlreadyUsed => 'Je hebt de hint van vandaag al gebruikt';
+
+  @override
   String get share => 'Delen';
 
   @override

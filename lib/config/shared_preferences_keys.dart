@@ -53,4 +53,8 @@ enum SharedPreferencesKeys {
   /// must be reused in subsequent guesses. The toggle locks once the first
   /// guess of the day is made. Absent → `false`.
   isHardMode,
+
+  /// ISO-8601 date string (`yyyy-MM-dd`) of the day the player last used the
+  /// once-per-day hint. When it differs from today, a hint is available again.
+  hintUsedDate,
 }

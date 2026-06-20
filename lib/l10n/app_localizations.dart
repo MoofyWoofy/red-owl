@@ -188,6 +188,24 @@ abstract class AppLocalizations {
   /// **'Help'**
   String get help;
 
+  /// No description provided for @hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Hint'**
+  String get hint;
+
+  /// No description provided for @hintReveal.
+  ///
+  /// In en, this message translates to:
+  /// **'Hint: letter {position} is {letter}'**
+  String hintReveal(int position, String letter);
+
+  /// No description provided for @hintAlreadyUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve already used today\'s hint'**
+  String get hintAlreadyUsed;
+
   /// No description provided for @share.
   ///
   /// In en, this message translates to:

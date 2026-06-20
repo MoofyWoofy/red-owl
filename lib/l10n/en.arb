@@ -15,6 +15,15 @@
   "close":"Close",
   "exit":"Exit",
   "help":"Help",
+  "hint":"Hint",
+  "hintReveal":"Hint: letter {position} is {letter}",
+  "@hintReveal":{
+    "placeholders":{
+      "position":{"type":"int"},
+      "letter":{"type":"String"}
+    }
+  },
+  "hintAlreadyUsed":"You've already used today's hint",
   "share":"Share",
   "settings":"Settings",
   "darkMode":"Dark Mode",

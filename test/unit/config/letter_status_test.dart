@@ -61,8 +61,8 @@ void main() {
   });
 
   group('SharedPreferencesKeys', () {
-    test('has eleven values', () {
-      expect(SharedPreferencesKeys.values, hasLength(11));
+    test('has twelve values', () {
+      expect(SharedPreferencesKeys.values, hasLength(12));
     });
 
     test('contains all expected keys', () {
@@ -78,6 +78,7 @@ void main() {
         SharedPreferencesKeys.fontScale,
         SharedPreferencesKeys.motionSpeed,
         SharedPreferencesKeys.isHardMode,
+        SharedPreferencesKeys.hintUsedDate,
       ]));
     });
   });
