@@ -52,14 +52,17 @@ void main() {
       expect(find.byType(GridView), findsOneWidget);
     });
 
-    testWidgets('AppBar shows the current date', (tester) async {
+    testWidgets('AppBar shows the current date in the regional format',
+        (tester) async {
       await tester.pumpWidget(
         makeTestAppRaw(child: const WordlePage()),
       );
       await tester.pumpAndSettle();
-      final now = DateTime.now();
+      // Compute the expected text via the same locale-aware API the page uses,
+      // so the test is independent of the exact pattern for the test locale.
+      final context = tester.element(find.byType(WordlePage));
       final expectedDate =
-          '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+          MaterialLocalizations.of(context).formatCompactDate(DateTime.now());
       expect(find.text(expectedDate), findsOneWidget);
     });
 

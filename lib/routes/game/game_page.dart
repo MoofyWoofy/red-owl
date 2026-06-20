@@ -10,7 +10,7 @@ import 'package:red_owl/config/shared.dart'
     show GameColors, LetterStatus, animationTiming, keyboardStatus;
 import 'package:red_owl/riverpod/shared.dart' show gridProvider;
 import 'package:red_owl/routes/game/widgets/shared.dart';
-import 'package:red_owl/util/shared.dart' show Localization, dateToString;
+import 'package:red_owl/util/shared.dart' show Localization;
 import 'package:red_owl/widgets/shared.dart' show HelpIconButton, appBar;
 
 /// The main Wordle gameplay screen.
@@ -97,8 +97,8 @@ class _WordlePageState extends ConsumerState<WordlePage> {
     return Scaffold(
       appBar: appBar(
         context: context,
-        // Display the current date (ISO format) as the page title.
-        title: dateToString(DateTime.now()),
+        // Display the current date in the user's regional format as the title.
+        title: MaterialLocalizations.of(context).formatCompactDate(DateTime.now()),
         showSettingIcon: true,
         widgets: [
           HelpIconButton(
