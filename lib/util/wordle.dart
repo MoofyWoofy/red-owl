@@ -23,6 +23,14 @@ class WordleService {
   /// The answer for today's game, set by [init].
   late String _wordOfTheDay;
 
+  /// Lazily-populated, normalised copy of the active word list.
+  ///
+  /// `getWordList` reads from disk/assets on the first call and reuses this for
+  /// subsequent calls (every guess hits the list), so the file is only read
+  /// once per list source. [init] clears it whenever the source may have
+  /// changed (custom-list toggle, import, or backup restore).
+  List<String>? _cachedWordList;
+
   static final WordleService _instance = WordleService._internal();
 
   /// Returns the singleton [WordleService] instance.
@@ -37,8 +45,10 @@ class WordleService {
   ///
   /// Must be awaited during app startup (in `main()`) before the first
   /// widget build. Can be called again after the custom word list is
-  /// imported to pick a new word from the updated list.
+  /// imported to pick a new word from the updated list; doing so clears the
+  /// cached list so the new source is re-read.
   Future<void> init() async {
+    _cachedWordList = null;
     _wordOfTheDay = await getWordOfTheDay();
   }
 
@@ -67,28 +77,34 @@ class WordleService {
   /// matching in [checkGuessWord] (which lower-cases the guess) is independent
   /// of how the imported file was cased or spaced.
   Future<List<String>> get getWordList async {
+    // Serve the cached copy if it has already been loaded for this source.
+    final cached = _cachedWordList;
+    if (cached != null) return cached;
+
     var useCustomList =
         SharedPreferenceService().getBool(SharedPreferencesKeys.useCustomList);
+    List<String> words;
     if (useCustomList != null && useCustomList) {
       Directory directory = await getApplicationDocumentsDirectory();
       try {
         File file = File(path.join(directory.path, 'custom_list.txt'));
         final lines = await file.readAsLines();
-        return lines.map((e) => e.trim().toLowerCase()).toList();
+        words = lines.map((e) => e.trim().toLowerCase()).toList();
       } on PathNotFoundException {
         // File doesn't exist yet — seed it from the bundled asset.
         final String data = await rootBundle.loadString('assets/word_list.txt');
-        List<String> words =
-            data.split('\n').map((e) => e.trim().toLowerCase()).toList();
+        words = data.split('\n').map((e) => e.trim().toLowerCase()).toList();
 
         File file = File('${directory.path}/custom_list.txt');
         file.writeAsString(words.join('\n'));
-        return words;
       }
     } else {
       final String data = await rootBundle.loadString('assets/word_list.txt');
-      return data.split('\n').map((e) => e.trim().toLowerCase()).toList();
+      words = data.split('\n').map((e) => e.trim().toLowerCase()).toList();
     }
+
+    _cachedWordList = words;
+    return words;
   }
 
   /// Evaluates a single [guessCharacter] at position [idx] against [answer].
