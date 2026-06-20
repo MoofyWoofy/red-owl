@@ -386,6 +386,24 @@ abstract class AppLocalizations {
   /// **'Out of guesses. The word was {word}.'**
   String a11yLossAnnouncement(String word);
 
+  /// No description provided for @dailyReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily reminder'**
+  String get dailyReminder;
+
+  /// No description provided for @reminderTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder time'**
+  String get reminderTime;
+
+  /// No description provided for @reminderBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s word is waiting — come play!'**
+  String get reminderBody;
+
   /// No description provided for @customWordList.
   ///
   /// In en, this message translates to:

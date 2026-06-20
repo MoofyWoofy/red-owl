@@ -81,6 +81,9 @@
       "word": {"type": "String"}
     }
   },
+  "dailyReminder": "Dagelijkse herinnering",
+  "reminderTime": "Herinneringstijd",
+  "reminderBody": "Het woord van vandaag wacht — kom spelen!",
   "customWordList": "Gebruik aangepaste woordenlijst",
   "gameInProgressChangingWordList": "Spel bezig, het wijzigen van de woordenlijst zal het spel resetten",
   "gameInProgressImportingWordList": "Spel bezig, het importeren van de woordenlijst zal het spel resetten",

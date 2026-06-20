@@ -20,7 +20,7 @@ import 'package:red_owl/riverpod/shared.dart'
         motionSpeedCodes;
 import 'package:red_owl/routes/settings/routes/view_custom_wordlist.dart';
 import 'package:red_owl/routes/settings/widgets/shared.dart'
-    show GameInProgressDialog, SwitchItem;
+    show GameInProgressDialog, ReminderSetting, SwitchItem;
 import 'package:red_owl/util/misc.dart' show isGameInProgress;
 import 'package:red_owl/util/shared.dart'
     show
@@ -145,6 +145,9 @@ class SettingsPage extends ConsumerWidget {
                           _motionLabel(context, ref.watch(motionSpeedProvider))),
                       onTap: () => _pickMotionSpeed(context, ref),
                     ),
+                    const SizedBox(height: 20),
+                    // ── Daily reminder notification ──────────────────────────
+                    const ReminderSetting(),
                     const SizedBox(height: 20),
                     // ── Custom Word List ─────────────────────────────────────
                     SwitchItem(

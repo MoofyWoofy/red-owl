@@ -169,6 +169,15 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get dailyReminder => 'Dagelijkse herinnering';
+
+  @override
+  String get reminderTime => 'Herinneringstijd';
+
+  @override
+  String get reminderBody => 'Het woord van vandaag wacht — kom spelen!';
+
+  @override
   String get customWordList => 'Gebruik aangepaste woordenlijst';
 
   @override

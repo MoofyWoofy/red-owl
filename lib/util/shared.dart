@@ -5,3 +5,4 @@ export 'wordle.dart';
 export 'misc.dart';
 export 'localization.dart';
 export 'share_grid.dart';
+export 'notification_service.dart';

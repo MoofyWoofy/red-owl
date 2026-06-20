@@ -15,4 +15,7 @@ enum BoolFamilyProviderIDs {
 
   /// Provider controlling the hard-mode toggle.
   isHardMode,
+
+  /// Provider controlling the daily-reminder toggle.
+  reminderEnabled,
 }

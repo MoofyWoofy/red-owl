@@ -21,7 +21,11 @@ import 'package:red_owl/config/shared.dart'
         SharedPreferencesKeys,
         BoolFamilyProviderIDs;
 import 'package:red_owl/util/shared.dart'
-    show Localization, SharedPreferenceService, WordleService;
+    show
+        Localization,
+        NotificationService,
+        SharedPreferenceService,
+        WordleService;
 import 'package:red_owl/widgets/shared.dart' show Logo, appBar;
 
 /// Application entry point.
@@ -37,6 +41,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharedPreferenceService().init();
   await WordleService().init();
+  // Prepare the (opt-in) daily reminder plugin; scheduling itself only happens
+  // when the user enables the reminder in Settings.
+  await NotificationService().init();
   runApp(const ProviderScope(child: App()));
 }
 

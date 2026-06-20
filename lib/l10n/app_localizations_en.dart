@@ -169,6 +169,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get dailyReminder => 'Daily reminder';
+
+  @override
+  String get reminderTime => 'Reminder time';
+
+  @override
+  String get reminderBody => 'Today\'s word is waiting — come play!';
+
+  @override
   String get customWordList => 'Use custom word list';
 
   @override

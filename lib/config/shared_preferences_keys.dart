@@ -57,4 +57,11 @@ enum SharedPreferencesKeys {
   /// ISO-8601 date string (`yyyy-MM-dd`) of the day the player last used the
   /// once-per-day hint. When it differs from today, a hint is available again.
   hintUsedDate,
+
+  /// Whether the opt-in daily reminder notification is enabled (bool).
+  /// Absent → `false`.
+  reminderEnabled,
+
+  /// The daily reminder time as a `HH:mm` 24-hour string. Absent → `20:00`.
+  reminderTime,
 }
