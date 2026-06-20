@@ -118,6 +118,8 @@
   "burnt":"BURNT",
   "whisk":"WHISK",
   "ideas":"IDEAS",
+  "resetStats":"Reset statistics",
+  "resetStatsConfirm":"This permanently deletes all statistics and game history. Continue?",
   "statistics":"Statistics",
   "guessDistribution":"Guess Distribution",
   "history":"History",

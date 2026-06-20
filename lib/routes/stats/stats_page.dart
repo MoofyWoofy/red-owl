@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:red_owl/config/shared.dart'
     show HistoryColors, SharedPreferencesKeys;
+import 'package:red_owl/database/database.dart' show AppDatabase;
 import 'package:red_owl/routes/stats/widgets/shared.dart';
 import 'package:red_owl/util/shared.dart'
     show Localization, SharedPreferenceService, getWinRate;
@@ -16,8 +17,48 @@ import 'package:share_plus/share_plus.dart' show SharePlus, ShareParams;
 /// 2. **"Statistics"** heading + [StatsInfo] — four key metrics.
 /// 3. **"Guess Distribution"** heading + [StatsGraph] — bar chart.
 /// 4. **"History"** heading + [History] (Expanded) — scrollable game log.
-class StatsPage extends StatelessWidget {
+class StatsPage extends StatefulWidget {
   const StatsPage({super.key});
+
+  @override
+  State<StatsPage> createState() => _StatsPageState();
+}
+
+class _StatsPageState extends State<StatsPage> {
+  /// Bumped after a reset to force the stats/history widgets (which read their
+  /// data once in `initState`) to rebuild from the now-cleared stores.
+  int _reloadKey = 0;
+
+  /// Clears all aggregate stats and the history table after confirmation.
+  Future<void> _resetStats(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text(context.l10n.resetStats),
+            content: Text(context.l10n.resetStatsConfirm),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(context.l10n.no),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(context.l10n.yes),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+    if (!confirmed) return;
+
+    await SharedPreferenceService().remove(SharedPreferencesKeys.statsData);
+    await SharedPreferenceService()
+        .remove(SharedPreferencesKeys.guessDistribution);
+    final database = AppDatabase();
+    await database.delete(database.history).go();
+
+    if (mounted) setState(() => _reloadKey++);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +68,12 @@ class StatsPage extends StatelessWidget {
         context: context,
         showSettingIcon: true,
         widgets: [
+          // ── Reset statistics button ──────────────────────────────────────
+          IconButton(
+            tooltip: context.l10n.resetStats,
+            onPressed: () => _resetStats(context),
+            icon: const Icon(Icons.delete_outline),
+          ),
           // ── Share button ─────────────────────────────────────────────────
           IconButton(
             tooltip: context.l10n.share,
@@ -141,7 +188,10 @@ ${context.l10n.checkOutWordleStats}!
           ),
         ],
       ),
+      // Keying the whole body on _reloadKey re-inits the data-reading children
+      // after a reset so they reflect the cleared stores.
       body: Column(
+        key: ValueKey(_reloadKey),
         children: [
           StatsHeading(text: context.l10n.statistics),
           const StatsInfo(),

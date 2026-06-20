@@ -255,6 +255,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String get ideas => 'IDEËEN';
 
   @override
+  String get resetStats => 'Statistieken wissen';
+
+  @override
+  String get resetStatsConfirm =>
+      'Hiermee worden alle statistieken en spelgeschiedenis permanent verwijderd. Doorgaan?';
+
+  @override
   String get statistics => 'Statistieken';
 
   @override

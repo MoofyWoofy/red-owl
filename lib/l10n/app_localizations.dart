@@ -542,6 +542,18 @@ abstract class AppLocalizations {
   /// **'IDEAS'**
   String get ideas;
 
+  /// No description provided for @resetStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset statistics'**
+  String get resetStats;
+
+  /// No description provided for @resetStatsConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'This permanently deletes all statistics and game history. Continue?'**
+  String get resetStatsConfirm;
+
   /// No description provided for @statistics.
   ///
   /// In en, this message translates to:

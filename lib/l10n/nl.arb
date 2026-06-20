@@ -118,6 +118,8 @@
   "burnt": "VERBRAND",
   "whisk": "GARD",
   "ideas": "IDEËEN",
+  "resetStats": "Statistieken wissen",
+  "resetStatsConfirm": "Hiermee worden alle statistieken en spelgeschiedenis permanent verwijderd. Doorgaan?",
   "statistics": "Statistieken",
   "guessDistribution": "Gokverdeling",
   "history": "Geschiedenis",

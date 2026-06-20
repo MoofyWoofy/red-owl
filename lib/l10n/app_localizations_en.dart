@@ -254,6 +254,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ideas => 'IDEAS';
 
   @override
+  String get resetStats => 'Reset statistics';
+
+  @override
+  String get resetStatsConfirm =>
+      'This permanently deletes all statistics and game history. Continue?';
+
+  @override
   String get statistics => 'Statistics';
 
   @override

@@ -6,10 +6,14 @@
 //
 // Verifies: Statistics/Guess Distribution/History headings, share/help/settings
 // icons, zero-stats state, stats seeded from SharedPreferences, and help dialog.
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:red_owl/config/shared.dart' show SharedPreferencesKeys;
+import 'package:red_owl/database/database.dart';
 import 'package:red_owl/routes/shared.dart' show StatsPage;
-import 'package:red_owl/util/shared.dart' show SharedPreferenceService;
+import 'package:red_owl/util/shared.dart'
+    show SharedPreferenceService, getDateOnly;
 
 import '../../helpers/test_helpers.dart';
 
@@ -103,6 +107,48 @@ void main() {
       await tester.tap(find.byIcon(Icons.help));
       await tester.pump(const Duration(seconds: 1));
       expect(find.byType(AlertDialog), findsOneWidget);
+    });
+
+    testWidgets('reset clears stats and history after confirmation',
+        (tester) async {
+      setSharedPreferencesMock({
+        'isDarkMode': false,
+        'statsData': ['10', '7', '3', '5'],
+        'guessDistribution': ['1', '2', '3', '1', '0', '0'],
+      });
+      await SharedPreferenceService().init();
+      AppDatabase.setSingleton(
+          AppDatabase.forTesting(NativeDatabase.memory()));
+      final db = AppDatabase();
+      await db.into(db.history).insert(HistoryCompanion.insert(
+            word: 'APPLE',
+            date: getDateOnly(DateTime.now()),
+            gameState: GameState.won.name,
+          ));
+      addTearDown(() async {
+        await AppDatabase().close();
+        AppDatabase.resetSingleton();
+      });
+
+      await pumpStatsPage(tester);
+      expect(find.text('10'), findsOneWidget);
+
+      // Open the reset dialog and confirm.
+      await tester.tap(find.byIcon(Icons.delete_outline));
+      await tester.pump(const Duration(seconds: 1));
+      expect(find.byType(AlertDialog), findsOneWidget);
+      await tester.tap(find.text('Yes'));
+      await tester.pump(const Duration(seconds: 1));
+
+      // Stats are now cleared, and the history rows are gone.
+      expect(find.text('10'), findsNothing);
+      expect(
+        SharedPreferenceService()
+            .getStringList(SharedPreferencesKeys.statsData),
+        isNull,
+      );
+      final rows = await AppDatabase().select(AppDatabase().history).get();
+      expect(rows, isEmpty);
     });
   });
 }
