@@ -92,6 +92,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'File could not be read. Check that it is a valid .txt file.';
 
   @override
+  String get importTooLarge => 'File is too large. The maximum size is 5 MB.';
+
+  @override
   String importFewWords(int count) {
     return 'Imported $count words. Fewer than 365 means daily words repeat within a year.';
   }

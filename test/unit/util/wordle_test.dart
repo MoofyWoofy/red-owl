@@ -113,6 +113,16 @@ void main() {
       expect(result.invalidWord, 'ch1ir');
     });
 
+    test('rejects files larger than the size cap', () async {
+      final src = File(p.join(docsDir.path, 'big.txt'))
+        ..writeAsBytesSync(
+            List.filled(WordleService.maxImportFileBytes + 1, 0x61));
+
+      final result = await WordleService().importWordList(src);
+
+      expect(result.status, WordListImportStatus.fileTooLarge);
+    });
+
     test('reports a read error for an unreadable file', () async {
       final missing = File(p.join(docsDir.path, 'does_not_exist.txt'));
 

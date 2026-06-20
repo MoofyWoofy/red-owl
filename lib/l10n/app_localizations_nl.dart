@@ -92,6 +92,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Bestand kon niet worden gelezen. Controleer of het een geldig .txt-bestand is.';
 
   @override
+  String get importTooLarge =>
+      'Bestand is te groot. De maximale grootte is 5 MB.';
+
+  @override
   String importFewWords(int count) {
     return '$count woorden geïmporteerd. Minder dan 365 betekent dat dagelijkse woorden binnen een jaar herhalen.';
   }

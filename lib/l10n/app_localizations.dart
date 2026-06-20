@@ -248,6 +248,12 @@ abstract class AppLocalizations {
   /// **'File could not be read. Check that it is a valid .txt file.'**
   String get importReadError;
 
+  /// No description provided for @importTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'File is too large. The maximum size is 5 MB.'**
+  String get importTooLarge;
+
   /// No description provided for @importFewWords.
   ///
   /// In en, this message translates to:

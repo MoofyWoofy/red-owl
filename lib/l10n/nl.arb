@@ -31,6 +31,7 @@
     }
   },
   "importReadError": "Bestand kon niet worden gelezen. Controleer of het een geldig .txt-bestand is.",
+  "importTooLarge": "Bestand is te groot. De maximale grootte is 5 MB.",
   "importFewWords": "{count} woorden geïmporteerd. Minder dan 365 betekent dat dagelijkse woorden binnen een jaar herhalen.",
   "@importFewWords": {
     "placeholders": {

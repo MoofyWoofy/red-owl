@@ -260,6 +260,8 @@ class SettingsPage extends ConsumerWidget {
         );
       case WordListImportStatus.readError:
         showSnackBar(context, context.l10n.importReadError, 3);
+      case WordListImportStatus.fileTooLarge:
+        showSnackBar(context, context.l10n.importTooLarge, 3);
     }
   }
 

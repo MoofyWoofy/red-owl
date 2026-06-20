@@ -115,6 +115,11 @@ class WordleService {
   /// are flagged with a warning.
   static const int recommendedMinimumWords = 365;
 
+  /// Upper bound on the size of an importable word-list file. Anything larger is
+  /// rejected rather than read fully into memory (a 5-letter-per-line list this
+  /// big is far beyond any legitimate dictionary).
+  static const int maxImportFileBytes = 5 * 1024 * 1024;
+
   /// Validates [file] as a custom word list and, if it is valid, writes it to
   /// `custom_list.txt` in the application documents directory.
   ///
@@ -131,6 +136,17 @@ class WordleService {
   /// is cleared; the caller should re-run [init] to pick the new word of the
   /// day.
   Future<WordListImportResult> importWordList(File file) async {
+    // Guard the size before reading the whole file into memory.
+    final int length;
+    try {
+      length = await file.length();
+    } on FileSystemException {
+      return const WordListImportResult.readError();
+    }
+    if (length > maxImportFileBytes) {
+      return const WordListImportResult.fileTooLarge();
+    }
+
     final String contents;
     try {
       contents = await file.readAsString();
@@ -237,6 +253,9 @@ enum WordListImportStatus {
 
   /// The chosen file could not be read.
   readError,
+
+  /// The chosen file exceeds [WordleService.maxImportFileBytes].
+  fileTooLarge,
 }
 
 /// Result of attempting to import a custom word list.
@@ -265,6 +284,14 @@ class WordListImportResult {
   /// The file could not be read.
   const WordListImportResult.readError()
       : status = WordListImportStatus.readError,
+        words = null,
+        lineNumber = null,
+        invalidWord = null,
+        belowRecommendedMinimum = false;
+
+  /// The file exceeded the maximum allowed size.
+  const WordListImportResult.fileTooLarge()
+      : status = WordListImportStatus.fileTooLarge,
         words = null,
         lineNumber = null,
         invalidWord = null,
