@@ -122,6 +122,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get a11yDeleteKey => 'Verwijderen';
 
   @override
+  String a11yWinAnnouncement(int count) {
+    return 'Gewonnen! Opgelost in $count van 6 pogingen.';
+  }
+
+  @override
+  String a11yLossAnnouncement(String word) {
+    return 'Geen pogingen meer. Het woord was $word.';
+  }
+
+  @override
   String get customWordList => 'Gebruik aangepaste woordenlijst';
 
   @override

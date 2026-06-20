@@ -42,6 +42,18 @@
   },
   "a11yEnterKey": "Enter",
   "a11yDeleteKey": "Verwijderen",
+  "a11yWinAnnouncement": "Gewonnen! Opgelost in {count} van 6 pogingen.",
+  "@a11yWinAnnouncement": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "a11yLossAnnouncement": "Geen pogingen meer. Het woord was {word}.",
+  "@a11yLossAnnouncement": {
+    "placeholders": {
+      "word": {"type": "String"}
+    }
+  },
   "customWordList": "Gebruik aangepaste woordenlijst",
   "gameInProgressChangingWordList": "Spel bezig, het wijzigen van de woordenlijst zal het spel resetten",
   "gameInProgressImportingWordList": "Spel bezig, het importeren van de woordenlijst zal het spel resetten",

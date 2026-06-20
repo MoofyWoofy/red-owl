@@ -42,6 +42,18 @@
   },
   "a11yEnterKey":"Enter",
   "a11yDeleteKey":"Delete",
+  "a11yWinAnnouncement":"You won! Solved in {count} of 6 guesses.",
+  "@a11yWinAnnouncement":{
+    "placeholders":{
+      "count":{"type":"int"}
+    }
+  },
+  "a11yLossAnnouncement":"Out of guesses. The word was {word}.",
+  "@a11yLossAnnouncement":{
+    "placeholders":{
+      "word":{"type":"String"}
+    }
+  },
   "customWordList":"Use custom word list",
   "gameInProgressChangingWordList":"Game in progress, changing word list will reset the game",
   "gameInProgressImportingWordList":"Game in progress, importing word list will reset the game",

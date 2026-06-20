@@ -314,6 +314,18 @@ abstract class AppLocalizations {
   /// **'Delete'**
   String get a11yDeleteKey;
 
+  /// No description provided for @a11yWinAnnouncement.
+  ///
+  /// In en, this message translates to:
+  /// **'You won! Solved in {count} of 6 guesses.'**
+  String a11yWinAnnouncement(int count);
+
+  /// No description provided for @a11yLossAnnouncement.
+  ///
+  /// In en, this message translates to:
+  /// **'Out of guesses. The word was {word}.'**
+  String a11yLossAnnouncement(String word);
+
   /// No description provided for @customWordList.
   ///
   /// In en, this message translates to:

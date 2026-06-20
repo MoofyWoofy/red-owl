@@ -122,6 +122,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get a11yDeleteKey => 'Delete';
 
   @override
+  String a11yWinAnnouncement(int count) {
+    return 'You won! Solved in $count of 6 guesses.';
+  }
+
+  @override
+  String a11yLossAnnouncement(String word) {
+    return 'Out of guesses. The word was $word.';
+  }
+
+  @override
   String get customWordList => 'Use custom word list';
 
   @override

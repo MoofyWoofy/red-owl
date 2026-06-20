@@ -211,6 +211,9 @@ class _WordlePageState extends ConsumerState<WordlePage> {
       ),
       body: Column(
         children: [
+          // Invisible live region that announces the win/loss outcome to
+          // screen readers when the game ends.
+          const GameStatusAnnouncer(),
           // ── Tile grid (5 columns × 6 rows = 30 cells) ───────────────────
           Expanded(
             flex: 5,
