@@ -23,6 +23,14 @@
   "import": "Importeren",
   "view": "Bekijken",
   "customList": "Aangepaste lijst",
+  "importInvalidLine": "Regel {line}: \"{word}\" is geen geldig woord van 5 letters",
+  "@importInvalidLine": {
+    "placeholders": {
+      "line": {"type": "int"},
+      "word": {"type": "String"}
+    }
+  },
+  "importReadError": "Bestand kon niet worden gelezen. Controleer of het een geldig .txt-bestand is.",
   "yetAnotherWordApp": "Nog een Wordle-app",
   "privacyPolicy": "Privacybeleid",
   "about": "Over",

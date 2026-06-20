@@ -107,6 +107,50 @@ class WordleService {
     return words;
   }
 
+  /// Matches a single valid word: exactly five ASCII letters.
+  static final RegExp _wordPattern = RegExp(r'^[a-zA-Z]{5}$');
+
+  /// Validates [file] as a custom word list and, if it is valid, writes it to
+  /// `custom_list.txt` in the application documents directory.
+  ///
+  /// Returns a [WordListImportResult] describing the outcome so the caller can
+  /// show an appropriate, localised message:
+  /// - [WordListImportStatus.readError] — the file could not be read.
+  /// - [WordListImportStatus.invalidWord] — a line is not a 5-letter word
+  ///   ([WordListImportResult.lineNumber] / [WordListImportResult.invalidWord]).
+  /// - [WordListImportStatus.success] — the list was saved.
+  ///
+  /// Blank lines (e.g. a trailing newline) are ignored. On success the cached
+  /// word list is cleared; the caller should re-run [init] to pick the new
+  /// word of the day.
+  Future<WordListImportResult> importWordList(File file) async {
+    final String contents;
+    try {
+      contents = await file.readAsString();
+    } on FileSystemException {
+      return const WordListImportResult.readError();
+    }
+
+    final words = contents
+        .split('\n')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+
+    for (var i = 0; i < words.length; i++) {
+      if (!_wordPattern.hasMatch(words[i])) {
+        return WordListImportResult.invalidWord(i + 1, words[i]);
+      }
+    }
+
+    final directory = await getApplicationDocumentsDirectory();
+    final dest = File(path.join(directory.path, 'custom_list.txt'));
+    await dest.writeAsString(words.join('\n'));
+    _cachedWordList = null;
+
+    return WordListImportResult.success(words);
+  }
+
   /// Evaluates a single [guessCharacter] at position [idx] against [answer].
   ///
   /// Returns a raw JSON-compatible map with `char`, `in_word`, and
@@ -163,4 +207,53 @@ class WordleService {
       'character_info': guessResult,
     };
   }
+}
+
+/// Outcome categories for [WordleService.importWordList].
+enum WordListImportStatus {
+  /// The list was valid and saved.
+  success,
+
+  /// A line was not a valid 5-letter word.
+  invalidWord,
+
+  /// The chosen file could not be read.
+  readError,
+}
+
+/// Result of attempting to import a custom word list.
+///
+/// Carries enough detail for the UI to build a specific, localised message
+/// (e.g. which line failed) without the service depending on Flutter widgets.
+class WordListImportResult {
+  /// Successful import; [words] holds the saved, trimmed list.
+  const WordListImportResult.success(this.words)
+      : status = WordListImportStatus.success,
+        lineNumber = null,
+        invalidWord = null;
+
+  /// A line failed validation. [lineNumber] is 1-based; [invalidWord] is the
+  /// offending text.
+  const WordListImportResult.invalidWord(this.lineNumber, this.invalidWord)
+      : status = WordListImportStatus.invalidWord,
+        words = null;
+
+  /// The file could not be read.
+  const WordListImportResult.readError()
+      : status = WordListImportStatus.readError,
+        words = null,
+        lineNumber = null,
+        invalidWord = null;
+
+  /// The category of outcome.
+  final WordListImportStatus status;
+
+  /// The saved words on success, otherwise `null`.
+  final List<String>? words;
+
+  /// 1-based line number of the first invalid word, if any.
+  final int? lineNumber;
+
+  /// The offending text for [WordListImportStatus.invalidWord].
+  final String? invalidWord;
 }

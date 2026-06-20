@@ -236,6 +236,18 @@ abstract class AppLocalizations {
   /// **'Custom list'**
   String get customList;
 
+  /// No description provided for @importInvalidLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Line {line}: \"{word}\" is not a valid 5-letter word'**
+  String importInvalidLine(int line, String word);
+
+  /// No description provided for @importReadError.
+  ///
+  /// In en, this message translates to:
+  /// **'File could not be read. Check that it is a valid .txt file.'**
+  String get importReadError;
+
   /// No description provided for @yetAnotherWordApp.
   ///
   /// In en, this message translates to:

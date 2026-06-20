@@ -83,6 +83,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get customList => 'Custom list';
 
   @override
+  String importInvalidLine(int line, String word) {
+    return 'Line $line: \"$word\" is not a valid 5-letter word';
+  }
+
+  @override
+  String get importReadError =>
+      'File could not be read. Check that it is a valid .txt file.';
+
+  @override
   String get yetAnotherWordApp => 'Yet another wordle app';
 
   @override

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
 import 'package:red_owl/config/shared.dart'
     show SharedPreferencesKeys, BoolFamilyProviderIDs;
 import 'package:red_owl/riverpod/shared.dart'
@@ -15,7 +14,12 @@ import 'package:red_owl/routes/settings/widgets/shared.dart'
     show GameInProgressDialog, SwitchItem;
 import 'package:red_owl/util/misc.dart' show isGameInProgress;
 import 'package:red_owl/util/shared.dart'
-    show BackupService, Localization, WordleService, showSnackBar;
+    show
+        BackupService,
+        Localization,
+        WordleService,
+        WordListImportStatus,
+        showSnackBar;
 import 'package:red_owl/widgets/shared.dart' show Logo, appBar;
 import 'package:share_plus/share_plus.dart' show SharePlus, ShareParams, XFile;
 import 'package:url_launcher/url_launcher.dart';
@@ -118,87 +122,8 @@ class SettingsPage extends ConsumerWidget {
                         children: [
                           // Import button: opens file picker and validates the file.
                           OutlinedButton.icon(
-                            onPressed: () async {
-                              var grid = ref.watch(gridProvider);
-                              bool importCustomList = true;
-                              // Warn the user if a game is currently in progress.
-                              if (isGameInProgress(grid)) {
-                                importCustomList = await showDialog(
-                                  context: context,
-                                  builder: (_) => GameInProgressDialog(
-                                    content:
-                                      context
-                                        .l10n.gameInProgressImportingWordList,
-                                  ),
-                                );
-                              }
-                              if (importCustomList) {
-                                FilePickerResult? result =
-                                    await FilePicker.pickFiles(
-                                  type: FileType.custom,
-                                  allowedExtensions: ['txt'],
-                                );
-
-                                if (result != null) {
-                                  File file = File(result.files.single.path!);
-
-                                  // Validate every word: must be exactly 5 ASCII letters.
-                                  final contents = await file.readAsString();
-                                  List<String> words = contents
-                                      .split('\n')
-                                      .map((e) => e.trim())
-                                      .toList();
-                                  RegExp regExp = RegExp(r'^[a-zA-Z]{5}$');
-
-                                  for (var i = 0; i < words.length; i++) {
-                                    if (!regExp.hasMatch(words[i])) {
-                                      // Invalid word found — show which line and abort.
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            duration:
-                                                const Duration(seconds: 3),
-                                            content: Text(
-                                              'line: ${i + 1} "${words[i]}" is not valid',
-                                              textAlign: TextAlign.center,
-                                            ),
-                                            behavior: SnackBarBehavior.floating,
-                                          ),
-                                        );
-                                      }
-                                      return;
-                                    }
-                                  }
-
-                                  // All words valid — copy to the app documents directory.
-                                  Directory directory =
-                                      await getApplicationDocumentsDirectory();
-
-                                  file.copy(
-                                      '${directory.path}/custom_list.txt');
-                                  file.delete();
-                                  // Reinitialise service to load the new word.
-                                  await WordleService().init();
-                                  // Reset the board since the word list changed.
-                                  ref.read(gridProvider.notifier).resetGrid();
-
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        duration: const Duration(seconds: 3),
-                                        content: Text(
-                                          context.l10n.success,
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        behavior: SnackBarBehavior.floating,
-                                      ),
-                                    );
-                                  }
-                                }
-                                // else: user cancelled the picker — no action needed.
-                              }
-                            },
+                            onPressed: () =>
+                                _importCustomWordList(context, ref),
                             icon: const Icon(Icons.file_upload_outlined),
                             label: Text(context.l10n.import),
                           ),
@@ -283,6 +208,51 @@ class SettingsPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// Lets the user pick a `.txt` file and imports it as the custom word list.
+  ///
+  /// Warns first if a game is in progress (importing resets the board), then
+  /// delegates validation/saving to [WordleService.importWordList] and shows a
+  /// localised message describing the result.
+  Future<void> _importCustomWordList(
+      BuildContext context, WidgetRef ref) async {
+    if (isGameInProgress(ref.read(gridProvider))) {
+      final proceed = await showDialog<bool>(
+        context: context,
+        builder: (_) => GameInProgressDialog(
+          content: context.l10n.gameInProgressImportingWordList,
+        ),
+      );
+      if (proceed != true) return;
+    }
+
+    final picked = await FilePicker.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['txt'],
+    );
+    if (picked == null) return; // User cancelled the picker.
+
+    final result =
+        await WordleService().importWordList(File(picked.files.single.path!));
+    if (!context.mounted) return;
+
+    switch (result.status) {
+      case WordListImportStatus.success:
+        // The word list changed — reload the word of the day and reset the board.
+        await WordleService().init();
+        ref.read(gridProvider.notifier).resetGrid();
+        if (context.mounted) showSnackBar(context, context.l10n.success);
+      case WordListImportStatus.invalidWord:
+        showSnackBar(
+          context,
+          context.l10n.importInvalidLine(
+              result.lineNumber!, result.invalidWord!),
+          3,
+        );
+      case WordListImportStatus.readError:
+        showSnackBar(context, context.l10n.importReadError, 3);
+    }
   }
 
   /// Exports settings, stats and history to a JSON file and opens the system

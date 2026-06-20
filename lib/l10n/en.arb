@@ -23,6 +23,14 @@
   "import":"Import",
   "view":"View",
   "customList":"Custom list",
+  "importInvalidLine":"Line {line}: \"{word}\" is not a valid 5-letter word",
+  "@importInvalidLine":{
+    "placeholders":{
+      "line":{"type":"int"},
+      "word":{"type":"String"}
+    }
+  },
+  "importReadError":"File could not be read. Check that it is a valid .txt file.",
   "yetAnotherWordApp":"Yet another wordle app",
   "privacyPolicy":"Privacy Policy",
   "about":"About",

@@ -83,6 +83,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get customList => 'Aangepaste lijst';
 
   @override
+  String importInvalidLine(int line, String word) {
+    return 'Regel $line: \"$word\" is geen geldig woord van 5 letters';
+  }
+
+  @override
+  String get importReadError =>
+      'Bestand kon niet worden gelezen. Controleer of het een geldig .txt-bestand is.';
+
+  @override
   String get yetAnotherWordApp => 'Nog een Wordle-app';
 
   @override
