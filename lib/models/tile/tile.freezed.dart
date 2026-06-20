@@ -15,9 +15,11 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Tile {
 
-/// Letter
- String get letter;/// Tile status
- LetterStatus get status;/// did tile play Flip animation before
+/// The uppercase letter displayed in this tile (e.g. `'A'`).
+ String get letter;/// Evaluation result assigned after the player submits a guess.
+ LetterStatus get status;/// Whether the flip animation has already played for this tile.
+/// Once true, the tile always shows its [status] color immediately
+/// without re-animating on widget rebuilds.
  bool get hasFlipAnimationPlayed;
 /// Create a copy of Tile
 /// with the given fields replaced by the non-null parameter values.
@@ -217,11 +219,13 @@ class _Tile implements Tile {
   const _Tile({required this.letter, required this.status, required this.hasFlipAnimationPlayed});
   factory _Tile.fromJson(Map<String, dynamic> json) => _$TileFromJson(json);
 
-/// Letter
+/// The uppercase letter displayed in this tile (e.g. `'A'`).
 @override final  String letter;
-/// Tile status
+/// Evaluation result assigned after the player submits a guess.
 @override final  LetterStatus status;
-/// did tile play Flip animation before
+/// Whether the flip animation has already played for this tile.
+/// Once true, the tile always shows its [status] color immediately
+/// without re-animating on widget rebuilds.
 @override final  bool hasFlipAnimationPlayed;
 
 /// Create a copy of Tile

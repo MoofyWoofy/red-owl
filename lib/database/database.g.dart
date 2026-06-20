@@ -111,13 +111,15 @@ class $HistoryTable extends History with TableInfo<$HistoryTable, HistoryData> {
 }
 
 class HistoryData extends DataClass implements Insertable<HistoryData> {
-  /// The wordle word.
+  /// The 5-letter Wordle answer for that day (uppercase).
   final String word;
 
-  /// Did user guess correctly? Or was the game incomplete.
+  /// Outcome of the game: one of `'won'`, `'lost'`, or `'incomplete'`.
+  /// Validated against [GameState.values] via a database CHECK constraint.
   final String gameState;
 
-  /// The date the game was played.
+  /// The calendar date on which the game was played (midnight, local time).
+  /// Acts as the primary key so each day can only have one history entry.
   final DateTime date;
   const HistoryData({
     required this.word,

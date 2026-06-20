@@ -15,15 +15,23 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Grid {
 
-/// current grid column.
- int get column;/// current grid row.
- int get row;/// List of all tiles in grid.
- List<Tile> get tiles;/// Keyboard status, green/yellow etc.
- Map<String, LetterStatus> get keyboardStatus;/// Run flip animation (when checking word).
- bool get runFlipAnimation;/// Check if letter pressed is ENTER or DELETE.
- bool get isEnterOrDeletePressed;/// Did player win the game?
- bool get isGameWon;/// Is the game over?
- bool get isGameOver;/// Does the row have 5 character to check word?
+/// Zero-based column index of the tile that will receive the next key press.
+/// Resets to 0 after ENTER or DELETE.
+ int get column;/// Zero-based row index of the current guess (0–5).
+/// Incremented after each valid guess is submitted.
+ int get row;/// All tiles that have been placed so far.
+/// Length grows as the player types letters and shrinks on DELETE.
+/// A full board has exactly 30 tiles (5 columns × 6 rows).
+ List<Tile> get tiles;/// Per-key evaluation status used to colour the on-screen keyboard.
+/// Mirrors the QWERTY layout from [keyboardStatus].
+ Map<String, LetterStatus> get keyboardStatus;/// True while the tile flip animation should be (re-)started.
+/// Set to false once all tiles in the row have animated.
+ bool get runFlipAnimation;/// True when the last key pressed was ENTER or DELETE.
+/// Suppresses the pop-in animation on the next rebuild.
+ bool get isEnterOrDeletePressed;/// Whether the player solved the puzzle in the current session.
+ bool get isGameWon;/// Whether the game has ended (either won or all 6 rows used up).
+ bool get isGameOver;/// True when the player presses ENTER on a row with fewer than 5 letters.
+/// Triggers the shake animation on the current row.
  bool get notEnoughCharacters;
 /// Create a copy of Grid
 /// with the given fields replaced by the non-null parameter values.
@@ -229,37 +237,48 @@ class _Grid implements Grid {
   const _Grid({required this.column, required this.row, required final  List<Tile> tiles, required final  Map<String, LetterStatus> keyboardStatus, required this.runFlipAnimation, required this.isEnterOrDeletePressed, required this.isGameWon, required this.isGameOver, required this.notEnoughCharacters}): _tiles = tiles,_keyboardStatus = keyboardStatus;
   factory _Grid.fromJson(Map<String, dynamic> json) => _$GridFromJson(json);
 
-/// current grid column.
+/// Zero-based column index of the tile that will receive the next key press.
+/// Resets to 0 after ENTER or DELETE.
 @override final  int column;
-/// current grid row.
+/// Zero-based row index of the current guess (0–5).
+/// Incremented after each valid guess is submitted.
 @override final  int row;
-/// List of all tiles in grid.
+/// All tiles that have been placed so far.
+/// Length grows as the player types letters and shrinks on DELETE.
+/// A full board has exactly 30 tiles (5 columns × 6 rows).
  final  List<Tile> _tiles;
-/// List of all tiles in grid.
+/// All tiles that have been placed so far.
+/// Length grows as the player types letters and shrinks on DELETE.
+/// A full board has exactly 30 tiles (5 columns × 6 rows).
 @override List<Tile> get tiles {
   if (_tiles is EqualUnmodifiableListView) return _tiles;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_tiles);
 }
 
-/// Keyboard status, green/yellow etc.
+/// Per-key evaluation status used to colour the on-screen keyboard.
+/// Mirrors the QWERTY layout from [keyboardStatus].
  final  Map<String, LetterStatus> _keyboardStatus;
-/// Keyboard status, green/yellow etc.
+/// Per-key evaluation status used to colour the on-screen keyboard.
+/// Mirrors the QWERTY layout from [keyboardStatus].
 @override Map<String, LetterStatus> get keyboardStatus {
   if (_keyboardStatus is EqualUnmodifiableMapView) return _keyboardStatus;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableMapView(_keyboardStatus);
 }
 
-/// Run flip animation (when checking word).
+/// True while the tile flip animation should be (re-)started.
+/// Set to false once all tiles in the row have animated.
 @override final  bool runFlipAnimation;
-/// Check if letter pressed is ENTER or DELETE.
+/// True when the last key pressed was ENTER or DELETE.
+/// Suppresses the pop-in animation on the next rebuild.
 @override final  bool isEnterOrDeletePressed;
-/// Did player win the game?
+/// Whether the player solved the puzzle in the current session.
 @override final  bool isGameWon;
-/// Is the game over?
+/// Whether the game has ended (either won or all 6 rows used up).
 @override final  bool isGameOver;
-/// Does the row have 5 character to check word?
+/// True when the player presses ENTER on a row with fewer than 5 letters.
+/// Triggers the shake animation on the current row.
 @override final  bool notEnoughCharacters;
 
 /// Create a copy of Grid

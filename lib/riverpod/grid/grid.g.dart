@@ -8,11 +8,44 @@ part of 'grid.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Riverpod notifier that owns and mutates the entire game board state.
+///
+/// On first access [build] rehydrates any in-progress game from
+/// SharedPreferences. If the stored game is from a previous day it is
+/// archived to the [History] database and a fresh empty grid is returned.
+///
+/// All user actions funnel through [onKeyboardPressed]:
+/// - **Letter key** → adds a tile.
+/// - **DELETE** → removes the last tile.
+/// - **ENTER** → evaluates the current row, updates tiles and keyboard colors,
+///   checks win/loss conditions, persists stats, and writes the history record.
 
 @ProviderFor(Grid)
 final gridProvider = GridProvider._();
 
+/// Riverpod notifier that owns and mutates the entire game board state.
+///
+/// On first access [build] rehydrates any in-progress game from
+/// SharedPreferences. If the stored game is from a previous day it is
+/// archived to the [History] database and a fresh empty grid is returned.
+///
+/// All user actions funnel through [onKeyboardPressed]:
+/// - **Letter key** → adds a tile.
+/// - **DELETE** → removes the last tile.
+/// - **ENTER** → evaluates the current row, updates tiles and keyboard colors,
+///   checks win/loss conditions, persists stats, and writes the history record.
 final class GridProvider extends $NotifierProvider<Grid, models.Grid> {
+  /// Riverpod notifier that owns and mutates the entire game board state.
+  ///
+  /// On first access [build] rehydrates any in-progress game from
+  /// SharedPreferences. If the stored game is from a previous day it is
+  /// archived to the [History] database and a fresh empty grid is returned.
+  ///
+  /// All user actions funnel through [onKeyboardPressed]:
+  /// - **Letter key** → adds a tile.
+  /// - **DELETE** → removes the last tile.
+  /// - **ENTER** → evaluates the current row, updates tiles and keyboard colors,
+  ///   checks win/loss conditions, persists stats, and writes the history record.
   GridProvider._()
     : super(
         from: null,
@@ -41,6 +74,18 @@ final class GridProvider extends $NotifierProvider<Grid, models.Grid> {
 }
 
 String _$gridHash() => r'5d27f1c1fe8b0c0b076c1a4bbf8631a009f4a27f';
+
+/// Riverpod notifier that owns and mutates the entire game board state.
+///
+/// On first access [build] rehydrates any in-progress game from
+/// SharedPreferences. If the stored game is from a previous day it is
+/// archived to the [History] database and a fresh empty grid is returned.
+///
+/// All user actions funnel through [onKeyboardPressed]:
+/// - **Letter key** → adds a tile.
+/// - **DELETE** → removes the last tile.
+/// - **ENTER** → evaluates the current row, updates tiles and keyboard colors,
+///   checks win/loss conditions, persists stats, and writes the history record.
 
 abstract class _$Grid extends $Notifier<models.Grid> {
   models.Grid build();

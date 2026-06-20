@@ -15,7 +15,14 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$GuessResult {
 
- String get guess;@JsonKey(name: "is_correct") bool get isCorrect;@JsonKey(name: "is_word_in_list") bool get isWordInList;@JsonKey(name: "character_info") List<CharacterInfo>? get characterInfo;
+/// The word the player submitted (uppercase).
+ String get guess;/// Whether [guess] exactly matches today's word.
+@JsonKey(name: "is_correct") bool get isCorrect;/// Whether [guess] is a real word in the active word list.
+/// When false the player should be prompted and the row should not advance.
+@JsonKey(name: "is_word_in_list") bool get isWordInList;/// Per-character scoring, one entry per letter of [guess].
+/// Null when [isCorrect] is true (no individual scoring needed) or when
+/// the word is not in the list.
+@JsonKey(name: "character_info") List<CharacterInfo>? get characterInfo;
 /// Create a copy of GuessResult
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -215,10 +222,20 @@ class _GuessResult implements GuessResult {
   const _GuessResult({required this.guess, @JsonKey(name: "is_correct") required this.isCorrect, @JsonKey(name: "is_word_in_list") required this.isWordInList, @JsonKey(name: "character_info") required final  List<CharacterInfo>? characterInfo}): _characterInfo = characterInfo;
   factory _GuessResult.fromJson(Map<String, dynamic> json) => _$GuessResultFromJson(json);
 
+/// The word the player submitted (uppercase).
 @override final  String guess;
+/// Whether [guess] exactly matches today's word.
 @override@JsonKey(name: "is_correct") final  bool isCorrect;
+/// Whether [guess] is a real word in the active word list.
+/// When false the player should be prompted and the row should not advance.
 @override@JsonKey(name: "is_word_in_list") final  bool isWordInList;
+/// Per-character scoring, one entry per letter of [guess].
+/// Null when [isCorrect] is true (no individual scoring needed) or when
+/// the word is not in the list.
  final  List<CharacterInfo>? _characterInfo;
+/// Per-character scoring, one entry per letter of [guess].
+/// Null when [isCorrect] is true (no individual scoring needed) or when
+/// the word is not in the list.
 @override@JsonKey(name: "character_info") List<CharacterInfo>? get characterInfo {
   final value = _characterInfo;
   if (value == null) return null;
@@ -295,7 +312,9 @@ as List<CharacterInfo>?,
 /// @nodoc
 mixin _$CharacterInfo {
 
- String get char; CharacterScoring get scoring;
+/// The evaluated character (uppercase).
+ String get char;/// Whether the character appears in the answer and/or is at the correct index.
+ CharacterScoring get scoring;
 /// Create a copy of CharacterInfo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -502,7 +521,9 @@ class _CharacterInfo implements CharacterInfo {
   const _CharacterInfo({required this.char, required this.scoring});
   factory _CharacterInfo.fromJson(Map<String, dynamic> json) => _$CharacterInfoFromJson(json);
 
+/// The evaluated character (uppercase).
 @override final  String char;
+/// Whether the character appears in the answer and/or is at the correct index.
 @override final  CharacterScoring scoring;
 
 /// Create a copy of CharacterInfo
@@ -579,7 +600,11 @@ $CharacterScoringCopyWith<$Res> get scoring {
 /// @nodoc
 mixin _$CharacterScoring {
 
-@JsonKey(name: "in_word") bool get inWord;@JsonKey(name: "correct_idx") bool get correctIndex;
+/// Whether the character exists anywhere in the answer.
+/// A yellow tile has [inWord] = true but [correctIndex] = false.
+@JsonKey(name: "in_word") bool get inWord;/// Whether the character is at exactly the right position.
+/// A green tile has both [inWord] and [correctIndex] = true.
+@JsonKey(name: "correct_idx") bool get correctIndex;
 /// Create a copy of CharacterScoring
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -777,7 +802,11 @@ class _CharacterScoring implements CharacterScoring {
   const _CharacterScoring({@JsonKey(name: "in_word") required this.inWord, @JsonKey(name: "correct_idx") required this.correctIndex});
   factory _CharacterScoring.fromJson(Map<String, dynamic> json) => _$CharacterScoringFromJson(json);
 
+/// Whether the character exists anywhere in the answer.
+/// A yellow tile has [inWord] = true but [correctIndex] = false.
 @override@JsonKey(name: "in_word") final  bool inWord;
+/// Whether the character is at exactly the right position.
+/// A green tile has both [inWord] and [correctIndex] = true.
 @override@JsonKey(name: "correct_idx") final  bool correctIndex;
 
 /// Create a copy of CharacterScoring

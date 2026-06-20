@@ -8,12 +8,39 @@ part of 'bool_family_notifier.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Riverpod family notifier for boolean settings backed by SharedPreferences.
+///
+/// A single notifier class handles any number of boolean toggles by taking
+/// [id] (a stable [BoolFamilyProviderIDs] value) and [sharedPrefsKey] as
+/// family parameters. This avoids duplicating notifier code for every toggle.
+///
+/// On first access the [build] method reads the persisted value and returns
+/// a sensible default if none is stored. [updateBoolean] persists the new
+/// value and updates the Riverpod state so the UI rebuilds reactively.
 
 @ProviderFor(BoolFamilyNotifier)
 final boolFamilyProvider = BoolFamilyNotifierFamily._();
 
+/// Riverpod family notifier for boolean settings backed by SharedPreferences.
+///
+/// A single notifier class handles any number of boolean toggles by taking
+/// [id] (a stable [BoolFamilyProviderIDs] value) and [sharedPrefsKey] as
+/// family parameters. This avoids duplicating notifier code for every toggle.
+///
+/// On first access the [build] method reads the persisted value and returns
+/// a sensible default if none is stored. [updateBoolean] persists the new
+/// value and updates the Riverpod state so the UI rebuilds reactively.
 final class BoolFamilyNotifierProvider
     extends $NotifierProvider<BoolFamilyNotifier, bool> {
+  /// Riverpod family notifier for boolean settings backed by SharedPreferences.
+  ///
+  /// A single notifier class handles any number of boolean toggles by taking
+  /// [id] (a stable [BoolFamilyProviderIDs] value) and [sharedPrefsKey] as
+  /// family parameters. This avoids duplicating notifier code for every toggle.
+  ///
+  /// On first access the [build] method reads the persisted value and returns
+  /// a sensible default if none is stored. [updateBoolean] persists the new
+  /// value and updates the Riverpod state so the UI rebuilds reactively.
   BoolFamilyNotifierProvider._({
     required BoolFamilyNotifierFamily super.from,
     required ({BoolFamilyProviderIDs id, SharedPreferencesKeys sharedPrefsKey})
@@ -62,6 +89,16 @@ final class BoolFamilyNotifierProvider
 String _$boolFamilyNotifierHash() =>
     r'd77308a8283feef24263eae722bed7ec6496eb86';
 
+/// Riverpod family notifier for boolean settings backed by SharedPreferences.
+///
+/// A single notifier class handles any number of boolean toggles by taking
+/// [id] (a stable [BoolFamilyProviderIDs] value) and [sharedPrefsKey] as
+/// family parameters. This avoids duplicating notifier code for every toggle.
+///
+/// On first access the [build] method reads the persisted value and returns
+/// a sensible default if none is stored. [updateBoolean] persists the new
+/// value and updates the Riverpod state so the UI rebuilds reactively.
+
 final class BoolFamilyNotifierFamily extends $Family
     with
         $ClassFamilyOverride<
@@ -80,6 +117,16 @@ final class BoolFamilyNotifierFamily extends $Family
         isAutoDispose: true,
       );
 
+  /// Riverpod family notifier for boolean settings backed by SharedPreferences.
+  ///
+  /// A single notifier class handles any number of boolean toggles by taking
+  /// [id] (a stable [BoolFamilyProviderIDs] value) and [sharedPrefsKey] as
+  /// family parameters. This avoids duplicating notifier code for every toggle.
+  ///
+  /// On first access the [build] method reads the persisted value and returns
+  /// a sensible default if none is stored. [updateBoolean] persists the new
+  /// value and updates the Riverpod state so the UI rebuilds reactively.
+
   BoolFamilyNotifierProvider call({
     required BoolFamilyProviderIDs id,
     required SharedPreferencesKeys sharedPrefsKey,
@@ -91,6 +138,16 @@ final class BoolFamilyNotifierFamily extends $Family
   @override
   String toString() => r'boolFamilyProvider';
 }
+
+/// Riverpod family notifier for boolean settings backed by SharedPreferences.
+///
+/// A single notifier class handles any number of boolean toggles by taking
+/// [id] (a stable [BoolFamilyProviderIDs] value) and [sharedPrefsKey] as
+/// family parameters. This avoids duplicating notifier code for every toggle.
+///
+/// On first access the [build] method reads the persisted value and returns
+/// a sensible default if none is stored. [updateBoolean] persists the new
+/// value and updates the Riverpod state so the UI rebuilds reactively.
 
 abstract class _$BoolFamilyNotifier extends $Notifier<bool> {
   late final _$args =
