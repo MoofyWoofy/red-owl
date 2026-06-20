@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:red_owl/riverpod/shared.dart' show boolFamilyProvider;
+import 'package:red_owl/riverpod/shared.dart'
+    show boolFamilyProvider, localeProvider;
 import 'package:red_owl/l10n/app_localizations.dart';
 import 'package:red_owl/routes/shared.dart';
 import 'package:red_owl/config/shared.dart'
@@ -60,6 +61,8 @@ class App extends ConsumerWidget {
       // Switch between light and dark theme based on the user's preference.
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       home: const HomePage(title: 'Red Owl'),
+      // null = follow the device language; a Locale forces the chosen language.
+      locale: ref.watch(localeProvider),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
     );

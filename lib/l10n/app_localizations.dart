@@ -200,6 +200,18 @@ abstract class AppLocalizations {
   /// **'Color-blind / high contrast'**
   String get colorBlindMode;
 
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @systemDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'System default'**
+  String get systemDefault;
+
   /// No description provided for @customWordList.
   ///
   /// In en, this message translates to:

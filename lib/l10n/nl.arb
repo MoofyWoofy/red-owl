@@ -17,6 +17,8 @@
   "settings": "Instellingen",
   "darkMode": "Donkere modus",
   "colorBlindMode": "Kleurenblind / hoog contrast",
+  "language": "Taal",
+  "systemDefault": "Systeemstandaard",
   "customWordList": "Gebruik aangepaste woordenlijst",
   "gameInProgressChangingWordList": "Spel bezig, het wijzigen van de woordenlijst zal het spel resetten",
   "gameInProgressImportingWordList": "Spel bezig, het importeren van de woordenlijst zal het spel resetten",

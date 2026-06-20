@@ -33,4 +33,8 @@ enum SharedPreferencesKeys {
   /// Swaps the green/yellow tile colors for a blue/orange palette and raises
   /// border contrast app-wide.
   isColorBlindMode,
+
+  /// The user's chosen UI language as a locale code (`'en'`, `'nl'`), or
+  /// `'system'`/absent to follow the device language (String).
+  localeCode,
 }

@@ -84,5 +84,24 @@ void main() {
       expect(find.text('Color-blind / high contrast'), findsOneWidget);
       expect(find.byIcon(Icons.visibility), findsOneWidget);
     });
+
+    testWidgets('language tile shows System default and opens a picker',
+        (tester) async {
+      await tester.pumpWidget(
+        makeTestAppRaw(child: const SettingsPage()),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Language'), findsOneWidget);
+      // No override stored, so the tile shows the system-default label.
+      expect(find.text('System default'), findsOneWidget);
+
+      await tester.tap(find.text('Language'));
+      await tester.pumpAndSettle();
+
+      // The picker lists the supported languages by their native names.
+      expect(find.text('English'), findsOneWidget);
+      expect(find.text('Nederlands'), findsOneWidget);
+    });
   });
 }

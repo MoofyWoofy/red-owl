@@ -3,12 +3,13 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:red_owl/l10n/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as path;
 import 'package:red_owl/config/shared.dart'
     show SharedPreferencesKeys, BoolFamilyProviderIDs;
 import 'package:red_owl/riverpod/shared.dart'
-    show gridProvider, boolFamilyProvider;
+    show gridProvider, boolFamilyProvider, localeProvider, systemLocaleCode;
 import 'package:red_owl/routes/settings/routes/view_custom_wordlist.dart';
 import 'package:red_owl/routes/settings/widgets/shared.dart'
     show GameInProgressDialog, SwitchItem;
@@ -75,6 +76,19 @@ class SettingsPage extends ConsumerWidget {
                       icon: Icons.visibility,
                       boolProviderId: BoolFamilyProviderIDs.isColorBlindMode,
                       sharedPrefsKey: SharedPreferencesKeys.isColorBlindMode,
+                    ),
+                    const SizedBox(height: 20),
+                    // ── Language selector ────────────────────────────────────
+                    ListTile(
+                      leading: const Icon(Icons.language),
+                      title: Text(context.l10n.language),
+                      trailing: Text(
+                        _languageLabel(
+                          context,
+                          ref.watch(localeProvider)?.languageCode,
+                        ),
+                      ),
+                      onTap: () => _pickLanguage(context, ref),
                     ),
                     const SizedBox(height: 20),
                     // ── Custom Word List ─────────────────────────────────────
@@ -216,6 +230,61 @@ class SettingsPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// Endonyms (native names) for the supported UI languages, shown in the
+  /// language picker so each option is recognisable regardless of the current
+  /// language.
+  static const Map<String, String> _languageEndonyms = {
+    'en': 'English',
+    'nl': 'Nederlands',
+  };
+
+  /// Human-readable label for the currently selected [languageCode]
+  /// (`null` / `'system'` → the localised "System default").
+  String _languageLabel(BuildContext context, String? languageCode) {
+    if (languageCode == null || languageCode == systemLocaleCode) {
+      return context.l10n.systemDefault;
+    }
+    return _languageEndonyms[languageCode] ?? languageCode;
+  }
+
+  /// Shows a dialog letting the user choose the UI language (or follow the
+  /// system language) and persists the choice via [localeProvider].
+  Future<void> _pickLanguage(BuildContext context, WidgetRef ref) async {
+    final current = ref.read(localeProvider)?.languageCode ?? systemLocaleCode;
+    // System default first, then every supported locale.
+    final codes = [
+      systemLocaleCode,
+      ...AppLocalizations.supportedLocales.map((l) => l.languageCode),
+    ];
+
+    final selected = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => SimpleDialog(
+        title: Text(dialogContext.l10n.language),
+        children: [
+          RadioGroup<String>(
+            groupValue: current,
+            onChanged: (value) => Navigator.of(dialogContext).pop(value),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final code in codes)
+                  RadioListTile<String>(
+                    value: code,
+                    title: Text(_languageLabel(dialogContext, code)),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (selected != null) {
+      ref.read(localeProvider.notifier).setLocale(selected);
+    }
   }
 
   /// Lets the user pick a `.txt` file and imports it as the custom word list.

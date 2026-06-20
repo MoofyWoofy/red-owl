@@ -17,6 +17,8 @@
   "settings":"Settings",
   "darkMode":"Dark Mode",
   "colorBlindMode":"Color-blind / high contrast",
+  "language":"Language",
+  "systemDefault":"System default",
   "customWordList":"Use custom word list",
   "gameInProgressChangingWordList":"Game in progress, changing word list will reset the game",
   "gameInProgressImportingWordList":"Game in progress, importing word list will reset the game",

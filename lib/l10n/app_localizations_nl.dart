@@ -63,6 +63,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get colorBlindMode => 'Kleurenblind / hoog contrast';
 
   @override
+  String get language => 'Taal';
+
+  @override
+  String get systemDefault => 'Systeemstandaard';
+
+  @override
   String get customWordList => 'Gebruik aangepaste woordenlijst';
 
   @override

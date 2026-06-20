@@ -63,6 +63,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get colorBlindMode => 'Color-blind / high contrast';
 
   @override
+  String get language => 'Language';
+
+  @override
+  String get systemDefault => 'System default';
+
+  @override
   String get customWordList => 'Use custom word list';
 
   @override
