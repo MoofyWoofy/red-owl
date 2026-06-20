@@ -115,6 +115,26 @@ void main() {
       expect(find.text('H'), findsNWidgets(2));
     });
 
+    testWidgets('keyboard keys expose a tappable button to assistive tech',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(makeTestAppRaw(child: const WordlePage()));
+      await tester.pumpAndSettle();
+
+      // The 'A' key is reachable by its label and operable as an enabled button.
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('A')),
+        matchesSemantics(
+          label: 'A',
+          isButton: true,
+          hasTapAction: true,
+          hasEnabledState: true,
+          isEnabled: true,
+        ),
+      );
+      handle.dispose();
+    });
+
     testWidgets('hardware backspace removes the last typed tile',
         (tester) async {
       tester.view.physicalSize = const Size(1080, 1920);

@@ -60,6 +60,15 @@ class Letter extends ConsumerWidget {
             letterStatusLabel(context, letter, grid.keyboardStatus[letter]);
     }
 
+    // Forwards the key press to the grid notifier. Shared by pointer taps and
+    // accessibility / keyboard activation.
+    void press() {
+      ref.read(gridProvider.notifier).onKeyboardPressed(
+            key: letter,
+            context: context,
+          );
+    }
+
     return IgnorePointer(
       // Disable all keys once the game is finished.
       ignoring: grid.isGameOver,
@@ -67,18 +76,18 @@ class Letter extends ConsumerWidget {
         button: true,
         enabled: !grid.isGameOver,
         label: semanticLabel,
+        // Let assistive tech activate the key directly (the inner InkWell's
+        // own semantics are excluded to avoid a duplicate node).
+        onTap: grid.isGameOver ? null : press,
         excludeSemantics: true,
         child: Padding(
         padding: const EdgeInsets.only(right: 5),
         child: InkWell(
           splashFactory: NoSplash.splashFactory,
           highlightColor: Colors.black38,
-          onTap: () {
-            ref.read(gridProvider.notifier).onKeyboardPressed(
-                  key: letter,
-                  context: context,
-                );
-          },
+          // Keep keys out of the focus traversal once the game is over.
+          canRequestFocus: !grid.isGameOver,
+          onTap: press,
           child: Ink(
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
