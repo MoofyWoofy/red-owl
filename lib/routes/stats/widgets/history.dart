@@ -47,17 +47,15 @@ class _HistoryState extends State<History> {
           return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
-          return Center(child: Text('error: ${snapshot.error!.toString()}'));
-        }
-        if (!snapshot.hasData) {
-          return const Center(child: Text('snapshot has no data.'));
-        }
-        if (snapshot.data!.isEmpty) {
-          // Friendly prompt when the player has not finished any game yet.
-          return Center(child: Text(context.l10n.playGameFirst));
+          return Center(child: Text('error: ${snapshot.error}'));
         }
 
-        final historyItems = snapshot.data!;
+        final historyItems = snapshot.data;
+        if (historyItems == null || historyItems.isEmpty) {
+          // No data, or the player has not finished any game yet — show the
+          // friendly prompt rather than force-unwrapping a possibly-null result.
+          return Center(child: Text(context.l10n.playGameFirst));
+        }
 
         return ListView.separated(
           itemCount: historyItems.length,
