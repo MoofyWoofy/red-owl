@@ -55,6 +55,17 @@ void main() {
       expect(result.invalidWord, 'four');
     });
 
+    test('removes duplicate words case-insensitively, keeping order', () async {
+      final src = File(p.join(docsDir.path, 'source.txt'))
+        ..writeAsStringSync('apple\nchair\nApple\nBERRY\nchair\n');
+
+      final result = await WordleService().importWordList(src);
+
+      expect(result.status, WordListImportStatus.success);
+      // First occurrences kept, later case-insensitive repeats dropped.
+      expect(result.words, ['apple', 'chair', 'BERRY']);
+    });
+
     test('rejects a word containing non-letters', () async {
       final src = File(p.join(docsDir.path, 'source.txt'))
         ..writeAsStringSync('apple\nch1ir\n');

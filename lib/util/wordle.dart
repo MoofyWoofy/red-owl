@@ -120,9 +120,11 @@ class WordleService {
   ///   ([WordListImportResult.lineNumber] / [WordListImportResult.invalidWord]).
   /// - [WordListImportStatus.success] — the list was saved.
   ///
-  /// Blank lines (e.g. a trailing newline) are ignored. On success the cached
-  /// word list is cleared; the caller should re-run [init] to pick the new
-  /// word of the day.
+  /// Blank lines (e.g. a trailing newline) are ignored, and duplicate words are
+  /// removed case-insensitively (keeping the first occurrence) so they don't
+  /// skew the deterministic daily-word seeding. On success the cached word list
+  /// is cleared; the caller should re-run [init] to pick the new word of the
+  /// day.
   Future<WordListImportResult> importWordList(File file) async {
     final String contents;
     try {
@@ -143,12 +145,20 @@ class WordleService {
       }
     }
 
+    // Drop duplicates (case-insensitively) while preserving order, since the
+    // active list is lower-cased on read and repeats would bias word-of-the-day.
+    final seen = <String>{};
+    final uniqueWords = [
+      for (final word in words)
+        if (seen.add(word.toLowerCase())) word,
+    ];
+
     final directory = await getApplicationDocumentsDirectory();
     final dest = File(path.join(directory.path, 'custom_list.txt'));
-    await dest.writeAsString(words.join('\n'));
+    await dest.writeAsString(uniqueWords.join('\n'));
     _cachedWordList = null;
 
-    return WordListImportResult.success(words);
+    return WordListImportResult.success(uniqueWords);
   }
 
   /// Evaluates a single [guessCharacter] at position [idx] against [answer].
