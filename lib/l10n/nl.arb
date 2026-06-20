@@ -17,6 +17,21 @@
   "settings": "Instellingen",
   "darkMode": "Donkere modus",
   "colorBlindMode": "Kleurenblind / hoog contrast",
+  "hardMode": "Moeilijke modus",
+  "hardModeLocked": "Moeilijke modus kan niet worden gewijzigd zodra je vandaag bent begonnen",
+  "hardModeLetterMustBe": "Letter {position} moet {letter} zijn",
+  "@hardModeLetterMustBe": {
+    "placeholders": {
+      "position": {"type": "int"},
+      "letter": {"type": "String"}
+    }
+  },
+  "hardModeMustContain": "Gok moet {letter} bevatten",
+  "@hardModeMustContain": {
+    "placeholders": {
+      "letter": {"type": "String"}
+    }
+  },
   "language": "Taal",
   "systemDefault": "Systeemstandaard",
   "fontSize": "Tekstgrootte",

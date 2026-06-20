@@ -5,6 +5,7 @@ import 'package:red_owl/database/database.dart';
 import 'package:red_owl/util/misc.dart';
 import 'package:red_owl/util/shared.dart'
     show
+        Localization,
         SharedPreferenceService,
         WordleService,
         getDateOnly,
@@ -111,6 +112,17 @@ class Grid extends _$Grid {
     switch (key) {
       case 'ENTER':
         if (state.column == 5) {
+          // Hard mode: enforce that previously revealed hints are reused.
+          final hardModeError = _hardModeViolation(context, guessWord);
+          if (hardModeError != null) {
+            // Reuse the shake animation to signal the invalid guess.
+            state = state.copyWith(notEnoughCharacters: true);
+            if (context.mounted) {
+              showSnackBar(context, hardModeError, 3);
+            }
+            break;
+          }
+
           // Mark that ENTER was pressed so the pop-in animation is suppressed.
           state = state.copyWith(isEnterOrDeletePressed: true);
 
@@ -223,6 +235,50 @@ class Grid extends _$Grid {
         }
         break;
     }
+  }
+
+  /// Validates [guessWord] against the hard-mode ruleset, returning a localized
+  /// error message describing the first violation, or `null` if the guess is
+  /// allowed (or hard mode is off / no guesses made yet).
+  ///
+  /// Standard hard mode requires every revealed hint to be reused:
+  /// - a letter previously marked green must stay in the same position;
+  /// - a letter previously marked yellow (present) must appear somewhere.
+  /// Grey letters are not restricted, matching the NYT ruleset.
+  String? _hardModeViolation(BuildContext context, String guessWord) {
+    final hardMode =
+        SharedPreferenceService().getBool(SharedPreferencesKeys.isHardMode) ??
+            false;
+    if (!hardMode || state.row == 0) return null;
+
+    // Derive the constraints from every committed tile so far.
+    final requiredGreens = <int, String>{};
+    final requiredPresent = <String>{};
+    for (var i = 0; i < state.row * 5; i++) {
+      final tile = state.tiles[i];
+      final position = i % 5;
+      final letter = tile.letter.toUpperCase();
+      if (tile.status == LetterStatus.green) {
+        requiredGreens[position] = letter;
+      } else if (tile.status == LetterStatus.yellow) {
+        requiredPresent.add(letter);
+      }
+    }
+
+    // Position constraints take precedence, reported left to right.
+    for (var position = 0; position < 5; position++) {
+      final expected = requiredGreens[position];
+      if (expected != null && guessWord[position] != expected) {
+        return context.l10n.hardModeLetterMustBe(position + 1, expected);
+      }
+    }
+    // Then presence constraints.
+    for (final letter in requiredPresent) {
+      if (!guessWord.contains(letter)) {
+        return context.l10n.hardModeMustContain(letter);
+      }
+    }
+    return null;
   }
 
   /// Delegates guess evaluation to [WordleService] and converts the raw

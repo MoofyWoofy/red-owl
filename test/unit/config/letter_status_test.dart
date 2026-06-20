@@ -61,8 +61,8 @@ void main() {
   });
 
   group('SharedPreferencesKeys', () {
-    test('has seven values', () {
-      expect(SharedPreferencesKeys.values, hasLength(7));
+    test('has eleven values', () {
+      expect(SharedPreferencesKeys.values, hasLength(11));
     });
 
     test('contains all expected keys', () {
@@ -74,20 +74,26 @@ void main() {
         SharedPreferencesKeys.guessDistribution,
         SharedPreferencesKeys.useCustomList,
         SharedPreferencesKeys.isColorBlindMode,
+        SharedPreferencesKeys.localeCode,
+        SharedPreferencesKeys.fontScale,
+        SharedPreferencesKeys.motionSpeed,
+        SharedPreferencesKeys.isHardMode,
       ]));
     });
   });
 
   group('BoolFamilyProviderIDs', () {
-    test('has exactly three values', () {
-      expect(BoolFamilyProviderIDs.values, hasLength(3));
+    test('has exactly four values', () {
+      expect(BoolFamilyProviderIDs.values, hasLength(4));
     });
 
-    test('contains isDarkMode, useCustomList and isColorBlindMode', () {
+    test('contains isDarkMode, useCustomList, isColorBlindMode and isHardMode',
+        () {
       expect(BoolFamilyProviderIDs.values, containsAll([
         BoolFamilyProviderIDs.isDarkMode,
         BoolFamilyProviderIDs.useCustomList,
         BoolFamilyProviderIDs.isColorBlindMode,
+        BoolFamilyProviderIDs.isHardMode,
       ]));
     });
   });

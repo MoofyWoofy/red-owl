@@ -308,4 +308,151 @@ void main() {
       expect(grid.column, 0);
     });
   });
+
+  group('Grid notifier — hard mode', () {
+    /// Builds a board with row 0 already committed (using [firstLetters] and
+    /// [firstStatuses]) and row 1 filled with [typed], ready to submit.
+    models.Grid hardModeBoard({
+      required String firstLetters,
+      required List<LetterStatus> firstStatuses,
+      required String typed,
+    }) {
+      final tiles = <models.Tile>[
+        for (var i = 0; i < 5; i++)
+          models.Tile(
+            letter: firstLetters[i],
+            status: firstStatuses[i],
+            hasFlipAnimationPlayed: true,
+          ),
+        for (var i = 0; i < 5; i++)
+          models.Tile(
+            letter: typed[i],
+            status: LetterStatus.initial,
+            hasFlipAnimationPlayed: false,
+          ),
+      ];
+      return models.Grid(
+        column: 5,
+        row: 1,
+        tiles: tiles,
+        keyboardStatus: keyboardStatus,
+        runFlipAnimation: false,
+        isEnterOrDeletePressed: false,
+        isGameWon: false,
+        isGameOver: false,
+        notEnoughCharacters: false,
+      );
+    }
+
+    testWidgets('rejects a guess that moves a known green letter',
+        (tester) async {
+      SharedPreferenceService().setBool(SharedPreferencesKeys.isHardMode, true);
+      await pumpHost(tester);
+      // Row 0 revealed a green 'A' in position 1; the new guess starts with 'B'.
+      capturedRef.read(gridProvider.notifier).updateState(hardModeBoard(
+            firstLetters: 'ABCDE',
+            firstStatuses: const [
+              LetterStatus.green,
+              LetterStatus.notInWord,
+              LetterStatus.notInWord,
+              LetterStatus.notInWord,
+              LetterStatus.notInWord,
+            ],
+            typed: 'BERRY',
+          ));
+
+      await enter();
+      // showSnackBar defers via a post-frame callback, so pump twice (and once
+      // more for the entry animation) before the message is in the tree.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 750));
+
+      final grid = capturedRef.read(gridProvider);
+      expect(grid.row, 1); // Rejected — row did not advance.
+      expect(grid.notEnoughCharacters, isTrue);
+      expect(find.text('Letter 1 must be A'), findsOneWidget);
+      await drainSnackBars(tester);
+    });
+
+    testWidgets('rejects a guess missing a known present letter',
+        (tester) async {
+      SharedPreferenceService().setBool(SharedPreferencesKeys.isHardMode, true);
+      await pumpHost(tester);
+      // Row 0 revealed a yellow 'Z'; the new guess 'APPLE' omits it.
+      capturedRef.read(gridProvider.notifier).updateState(hardModeBoard(
+            firstLetters: 'ZWXYV',
+            firstStatuses: const [
+              LetterStatus.yellow,
+              LetterStatus.notInWord,
+              LetterStatus.notInWord,
+              LetterStatus.notInWord,
+              LetterStatus.notInWord,
+            ],
+            typed: 'APPLE',
+          ));
+
+      await enter();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 750));
+
+      final grid = capturedRef.read(gridProvider);
+      expect(grid.row, 1);
+      expect(grid.notEnoughCharacters, isTrue);
+      expect(find.text('Guess must contain Z'), findsOneWidget);
+      await drainSnackBars(tester);
+    });
+
+    testWidgets('allows a guess that respects every revealed hint',
+        (tester) async {
+      SharedPreferenceService().setBool(SharedPreferencesKeys.isHardMode, true);
+      await pumpHost(tester);
+      // Green 'A' in position 1 is kept ('APPLE' also starts with 'A').
+      capturedRef.read(gridProvider.notifier).updateState(hardModeBoard(
+            firstLetters: 'ABCDE',
+            firstStatuses: const [
+              LetterStatus.green,
+              LetterStatus.notInWord,
+              LetterStatus.notInWord,
+              LetterStatus.notInWord,
+              LetterStatus.notInWord,
+            ],
+            typed: 'APPLE',
+          ));
+
+      await enter();
+      await tester.pump();
+
+      final grid = capturedRef.read(gridProvider);
+      // Not rejected: either the row advanced or the game ended on a win.
+      expect(grid.row != 1 || grid.isGameOver, isTrue);
+      expect(find.textContaining('must be'), findsNothing);
+      await drainSnackBars(tester);
+    });
+
+    testWidgets('does not restrict guesses when hard mode is off',
+        (tester) async {
+      // isHardMode left unset (defaults to false).
+      await pumpHost(tester);
+      capturedRef.read(gridProvider.notifier).updateState(hardModeBoard(
+            firstLetters: 'ABCDE',
+            firstStatuses: const [
+              LetterStatus.green,
+              LetterStatus.notInWord,
+              LetterStatus.notInWord,
+              LetterStatus.notInWord,
+              LetterStatus.notInWord,
+            ],
+            // Violates the green 'A', but hard mode is off so it's allowed.
+            typed: 'BERRY',
+          ));
+
+      await enter();
+      await tester.pump();
+
+      final grid = capturedRef.read(gridProvider);
+      expect(grid.row != 1 || grid.isGameOver, isTrue);
+      expect(find.textContaining('must be'), findsNothing);
+      await drainSnackBars(tester);
+    });
+  });
 }

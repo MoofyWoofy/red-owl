@@ -63,6 +63,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get colorBlindMode => 'Color-blind / high contrast';
 
   @override
+  String get hardMode => 'Hard mode';
+
+  @override
+  String get hardModeLocked =>
+      'Hard mode can\'t be changed once you\'ve started today\'s game';
+
+  @override
+  String hardModeLetterMustBe(int position, String letter) {
+    return 'Letter $position must be $letter';
+  }
+
+  @override
+  String hardModeMustContain(String letter) {
+    return 'Guess must contain $letter';
+  }
+
+  @override
   String get language => 'Language';
 
   @override

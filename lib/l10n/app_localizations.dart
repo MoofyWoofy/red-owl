@@ -200,6 +200,30 @@ abstract class AppLocalizations {
   /// **'Color-blind / high contrast'**
   String get colorBlindMode;
 
+  /// No description provided for @hardMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Hard mode'**
+  String get hardMode;
+
+  /// No description provided for @hardModeLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Hard mode can\'t be changed once you\'ve started today\'s game'**
+  String get hardModeLocked;
+
+  /// No description provided for @hardModeLetterMustBe.
+  ///
+  /// In en, this message translates to:
+  /// **'Letter {position} must be {letter}'**
+  String hardModeLetterMustBe(int position, String letter);
+
+  /// No description provided for @hardModeMustContain.
+  ///
+  /// In en, this message translates to:
+  /// **'Guess must contain {letter}'**
+  String hardModeMustContain(String letter);
+
   /// No description provided for @language.
   ///
   /// In en, this message translates to:

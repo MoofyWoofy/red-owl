@@ -63,6 +63,23 @@ class AppLocalizationsNl extends AppLocalizations {
   String get colorBlindMode => 'Kleurenblind / hoog contrast';
 
   @override
+  String get hardMode => 'Moeilijke modus';
+
+  @override
+  String get hardModeLocked =>
+      'Moeilijke modus kan niet worden gewijzigd zodra je vandaag bent begonnen';
+
+  @override
+  String hardModeLetterMustBe(int position, String letter) {
+    return 'Letter $position moet $letter zijn';
+  }
+
+  @override
+  String hardModeMustContain(String letter) {
+    return 'Gok moet $letter bevatten';
+  }
+
+  @override
   String get language => 'Taal';
 
   @override

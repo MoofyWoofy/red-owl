@@ -37,4 +37,20 @@ enum SharedPreferencesKeys {
   /// The user's chosen UI language as a locale code (`'en'`, `'nl'`), or
   /// `'system'`/absent to follow the device language (String).
   localeCode,
+
+  /// The user's preferred text size as a scale code
+  /// (`'small'`, `'normal'`, `'large'`, `'xlarge'`). Applied app-wide via a
+  /// [TextScaler]. Absent → `'normal'` (String).
+  fontScale,
+
+  /// The user's animation-speed preference as a code
+  /// (`'reduced'`, `'fast'`, `'normal'`, `'slow'`). Maps to a global
+  /// `timeDilation`. Absent → `'normal'`. The system "remove animations"
+  /// accessibility setting forces `'reduced'` regardless (String).
+  motionSpeed,
+
+  /// Whether hard mode is enabled (bool). In hard mode every revealed hint
+  /// must be reused in subsequent guesses. The toggle locks once the first
+  /// guess of the day is made. Absent → `false`.
+  isHardMode,
 }

@@ -12,4 +12,7 @@ enum BoolFamilyProviderIDs {
 
   /// Provider controlling the color-blind / high-contrast palette toggle.
   isColorBlindMode,
+
+  /// Provider controlling the hard-mode toggle.
+  isHardMode,
 }

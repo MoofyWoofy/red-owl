@@ -17,6 +17,21 @@
   "settings":"Settings",
   "darkMode":"Dark Mode",
   "colorBlindMode":"Color-blind / high contrast",
+  "hardMode":"Hard mode",
+  "hardModeLocked":"Hard mode can't be changed once you've started today's game",
+  "hardModeLetterMustBe":"Letter {position} must be {letter}",
+  "@hardModeLetterMustBe":{
+    "placeholders":{
+      "position":{"type":"int"},
+      "letter":{"type":"String"}
+    }
+  },
+  "hardModeMustContain":"Guess must contain {letter}",
+  "@hardModeMustContain":{
+    "placeholders":{
+      "letter":{"type":"String"}
+    }
+  },
   "language":"Language",
   "systemDefault":"System default",
   "fontSize":"Text size",

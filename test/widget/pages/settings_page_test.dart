@@ -16,6 +16,7 @@ void main() {
         'isDarkMode': false,
         'useCustomList': false,
         'isColorBlindMode': false,
+        'isHardMode': false,
       });
       await SharedPreferenceService().init();
     });
@@ -102,6 +103,26 @@ void main() {
       // The picker lists the supported languages by their native names.
       expect(find.text('English'), findsOneWidget);
       expect(find.text('Nederlands'), findsOneWidget);
+    });
+
+    testWidgets('renders the hard mode switch and toggles it on',
+        (tester) async {
+      await tester.pumpWidget(
+        makeTestAppRaw(child: const SettingsPage()),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Hard mode'), findsOneWidget);
+      expect(find.byIcon(Icons.local_fire_department), findsOneWidget);
+
+      // No game has started, so the toggle is free to change.
+      final tile = find.ancestor(
+        of: find.text('Hard mode'),
+        matching: find.byType(SwitchListTile),
+      );
+      await tester.tap(tile);
+      await tester.pumpAndSettle();
+      expect(tester.widget<SwitchListTile>(tile).value, true);
     });
 
     testWidgets('text-size tile shows Normal and opens a picker',

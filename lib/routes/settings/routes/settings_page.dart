@@ -93,6 +93,30 @@ class SettingsPage extends ConsumerWidget {
                       sharedPrefsKey: SharedPreferencesKeys.isColorBlindMode,
                     ),
                     const SizedBox(height: 20),
+                    // ── Hard mode ────────────────────────────────────────────
+                    SwitchItem(
+                      title: context.l10n.hardMode,
+                      icon: Icons.local_fire_department,
+                      boolProviderId: BoolFamilyProviderIDs.isHardMode,
+                      sharedPrefsKey: SharedPreferencesKeys.isHardMode,
+                      // Lock the toggle once today's game is underway so the
+                      // ruleset can't be changed mid-puzzle.
+                      callback: (value) {
+                        final grid = ref.read(gridProvider);
+                        if (grid.row > 0 && !grid.isGameOver) {
+                          showSnackBar(context, context.l10n.hardModeLocked, 3);
+                          return;
+                        }
+                        ref
+                            .read(boolFamilyProvider(
+                              id: BoolFamilyProviderIDs.isHardMode,
+                              sharedPrefsKey: SharedPreferencesKeys.isHardMode,
+                            ).notifier)
+                            .updateBoolean(
+                                SharedPreferencesKeys.isHardMode, value);
+                      },
+                    ),
+                    const SizedBox(height: 20),
                     // ── Language selector ────────────────────────────────────
                     ListTile(
                       leading: const Icon(Icons.language),
