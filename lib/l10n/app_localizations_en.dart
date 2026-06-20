@@ -60,6 +60,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get darkMode => 'Dark Mode';
 
   @override
+  String get colorBlindMode => 'Color-blind / high contrast';
+
+  @override
   String get customWordList => 'Use custom word list';
 
   @override

@@ -60,6 +60,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get darkMode => 'Donkere modus';
 
   @override
+  String get colorBlindMode => 'Kleurenblind / hoog contrast';
+
+  @override
   String get customWordList => 'Gebruik aangepaste woordenlijst';
 
   @override

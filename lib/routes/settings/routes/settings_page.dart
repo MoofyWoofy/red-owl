@@ -69,6 +69,14 @@ class SettingsPage extends ConsumerWidget {
                       sharedPrefsKey: SharedPreferencesKeys.isDarkMode,
                     ),
                     const SizedBox(height: 20),
+                    // ── Color-blind / high-contrast mode ─────────────────────
+                    SwitchItem(
+                      title: context.l10n.colorBlindMode,
+                      icon: Icons.visibility,
+                      boolProviderId: BoolFamilyProviderIDs.isColorBlindMode,
+                      sharedPrefsKey: SharedPreferencesKeys.isColorBlindMode,
+                    ),
+                    const SizedBox(height: 20),
                     // ── Custom Word List ─────────────────────────────────────
                     SwitchItem(
                       title: context.l10n.customWordList,

@@ -61,8 +61,8 @@ void main() {
   });
 
   group('SharedPreferencesKeys', () {
-    test('has six values', () {
-      expect(SharedPreferencesKeys.values, hasLength(6));
+    test('has seven values', () {
+      expect(SharedPreferencesKeys.values, hasLength(7));
     });
 
     test('contains all expected keys', () {
@@ -73,19 +73,21 @@ void main() {
         SharedPreferencesKeys.statsData,
         SharedPreferencesKeys.guessDistribution,
         SharedPreferencesKeys.useCustomList,
+        SharedPreferencesKeys.isColorBlindMode,
       ]));
     });
   });
 
   group('BoolFamilyProviderIDs', () {
-    test('has exactly two values', () {
-      expect(BoolFamilyProviderIDs.values, hasLength(2));
+    test('has exactly three values', () {
+      expect(BoolFamilyProviderIDs.values, hasLength(3));
     });
 
-    test('contains isDarkMode and useCustomList', () {
+    test('contains isDarkMode, useCustomList and isColorBlindMode', () {
       expect(BoolFamilyProviderIDs.values, containsAll([
         BoolFamilyProviderIDs.isDarkMode,
         BoolFamilyProviderIDs.useCustomList,
+        BoolFamilyProviderIDs.isColorBlindMode,
       ]));
     });
   });

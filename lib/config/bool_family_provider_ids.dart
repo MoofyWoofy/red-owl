@@ -9,4 +9,7 @@ enum BoolFamilyProviderIDs {
 
   /// Provider controlling whether the custom word list is active.
   useCustomList,
+
+  /// Provider controlling the color-blind / high-contrast palette toggle.
+  isColorBlindMode,
 }

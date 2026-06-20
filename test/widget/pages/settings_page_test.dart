@@ -15,6 +15,7 @@ void main() {
       setSharedPreferencesMock({
         'isDarkMode': false,
         'useCustomList': false,
+        'isColorBlindMode': false,
       });
       await SharedPreferenceService().init();
     });
@@ -72,6 +73,16 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.byIcon(Icons.contrast), findsOneWidget);
+    });
+
+    testWidgets('renders the color-blind / high contrast switch',
+        (tester) async {
+      await tester.pumpWidget(
+        makeTestAppRaw(child: const SettingsPage()),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Color-blind / high contrast'), findsOneWidget);
+      expect(find.byIcon(Icons.visibility), findsOneWidget);
     });
   });
 }

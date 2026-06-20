@@ -4,7 +4,13 @@ import 'package:red_owl/riverpod/shared.dart' show boolFamilyProvider;
 import 'package:red_owl/l10n/app_localizations.dart';
 import 'package:red_owl/routes/shared.dart';
 import 'package:red_owl/config/shared.dart'
-    show lightTheme, darkTheme, SharedPreferencesKeys, BoolFamilyProviderIDs;
+    show
+        lightTheme,
+        darkTheme,
+        lightThemeHighContrast,
+        darkThemeHighContrast,
+        SharedPreferencesKeys,
+        BoolFamilyProviderIDs;
 import 'package:red_owl/util/shared.dart'
     show Localization, SharedPreferenceService, WordleService;
 import 'package:red_owl/widgets/shared.dart' show Logo, appBar;
@@ -39,11 +45,18 @@ class App extends ConsumerWidget {
       id: BoolFamilyProviderIDs.isDarkMode,
       sharedPrefsKey: SharedPreferencesKeys.isDarkMode,
     ));
+    bool isColorBlindMode = ref.watch(
+      boolFamilyProvider(
+      id: BoolFamilyProviderIDs.isColorBlindMode,
+      sharedPrefsKey: SharedPreferencesKeys.isColorBlindMode,
+    ));
 
     return MaterialApp(
       title: 'Red Owl',
-      theme: lightTheme,
-      darkTheme: darkTheme,
+      // Pick the standard or color-blind/high-contrast palette for each
+      // brightness, then let themeMode choose between light and dark.
+      theme: isColorBlindMode ? lightThemeHighContrast : lightTheme,
+      darkTheme: isColorBlindMode ? darkThemeHighContrast : darkTheme,
       // Switch between light and dark theme based on the user's preference.
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       home: const HomePage(title: 'Red Owl'),

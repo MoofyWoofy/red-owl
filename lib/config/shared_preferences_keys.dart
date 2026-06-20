@@ -28,4 +28,9 @@ enum SharedPreferencesKeys {
   /// Whether to use the user-imported custom word list instead of the
   /// bundled default list (bool).
   useCustomList,
+
+  /// Whether the color-blind / high-contrast palette is enabled (bool).
+  /// Swaps the green/yellow tile colors for a blue/orange palette and raises
+  /// border contrast app-wide.
+  isColorBlindMode,
 }
