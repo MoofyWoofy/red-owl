@@ -62,6 +62,10 @@ class WordleService {
   /// copies the bundled list to `custom_list.txt` and returns that.
   /// Falls back to the bundled `assets/word_list.txt` when the custom list
   /// feature is disabled.
+  ///
+  /// Every word is normalised to a trimmed, lower-case form so that guess
+  /// matching in [checkGuessWord] (which lower-cases the guess) is independent
+  /// of how the imported file was cased or spaced.
   Future<List<String>> get getWordList async {
     var useCustomList =
         SharedPreferenceService().getBool(SharedPreferencesKeys.useCustomList);
@@ -69,11 +73,13 @@ class WordleService {
       Directory directory = await getApplicationDocumentsDirectory();
       try {
         File file = File(path.join(directory.path, 'custom_list.txt'));
-        return await file.readAsLines();
+        final lines = await file.readAsLines();
+        return lines.map((e) => e.trim().toLowerCase()).toList();
       } on PathNotFoundException {
         // File doesn't exist yet — seed it from the bundled asset.
         final String data = await rootBundle.loadString('assets/word_list.txt');
-        List<String> words = data.split('\n').map((e) => e.trim()).toList();
+        List<String> words =
+            data.split('\n').map((e) => e.trim().toLowerCase()).toList();
 
         File file = File('${directory.path}/custom_list.txt');
         file.writeAsString(words.join('\n'));
@@ -81,7 +87,7 @@ class WordleService {
       }
     } else {
       final String data = await rootBundle.loadString('assets/word_list.txt');
-      return data.split('\n').map((e) => e.trim()).toList();
+      return data.split('\n').map((e) => e.trim().toLowerCase()).toList();
     }
   }
 
