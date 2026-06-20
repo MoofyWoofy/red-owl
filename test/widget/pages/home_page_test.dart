@@ -24,12 +24,13 @@ void main() {
       expect(find.text('Red Owl'), findsOneWidget);
     });
 
-    testWidgets('renders Daily and Stats buttons', (tester) async {
+    testWidgets('renders Daily, Practice and Stats buttons', (tester) async {
       await tester.pumpWidget(
         makeTestAppRaw(child: const HomePage(title: 'Red Owl')),
       );
       await tester.pumpAndSettle();
       expect(find.text('Daily'), findsOneWidget);
+      expect(find.text('Practice'), findsOneWidget);
       expect(find.text('Stats'), findsOneWidget);
     });
 
@@ -65,12 +66,20 @@ void main() {
       expect(find.byIcon(Icons.settings), findsOneWidget);
     });
 
-    testWidgets('has two OutlinedButtons', (tester) async {
+    testWidgets('renders the Practice (fitness) icon button', (tester) async {
       await tester.pumpWidget(
         makeTestAppRaw(child: const HomePage(title: 'Red Owl')),
       );
       await tester.pumpAndSettle();
-      expect(find.byType(OutlinedButton), findsNWidgets(2));
+      expect(find.byIcon(Icons.fitness_center), findsOneWidget);
+    });
+
+    testWidgets('has three OutlinedButtons', (tester) async {
+      await tester.pumpWidget(
+        makeTestAppRaw(child: const HomePage(title: 'Red Owl')),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(OutlinedButton), findsNWidgets(3));
     });
   });
 }

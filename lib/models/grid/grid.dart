@@ -48,6 +48,12 @@ abstract class Grid with _$Grid {
     /// True when the player presses ENTER on a row with fewer than 5 letters.
     /// Triggers the shake animation on the current row.
     required bool notEnoughCharacters,
+
+    /// Whether this board should be persisted to SharedPreferences after each
+    /// move. The daily game persists (so it survives restarts); the practice
+    /// board sets this to `false` so it never overwrites the saved daily game.
+    /// Defaults to `true`, so existing serialized grids deserialize unchanged.
+    @Default(true) bool persistState,
   }) = _Grid;
 
   /// Creates a [Grid] from a JSON map produced by [toJson].

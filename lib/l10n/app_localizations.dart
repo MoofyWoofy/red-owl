@@ -110,6 +110,18 @@ abstract class AppLocalizations {
   /// **'Daily'**
   String get daily;
 
+  /// No description provided for @practice.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice'**
+  String get practice;
+
+  /// No description provided for @newWord.
+  ///
+  /// In en, this message translates to:
+  /// **'New word'**
+  String get newWord;
+
   /// No description provided for @stats.
   ///
   /// In en, this message translates to:

@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:red_owl/riverpod/shared.dart'
-    show boolFamilyProvider, localeProvider;
+    show
+        boolFamilyProvider,
+        localeProvider,
+        fontScaleProvider,
+        fontScaleValueOf,
+        motionSpeedProvider,
+        motionSpeedReduced,
+        motionDilationOf;
 import 'package:red_owl/l10n/app_localizations.dart';
 import 'package:red_owl/routes/shared.dart';
 import 'package:red_owl/config/shared.dart'
@@ -51,6 +59,15 @@ class App extends ConsumerWidget {
       id: BoolFamilyProviderIDs.isColorBlindMode,
       sharedPrefsKey: SharedPreferencesKeys.isColorBlindMode,
     ));
+    final fontScaleCode = ref.watch(fontScaleProvider);
+    final motionSpeedCode = ref.watch(motionSpeedProvider);
+
+    // Apply the animation-speed preference globally. The OS "remove animations"
+    // accessibility setting forces the reduced speed regardless of the choice.
+    final systemReduceMotion =
+        MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+    timeDilation = motionDilationOf(
+        systemReduceMotion ? motionSpeedReduced : motionSpeedCode);
 
     return MaterialApp(
       title: 'Red Owl',
@@ -60,6 +77,17 @@ class App extends ConsumerWidget {
       darkTheme: isColorBlindMode ? darkThemeHighContrast : darkTheme,
       // Switch between light and dark theme based on the user's preference.
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      // Apply the user's text-size preference to all text in the app. The game
+      // tiles use a FittedBox, so larger scales never overflow the grid.
+      builder: (context, child) {
+        final mq = MediaQuery.of(context);
+        return MediaQuery(
+          data: mq.copyWith(
+            textScaler: TextScaler.linear(fontScaleValueOf(fontScaleCode)),
+          ),
+          child: child!,
+        );
+      },
       home: const HomePage(title: 'Red Owl'),
       // null = follow the device language; a Locale forces the chosen language.
       locale: ref.watch(localeProvider),
@@ -106,6 +134,16 @@ class HomePage extends StatelessWidget {
                     },
                     label: Text(context.l10n.daily),
                     icon: const Icon(Icons.calendar_today),
+                  ),
+                  const SizedBox(height: 20),
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      // PracticePage also slides in from the right.
+                      Navigator.of(context).push(_createRouteTo(
+                          const PracticePage(), const Offset(1.0, 0.0)));
+                    },
+                    label: Text(context.l10n.practice),
+                    icon: const Icon(Icons.fitness_center),
                   ),
                   const SizedBox(height: 20),
                   OutlinedButton.icon(

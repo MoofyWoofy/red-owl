@@ -93,6 +93,33 @@ void main() {
       final result = await WordleService().checkGuessWord(guess);
       expect(result['is_word_in_list'], isTrue);
     });
+
+    test('checkGuessWord scores against an explicit answer when provided',
+        () async {
+      await WordleService().init();
+      // Force a specific answer different from the word of the day.
+      final result =
+          await WordleService().checkGuessWord('APPLE', answer: 'APPLE');
+      expect(result['is_correct'], isTrue);
+
+      // A wrong guess is scored relative to the supplied answer, not the daily.
+      final wrong =
+          await WordleService().checkGuessWord('BERRY', answer: 'APPLE');
+      expect(wrong['is_correct'], isFalse);
+      final info = wrong['character_info'] as List;
+      for (var i = 0; i < 5; i++) {
+        final scoring = info[i]['scoring'] as Map;
+        expect(scoring['in_word'], 'APPLE'.contains('BERRY'[i]));
+        expect(scoring['correct_idx'], 'BERRY'[i] == 'APPLE'[i]);
+      }
+    });
+
+    test('randomWord returns an uppercase word from the active list', () async {
+      final upper = words.map((w) => w.toUpperCase()).toSet();
+      for (var i = 0; i < 20; i++) {
+        expect(upper, contains(await WordleService().randomWord()));
+      }
+    });
   });
 
   group('WordleService.importWordList', () {

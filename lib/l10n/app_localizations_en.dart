@@ -15,6 +15,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get daily => 'Daily';
 
   @override
+  String get practice => 'Practice';
+
+  @override
+  String get newWord => 'New word';
+
+  @override
   String get stats => 'Stats';
 
   @override

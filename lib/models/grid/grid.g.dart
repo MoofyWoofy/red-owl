@@ -20,6 +20,7 @@ _Grid _$GridFromJson(Map<String, dynamic> json) => _Grid(
   isGameWon: json['isGameWon'] as bool,
   isGameOver: json['isGameOver'] as bool,
   notEnoughCharacters: json['notEnoughCharacters'] as bool,
+  persistState: json['persistState'] as bool? ?? true,
 );
 
 Map<String, dynamic> _$GridToJson(_Grid instance) => <String, dynamic>{
@@ -34,6 +35,7 @@ Map<String, dynamic> _$GridToJson(_Grid instance) => <String, dynamic>{
   'isGameWon': instance.isGameWon,
   'isGameOver': instance.isGameOver,
   'notEnoughCharacters': instance.notEnoughCharacters,
+  'persistState': instance.persistState,
 };
 
 const _$LetterStatusEnumMap = {

@@ -2,6 +2,8 @@
   "@@locale": "nl",
   "appName": "Rode Uil",
   "daily": "Dagelijks",
+  "practice": "Oefenen",
+  "newWord": "Nieuw woord",
   "stats": "Statistieken",
   "howToPlay": "HOE TE SPELEN",
   "sixTries": "Je hebt 6 pogingen om het woord te raden.",

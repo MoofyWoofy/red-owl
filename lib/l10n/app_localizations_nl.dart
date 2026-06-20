@@ -15,6 +15,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get daily => 'Dagelijks';
 
   @override
+  String get practice => 'Oefenen';
+
+  @override
+  String get newWord => 'Nieuw woord';
+
+  @override
   String get stats => 'Statistieken';
 
   @override

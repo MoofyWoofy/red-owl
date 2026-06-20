@@ -2,6 +2,8 @@
   "@@locale": "en",
   "appName":"Red Owl",
   "daily": "Daily",
+  "practice": "Practice",
+  "newWord": "New word",
   "stats": "Stats",
   "howToPlay":"HOW TO PLAY",
   "sixTries":"You have 6 tries to guess the word.",

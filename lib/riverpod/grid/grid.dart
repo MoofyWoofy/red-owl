@@ -147,8 +147,7 @@ class Grid extends _$Grid {
               notEnoughCharacters: false,
             );
             _updateKeyboard(keyboardStatusTemp);
-            _updateStatsData(gameWon: true);
-            await _addToDatabase(gameState: GameState.won);
+            await recordOutcome(gameWon: true);
           } else if (!result.isWordInList) {
             // ── Word not in list ───────────────────────────────────────────
             // Reuse the notEnoughCharacters flag to trigger the shake animation.
@@ -185,8 +184,7 @@ class Grid extends _$Grid {
                 isGameWon: false,
                 isGameOver: true,
               );
-              _updateStatsData(gameWon: false);
-              await _addToDatabase(gameState: GameState.lost);
+              await recordOutcome(gameWon: false);
             }
             // Advance to the next row and trigger the flip animation.
             state = state.copyWith(
@@ -283,10 +281,22 @@ class Grid extends _$Grid {
 
   /// Delegates guess evaluation to [WordleService] and converts the raw
   /// JSON map into a typed [models.GuessResult].
+  ///
+  /// Evaluates against the word of the day. The practice notifier overrides
+  /// this to score against its own random answer instead.
   Future<models.GuessResult> getGuessResult(String guess) async {
     return models.GuessResult.fromJson(
       await WordleService().checkGuessWord(guess),
     );
+  }
+
+  /// Records the finished game's outcome: updates the aggregate stats and
+  /// writes a history row. The practice notifier overrides this to a no-op so
+  /// unlimited play never affects stats or history.
+  Future<void> recordOutcome({required bool gameWon}) async {
+    _updateStatsData(gameWon: gameWon);
+    await _addToDatabase(
+        gameState: gameWon ? GameState.won : GameState.lost);
   }
 
   /// Directly replaces the board state. Used by the [Tile] widget after the

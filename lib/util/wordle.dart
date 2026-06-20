@@ -64,6 +64,16 @@ class WordleService {
     return wordlist[random.nextInt(wordlist.length)].trim().toUpperCase();
   }
 
+  /// Returns a non-deterministic random word (uppercase) from the active list.
+  ///
+  /// Used by the practice / unlimited mode, where each game should pick a fresh
+  /// answer unrelated to the date so the daily word isn't spoiled.
+  Future<String> randomWord() async {
+    final wordlist = await getWordList;
+    final random = math.Random();
+    return wordlist[random.nextInt(wordlist.length)].trim().toUpperCase();
+  }
+
   /// Resolves and returns the active word list.
   ///
   /// When the user has enabled the custom word list and the file exists,
@@ -200,18 +210,23 @@ class WordleService {
     };
   }
 
-  /// Evaluates [guessWord] against today's word and returns a raw JSON map
+  /// Evaluates [guessWord] against the answer and returns a raw JSON map
   /// suitable for [GuessResult.fromJson].
   ///
+  /// [answer] defaults to today's word; the practice mode passes its own random
+  /// answer so the same evaluation logic serves both flows.
+  ///
   /// Three outcomes:
-  /// 1. **Correct** – [guessWord] matches the word of the day.
+  /// 1. **Correct** – [guessWord] matches the answer.
   ///    `is_correct: true`, no character_info needed.
   /// 2. **Not in list** – word not found in the active word list.
   ///    `is_word_in_list: false`, row does not advance.
   /// 3. **In list but wrong** – returns per-character scoring
   ///    (`character_info`) so each tile can be coloured green/yellow/grey.
-  Future<Map<String, dynamic>> checkGuessWord(String guessWord) async {
-    if (guessWord == WordleService()._wordOfTheDay) {
+  Future<Map<String, dynamic>> checkGuessWord(String guessWord,
+      {String? answer}) async {
+    final target = answer ?? _wordOfTheDay;
+    if (guessWord == target) {
       return {
         'guess': guessWord,
         'is_correct': true,
@@ -232,7 +247,7 @@ class WordleService {
     // Word is valid — evaluate each character against the answer.
     List<Map<String, dynamic>> guessResult = [];
     for (int idx = 0; idx < guessWord.length; idx++) {
-      guessResult.add(_checkCharacter(guessWord[idx], _wordOfTheDay, idx));
+      guessResult.add(_checkCharacter(guessWord[idx], target, idx));
     }
     return {
       'guess': guessWord,

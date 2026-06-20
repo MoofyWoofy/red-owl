@@ -32,7 +32,11 @@ mixin _$Grid {
  bool get isGameWon;/// Whether the game has ended (either won or all 6 rows used up).
  bool get isGameOver;/// True when the player presses ENTER on a row with fewer than 5 letters.
 /// Triggers the shake animation on the current row.
- bool get notEnoughCharacters;
+ bool get notEnoughCharacters;/// Whether this board should be persisted to SharedPreferences after each
+/// move. The daily game persists (so it survives restarts); the practice
+/// board sets this to `false` so it never overwrites the saved daily game.
+/// Defaults to `true`, so existing serialized grids deserialize unchanged.
+ bool get persistState;
 /// Create a copy of Grid
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -45,16 +49,16 @@ $GridCopyWith<Grid> get copyWith => _$GridCopyWithImpl<Grid>(this as Grid, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Grid&&(identical(other.column, column) || other.column == column)&&(identical(other.row, row) || other.row == row)&&const DeepCollectionEquality().equals(other.tiles, tiles)&&const DeepCollectionEquality().equals(other.keyboardStatus, keyboardStatus)&&(identical(other.runFlipAnimation, runFlipAnimation) || other.runFlipAnimation == runFlipAnimation)&&(identical(other.isEnterOrDeletePressed, isEnterOrDeletePressed) || other.isEnterOrDeletePressed == isEnterOrDeletePressed)&&(identical(other.isGameWon, isGameWon) || other.isGameWon == isGameWon)&&(identical(other.isGameOver, isGameOver) || other.isGameOver == isGameOver)&&(identical(other.notEnoughCharacters, notEnoughCharacters) || other.notEnoughCharacters == notEnoughCharacters));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Grid&&(identical(other.column, column) || other.column == column)&&(identical(other.row, row) || other.row == row)&&const DeepCollectionEquality().equals(other.tiles, tiles)&&const DeepCollectionEquality().equals(other.keyboardStatus, keyboardStatus)&&(identical(other.runFlipAnimation, runFlipAnimation) || other.runFlipAnimation == runFlipAnimation)&&(identical(other.isEnterOrDeletePressed, isEnterOrDeletePressed) || other.isEnterOrDeletePressed == isEnterOrDeletePressed)&&(identical(other.isGameWon, isGameWon) || other.isGameWon == isGameWon)&&(identical(other.isGameOver, isGameOver) || other.isGameOver == isGameOver)&&(identical(other.notEnoughCharacters, notEnoughCharacters) || other.notEnoughCharacters == notEnoughCharacters)&&(identical(other.persistState, persistState) || other.persistState == persistState));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,column,row,const DeepCollectionEquality().hash(tiles),const DeepCollectionEquality().hash(keyboardStatus),runFlipAnimation,isEnterOrDeletePressed,isGameWon,isGameOver,notEnoughCharacters);
+int get hashCode => Object.hash(runtimeType,column,row,const DeepCollectionEquality().hash(tiles),const DeepCollectionEquality().hash(keyboardStatus),runFlipAnimation,isEnterOrDeletePressed,isGameWon,isGameOver,notEnoughCharacters,persistState);
 
 @override
 String toString() {
-  return 'Grid(column: $column, row: $row, tiles: $tiles, keyboardStatus: $keyboardStatus, runFlipAnimation: $runFlipAnimation, isEnterOrDeletePressed: $isEnterOrDeletePressed, isGameWon: $isGameWon, isGameOver: $isGameOver, notEnoughCharacters: $notEnoughCharacters)';
+  return 'Grid(column: $column, row: $row, tiles: $tiles, keyboardStatus: $keyboardStatus, runFlipAnimation: $runFlipAnimation, isEnterOrDeletePressed: $isEnterOrDeletePressed, isGameWon: $isGameWon, isGameOver: $isGameOver, notEnoughCharacters: $notEnoughCharacters, persistState: $persistState)';
 }
 
 
@@ -65,7 +69,7 @@ abstract mixin class $GridCopyWith<$Res>  {
   factory $GridCopyWith(Grid value, $Res Function(Grid) _then) = _$GridCopyWithImpl;
 @useResult
 $Res call({
- int column, int row, List<Tile> tiles, Map<String, LetterStatus> keyboardStatus, bool runFlipAnimation, bool isEnterOrDeletePressed, bool isGameWon, bool isGameOver, bool notEnoughCharacters
+ int column, int row, List<Tile> tiles, Map<String, LetterStatus> keyboardStatus, bool runFlipAnimation, bool isEnterOrDeletePressed, bool isGameWon, bool isGameOver, bool notEnoughCharacters, bool persistState
 });
 
 
@@ -82,7 +86,7 @@ class _$GridCopyWithImpl<$Res>
 
 /// Create a copy of Grid
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? column = null,Object? row = null,Object? tiles = null,Object? keyboardStatus = null,Object? runFlipAnimation = null,Object? isEnterOrDeletePressed = null,Object? isGameWon = null,Object? isGameOver = null,Object? notEnoughCharacters = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? column = null,Object? row = null,Object? tiles = null,Object? keyboardStatus = null,Object? runFlipAnimation = null,Object? isEnterOrDeletePressed = null,Object? isGameWon = null,Object? isGameOver = null,Object? notEnoughCharacters = null,Object? persistState = null,}) {
   return _then(_self.copyWith(
 column: null == column ? _self.column : column // ignore: cast_nullable_to_non_nullable
 as int,row: null == row ? _self.row : row // ignore: cast_nullable_to_non_nullable
@@ -93,6 +97,7 @@ as bool,isEnterOrDeletePressed: null == isEnterOrDeletePressed ? _self.isEnterOr
 as bool,isGameWon: null == isGameWon ? _self.isGameWon : isGameWon // ignore: cast_nullable_to_non_nullable
 as bool,isGameOver: null == isGameOver ? _self.isGameOver : isGameOver // ignore: cast_nullable_to_non_nullable
 as bool,notEnoughCharacters: null == notEnoughCharacters ? _self.notEnoughCharacters : notEnoughCharacters // ignore: cast_nullable_to_non_nullable
+as bool,persistState: null == persistState ? _self.persistState : persistState // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -178,10 +183,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int column,  int row,  List<Tile> tiles,  Map<String, LetterStatus> keyboardStatus,  bool runFlipAnimation,  bool isEnterOrDeletePressed,  bool isGameWon,  bool isGameOver,  bool notEnoughCharacters)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int column,  int row,  List<Tile> tiles,  Map<String, LetterStatus> keyboardStatus,  bool runFlipAnimation,  bool isEnterOrDeletePressed,  bool isGameWon,  bool isGameOver,  bool notEnoughCharacters,  bool persistState)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Grid() when $default != null:
-return $default(_that.column,_that.row,_that.tiles,_that.keyboardStatus,_that.runFlipAnimation,_that.isEnterOrDeletePressed,_that.isGameWon,_that.isGameOver,_that.notEnoughCharacters);case _:
+return $default(_that.column,_that.row,_that.tiles,_that.keyboardStatus,_that.runFlipAnimation,_that.isEnterOrDeletePressed,_that.isGameWon,_that.isGameOver,_that.notEnoughCharacters,_that.persistState);case _:
   return orElse();
 
 }
@@ -199,10 +204,10 @@ return $default(_that.column,_that.row,_that.tiles,_that.keyboardStatus,_that.ru
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int column,  int row,  List<Tile> tiles,  Map<String, LetterStatus> keyboardStatus,  bool runFlipAnimation,  bool isEnterOrDeletePressed,  bool isGameWon,  bool isGameOver,  bool notEnoughCharacters)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int column,  int row,  List<Tile> tiles,  Map<String, LetterStatus> keyboardStatus,  bool runFlipAnimation,  bool isEnterOrDeletePressed,  bool isGameWon,  bool isGameOver,  bool notEnoughCharacters,  bool persistState)  $default,) {final _that = this;
 switch (_that) {
 case _Grid():
-return $default(_that.column,_that.row,_that.tiles,_that.keyboardStatus,_that.runFlipAnimation,_that.isEnterOrDeletePressed,_that.isGameWon,_that.isGameOver,_that.notEnoughCharacters);case _:
+return $default(_that.column,_that.row,_that.tiles,_that.keyboardStatus,_that.runFlipAnimation,_that.isEnterOrDeletePressed,_that.isGameWon,_that.isGameOver,_that.notEnoughCharacters,_that.persistState);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -219,10 +224,10 @@ return $default(_that.column,_that.row,_that.tiles,_that.keyboardStatus,_that.ru
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int column,  int row,  List<Tile> tiles,  Map<String, LetterStatus> keyboardStatus,  bool runFlipAnimation,  bool isEnterOrDeletePressed,  bool isGameWon,  bool isGameOver,  bool notEnoughCharacters)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int column,  int row,  List<Tile> tiles,  Map<String, LetterStatus> keyboardStatus,  bool runFlipAnimation,  bool isEnterOrDeletePressed,  bool isGameWon,  bool isGameOver,  bool notEnoughCharacters,  bool persistState)?  $default,) {final _that = this;
 switch (_that) {
 case _Grid() when $default != null:
-return $default(_that.column,_that.row,_that.tiles,_that.keyboardStatus,_that.runFlipAnimation,_that.isEnterOrDeletePressed,_that.isGameWon,_that.isGameOver,_that.notEnoughCharacters);case _:
+return $default(_that.column,_that.row,_that.tiles,_that.keyboardStatus,_that.runFlipAnimation,_that.isEnterOrDeletePressed,_that.isGameWon,_that.isGameOver,_that.notEnoughCharacters,_that.persistState);case _:
   return null;
 
 }
@@ -234,7 +239,7 @@ return $default(_that.column,_that.row,_that.tiles,_that.keyboardStatus,_that.ru
 @JsonSerializable()
 
 class _Grid implements Grid {
-  const _Grid({required this.column, required this.row, required final  List<Tile> tiles, required final  Map<String, LetterStatus> keyboardStatus, required this.runFlipAnimation, required this.isEnterOrDeletePressed, required this.isGameWon, required this.isGameOver, required this.notEnoughCharacters}): _tiles = tiles,_keyboardStatus = keyboardStatus;
+  const _Grid({required this.column, required this.row, required final  List<Tile> tiles, required final  Map<String, LetterStatus> keyboardStatus, required this.runFlipAnimation, required this.isEnterOrDeletePressed, required this.isGameWon, required this.isGameOver, required this.notEnoughCharacters, this.persistState = true}): _tiles = tiles,_keyboardStatus = keyboardStatus;
   factory _Grid.fromJson(Map<String, dynamic> json) => _$GridFromJson(json);
 
 /// Zero-based column index of the tile that will receive the next key press.
@@ -280,6 +285,11 @@ class _Grid implements Grid {
 /// True when the player presses ENTER on a row with fewer than 5 letters.
 /// Triggers the shake animation on the current row.
 @override final  bool notEnoughCharacters;
+/// Whether this board should be persisted to SharedPreferences after each
+/// move. The daily game persists (so it survives restarts); the practice
+/// board sets this to `false` so it never overwrites the saved daily game.
+/// Defaults to `true`, so existing serialized grids deserialize unchanged.
+@override@JsonKey() final  bool persistState;
 
 /// Create a copy of Grid
 /// with the given fields replaced by the non-null parameter values.
@@ -294,16 +304,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Grid&&(identical(other.column, column) || other.column == column)&&(identical(other.row, row) || other.row == row)&&const DeepCollectionEquality().equals(other._tiles, _tiles)&&const DeepCollectionEquality().equals(other._keyboardStatus, _keyboardStatus)&&(identical(other.runFlipAnimation, runFlipAnimation) || other.runFlipAnimation == runFlipAnimation)&&(identical(other.isEnterOrDeletePressed, isEnterOrDeletePressed) || other.isEnterOrDeletePressed == isEnterOrDeletePressed)&&(identical(other.isGameWon, isGameWon) || other.isGameWon == isGameWon)&&(identical(other.isGameOver, isGameOver) || other.isGameOver == isGameOver)&&(identical(other.notEnoughCharacters, notEnoughCharacters) || other.notEnoughCharacters == notEnoughCharacters));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Grid&&(identical(other.column, column) || other.column == column)&&(identical(other.row, row) || other.row == row)&&const DeepCollectionEquality().equals(other._tiles, _tiles)&&const DeepCollectionEquality().equals(other._keyboardStatus, _keyboardStatus)&&(identical(other.runFlipAnimation, runFlipAnimation) || other.runFlipAnimation == runFlipAnimation)&&(identical(other.isEnterOrDeletePressed, isEnterOrDeletePressed) || other.isEnterOrDeletePressed == isEnterOrDeletePressed)&&(identical(other.isGameWon, isGameWon) || other.isGameWon == isGameWon)&&(identical(other.isGameOver, isGameOver) || other.isGameOver == isGameOver)&&(identical(other.notEnoughCharacters, notEnoughCharacters) || other.notEnoughCharacters == notEnoughCharacters)&&(identical(other.persistState, persistState) || other.persistState == persistState));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,column,row,const DeepCollectionEquality().hash(_tiles),const DeepCollectionEquality().hash(_keyboardStatus),runFlipAnimation,isEnterOrDeletePressed,isGameWon,isGameOver,notEnoughCharacters);
+int get hashCode => Object.hash(runtimeType,column,row,const DeepCollectionEquality().hash(_tiles),const DeepCollectionEquality().hash(_keyboardStatus),runFlipAnimation,isEnterOrDeletePressed,isGameWon,isGameOver,notEnoughCharacters,persistState);
 
 @override
 String toString() {
-  return 'Grid(column: $column, row: $row, tiles: $tiles, keyboardStatus: $keyboardStatus, runFlipAnimation: $runFlipAnimation, isEnterOrDeletePressed: $isEnterOrDeletePressed, isGameWon: $isGameWon, isGameOver: $isGameOver, notEnoughCharacters: $notEnoughCharacters)';
+  return 'Grid(column: $column, row: $row, tiles: $tiles, keyboardStatus: $keyboardStatus, runFlipAnimation: $runFlipAnimation, isEnterOrDeletePressed: $isEnterOrDeletePressed, isGameWon: $isGameWon, isGameOver: $isGameOver, notEnoughCharacters: $notEnoughCharacters, persistState: $persistState)';
 }
 
 
@@ -314,7 +324,7 @@ abstract mixin class _$GridCopyWith<$Res> implements $GridCopyWith<$Res> {
   factory _$GridCopyWith(_Grid value, $Res Function(_Grid) _then) = __$GridCopyWithImpl;
 @override @useResult
 $Res call({
- int column, int row, List<Tile> tiles, Map<String, LetterStatus> keyboardStatus, bool runFlipAnimation, bool isEnterOrDeletePressed, bool isGameWon, bool isGameOver, bool notEnoughCharacters
+ int column, int row, List<Tile> tiles, Map<String, LetterStatus> keyboardStatus, bool runFlipAnimation, bool isEnterOrDeletePressed, bool isGameWon, bool isGameOver, bool notEnoughCharacters, bool persistState
 });
 
 
@@ -331,7 +341,7 @@ class __$GridCopyWithImpl<$Res>
 
 /// Create a copy of Grid
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? column = null,Object? row = null,Object? tiles = null,Object? keyboardStatus = null,Object? runFlipAnimation = null,Object? isEnterOrDeletePressed = null,Object? isGameWon = null,Object? isGameOver = null,Object? notEnoughCharacters = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? column = null,Object? row = null,Object? tiles = null,Object? keyboardStatus = null,Object? runFlipAnimation = null,Object? isEnterOrDeletePressed = null,Object? isGameWon = null,Object? isGameOver = null,Object? notEnoughCharacters = null,Object? persistState = null,}) {
   return _then(_Grid(
 column: null == column ? _self.column : column // ignore: cast_nullable_to_non_nullable
 as int,row: null == row ? _self.row : row // ignore: cast_nullable_to_non_nullable
@@ -342,6 +352,7 @@ as bool,isEnterOrDeletePressed: null == isEnterOrDeletePressed ? _self.isEnterOr
 as bool,isGameWon: null == isGameWon ? _self.isGameWon : isGameWon // ignore: cast_nullable_to_non_nullable
 as bool,isGameOver: null == isGameOver ? _self.isGameOver : isGameOver // ignore: cast_nullable_to_non_nullable
 as bool,notEnoughCharacters: null == notEnoughCharacters ? _self.notEnoughCharacters : notEnoughCharacters // ignore: cast_nullable_to_non_nullable
+as bool,persistState: null == persistState ? _self.persistState : persistState // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

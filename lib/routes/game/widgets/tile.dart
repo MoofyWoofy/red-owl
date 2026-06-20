@@ -94,16 +94,20 @@ class _TileState extends ConsumerState<Tile>
 
             ref.read(gridProvider.notifier).updateState(newGrid);
 
-            // Persist the updated grid to SharedPreferences as Base64 JSON.
-            String gameState = jsonEncode(newGrid.toJson());
-            String gameStateBase64 = base64.encode(utf8.encode(gameState));
+            // The practice board opts out of persistence so it never clobbers
+            // the saved daily game.
+            if (newGrid.persistState) {
+              // Persist the updated grid to SharedPreferences as Base64 JSON.
+              String gameState = jsonEncode(newGrid.toJson());
+              String gameStateBase64 = base64.encode(utf8.encode(gameState));
 
-            SharedPreferenceService()
-                .setString(SharedPreferencesKeys.gridState, gameStateBase64);
+              SharedPreferenceService()
+                  .setString(SharedPreferencesKeys.gridState, gameStateBase64);
 
-            // Update the date stamp alongside the grid.
-            SharedPreferenceService().setString(
-                SharedPreferencesKeys.gameDate, dateToString(DateTime.now()));
+              // Update the date stamp alongside the grid.
+              SharedPreferenceService().setString(
+                  SharedPreferencesKeys.gameDate, dateToString(DateTime.now()));
+            }
           });
         });
       }
