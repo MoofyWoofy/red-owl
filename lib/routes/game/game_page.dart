@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart'
-    show KeyDownEvent, KeyRepeatEvent, KeyUpEvent, ServicesBinding;
+    show
+        KeyDownEvent,
+        KeyEvent,
+        LogicalKeyboardKey,
+        ServicesBinding;
 import 'package:red_owl/config/shared.dart'
     show GameColors, LetterStatus, animationTiming, keyboardStatus;
 import 'package:red_owl/riverpod/shared.dart' show gridProvider;
@@ -30,16 +34,43 @@ class WordlePage extends ConsumerStatefulWidget {
 }
 
 class _WordlePageState extends ConsumerState<WordlePage> {
-  /// Handler registered with [ServicesBinding.keyboard] to intercept
-  /// physical key events. Returns `false` so the event continues propagating
-  /// to other handlers (e.g. scroll view focus).
+  /// Handler registered with [ServicesBinding.keyboard] to intercept physical
+  /// key events so desktop and web users can play with a hardware keyboard.
+  ///
+  /// Maps `Enter`/`numpad Enter` → `ENTER`, `Backspace` → `DELETE`, and any
+  /// single `A`–`Z` character → the corresponding letter, forwarding each to
+  /// [Grid.onKeyboardPressed]. Only [KeyDownEvent]s are handled so a held key
+  /// doesn't insert repeated letters. Input is ignored once the game is over,
+  /// mirroring the [IgnorePointer] on the on-screen keyboard.
+  ///
+  /// Returns `true` when an event was consumed so it doesn't also, for example,
+  /// activate a focused button; otherwise `false` to let it propagate.
   bool _onKey(KeyEvent event) {
-    if (event is KeyDownEvent) {
-      // Key pressed — could forward to onKeyboardPressed here if needed.
-    } else if (event is KeyUpEvent) {
-      // Key released.
-    } else if (event is KeyRepeatEvent) {
-      // Key held down and auto-repeating.
+    if (event is! KeyDownEvent) return false;
+    if (ref.read(gridProvider).isGameOver) return false;
+
+    final notifier = ref.read(gridProvider.notifier);
+    final key = event.logicalKey;
+
+    if (key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.numpadEnter) {
+      notifier.onKeyboardPressed(key: 'ENTER', context: context);
+      return true;
+    }
+    if (key == LogicalKeyboardKey.backspace) {
+      notifier.onKeyboardPressed(key: 'DELETE', context: context);
+      return true;
+    }
+
+    // A single printable A–Z character (ignores digits, symbols, shortcuts).
+    final character = event.character;
+    if (character != null && character.length == 1) {
+      final upper = character.toUpperCase();
+      final code = upper.codeUnitAt(0);
+      if (code >= 0x41 && code <= 0x5A) {
+        notifier.onKeyboardPressed(key: upper, context: context);
+        return true;
+      }
     }
 
     return false;

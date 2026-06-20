@@ -4,6 +4,7 @@
 // current date in AppBar, settings/help icons, and HOW TO PLAY dialog.
 // Uses a larger viewport (1080×1920) so the GridView renders all 30 tiles.
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:red_owl/routes/game/widgets/shared.dart'
     show KeyboardRow, Tile;
@@ -89,6 +90,48 @@ void main() {
 
       expect(find.byType(AlertDialog), findsOneWidget);
       expect(find.text('HOW TO PLAY'), findsOneWidget);
+    });
+
+    testWidgets('hardware keyboard letters fill the grid', (tester) async {
+      tester.view.physicalSize = const Size(1080, 1920);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+      await tester.pumpWidget(makeTestAppRaw(child: const WordlePage()));
+      await tester.pumpAndSettle();
+
+      // Before typing, 'H' appears only on the on-screen keyboard.
+      expect(find.text('H'), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyH);
+      await tester.pumpAndSettle();
+
+      // Now 'H' is on the keyboard AND in the first tile.
+      expect(find.text('H'), findsNWidgets(2));
+    });
+
+    testWidgets('hardware backspace removes the last typed tile',
+        (tester) async {
+      tester.view.physicalSize = const Size(1080, 1920);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+      await tester.pumpWidget(makeTestAppRaw(child: const WordlePage()));
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyH);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyE);
+      await tester.pumpAndSettle();
+      expect(find.text('E'), findsNWidgets(2));
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
+      await tester.pumpAndSettle();
+      // The 'E' tile is gone; only the keyboard key remains.
+      expect(find.text('E'), findsOneWidget);
     });
   });
 }
