@@ -6,12 +6,94 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
+import 'package:red_owl/util/shared.dart' show SharedPreferenceService;
 import 'package:red_owl/util/wordle.dart';
 
 import '../../helpers/test_helpers.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  group('WordleService word-of-the-day and guess checking', () {
+    const words = ['apple', 'berry', 'chair', 'dwarf', 'eagle', 'flame'];
+
+    setUp(() async {
+      await installFakePathProvider();
+      setSharedPreferencesMock();
+      await SharedPreferenceService().init();
+      setAssetBundleMock(words);
+    });
+
+    tearDown(() => setAssetBundleMock(null));
+
+    test('returns the same word for the same date every time', () async {
+      final date = DateTime(2024, 3, 14);
+      final first = await WordleService().getWordOfTheDay(date);
+      final second = await WordleService().getWordOfTheDay(date);
+      expect(first, second);
+      // The chosen word is one of the list words, upper-cased.
+      expect(words.map((w) => w.toUpperCase()), contains(first));
+    });
+
+    test('different dates can select different words', () async {
+      // Sweep a month of dates; with six words the seed must land on at least
+      // two distinct answers, proving the date actually drives the choice.
+      final seen = <String>{};
+      for (var day = 1; day <= 28; day++) {
+        seen.add(await WordleService().getWordOfTheDay(DateTime(2024, 1, day)));
+      }
+      expect(seen.length, greaterThan(1));
+    });
+
+    test('checkGuessWord reports a correct guess', () async {
+      await WordleService().init();
+      final answer = WordleService().wordOfTheDay;
+      final result = await WordleService().checkGuessWord(answer);
+      expect(result['is_correct'], isTrue);
+      expect(result['is_word_in_list'], isTrue);
+    });
+
+    test('checkGuessWord rejects a word that is not in the list', () async {
+      await WordleService().init();
+      final result = await WordleService().checkGuessWord('ZZZZZ');
+      expect(result['is_correct'], isFalse);
+      expect(result['is_word_in_list'], isFalse);
+      expect(result.containsKey('character_info'), isFalse);
+    });
+
+    test('checkGuessWord scores each character of a valid wrong guess',
+        () async {
+      await WordleService().init();
+      final answer = WordleService().wordOfTheDay;
+      // Any list word other than the answer is a valid wrong guess.
+      final guess =
+          words.map((w) => w.toUpperCase()).firstWhere((w) => w != answer);
+
+      final result = await WordleService().checkGuessWord(guess);
+      expect(result['is_correct'], isFalse);
+      expect(result['is_word_in_list'], isTrue);
+
+      final info = result['character_info'] as List;
+      expect(info, hasLength(5));
+      // Each character is scored relative to the answer.
+      for (var i = 0; i < 5; i++) {
+        final scoring = info[i]['scoring'] as Map;
+        expect(scoring['in_word'], answer.contains(guess[i]));
+        expect(scoring['correct_idx'], guess[i] == answer[i]);
+      }
+    });
+
+    test('checkGuessWord lower-cases the guess for list membership', () async {
+      await WordleService().init();
+      // The list stores lower-case words; an upper-case non-answer guess must
+      // still be recognised as in-list.
+      final answer = WordleService().wordOfTheDay;
+      final guess =
+          words.map((w) => w.toUpperCase()).firstWhere((w) => w != answer);
+      final result = await WordleService().checkGuessWord(guess);
+      expect(result['is_word_in_list'], isTrue);
+    });
+  });
 
   group('WordleService.importWordList', () {
     late Directory docsDir;
