@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart' show BuildContext;
 import 'package:red_owl/database/database.dart';
 import 'package:red_owl/util/misc.dart';
@@ -140,13 +139,10 @@ class Grid extends _$Grid {
             await _addToDatabase(gameState: GameState.won);
           } else if (!result.isWordInList) {
             // ── Word not in list ───────────────────────────────────────────
-            debugPrint("AAAAAAAAAAABCDEFG");
-            debugPrint(state.notEnoughCharacters.toString());
+            // Reuse the notEnoughCharacters flag to trigger the shake animation.
             state = state.copyWith(notEnoughCharacters: true);
-            debugPrint(state.notEnoughCharacters.toString());
             if (context.mounted) {
               showSnackBar(context, "'$guessWord' is not in wordlist");
-              state = state;
             }
           } else {
             // ── Valid word, evaluate each character ────────────────────────
