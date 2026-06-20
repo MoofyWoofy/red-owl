@@ -264,6 +264,18 @@ class AppLocalizationsNl extends AppLocalizations {
   String get history => 'Geschiedenis';
 
   @override
+  String get filterAll => 'Alle';
+
+  @override
+  String get filterLast30 => '30 dagen';
+
+  @override
+  String get filterDateRange => 'Bereik';
+
+  @override
+  String get noGamesInRange => 'Geen spellen in dit bereik.';
+
+  @override
   String get played => 'Gespeeld';
 
   @override

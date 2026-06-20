@@ -560,6 +560,30 @@ abstract class AppLocalizations {
   /// **'History'**
   String get history;
 
+  /// No description provided for @filterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAll;
+
+  /// No description provided for @filterLast30.
+  ///
+  /// In en, this message translates to:
+  /// **'30 days'**
+  String get filterLast30;
+
+  /// No description provided for @filterDateRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Range'**
+  String get filterDateRange;
+
+  /// No description provided for @noGamesInRange.
+  ///
+  /// In en, this message translates to:
+  /// **'No games in this range.'**
+  String get noGamesInRange;
+
   /// No description provided for @played.
   ///
   /// In en, this message translates to:
