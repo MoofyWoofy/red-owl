@@ -266,6 +266,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get played => 'Played';
 
   @override
+  String get wins => 'Wins';
+
+  @override
+  String get avgGuesses => 'Avg guesses';
+
+  @override
   String get win => 'Win %';
 
   @override

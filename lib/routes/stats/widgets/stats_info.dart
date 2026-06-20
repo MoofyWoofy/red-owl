@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:red_owl/config/shared.dart' show SharedPreferencesKeys;
 import 'package:red_owl/routes/stats/widgets/shared.dart';
 import 'package:red_owl/util/shared.dart'
-    show Localization, SharedPreferenceService, getWinRate;
+    show
+        Localization,
+        SharedPreferenceService,
+        getAverageGuesses,
+        getWinRate;
 
 /// Displays the four top-level statistics in a two-row grid:
 ///
@@ -25,6 +29,9 @@ class _StatsInfoState extends State<StatsInfo> {
   /// `[gamesPlayed, gamesWon, currentStreak, maxStreak]` as string values.
   late List<String> arr;
 
+  /// Average number of guesses per win, derived from the guess distribution.
+  late String avgGuesses;
+
   @override
   void initState() {
     super.initState();
@@ -32,6 +39,11 @@ class _StatsInfoState extends State<StatsInfo> {
     arr = SharedPreferenceService()
             .getStringList(SharedPreferencesKeys.statsData) ??
         ['0', '0', '0', '0'];
+    avgGuesses = getAverageGuesses(
+      SharedPreferenceService()
+              .getStringList(SharedPreferencesKeys.guessDistribution) ??
+          ['0', '0', '0', '0', '0', '0'],
+    );
   }
 
   @override
@@ -98,6 +110,45 @@ class _StatsInfoState extends State<StatsInfo> {
             Expanded(
               child: StatsText(
                 text: context.l10n.maxStreak,
+                isTopText: false,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        // ── Secondary row: wins count and average guesses per win ─────────
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Expanded(
+              child: StatsText(
+                text: arr[1], // games won
+                isTopText: true,
+              ),
+            ),
+            Expanded(
+              child: StatsText(
+                text: avgGuesses,
+                isTopText: true,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Expanded(
+              child: StatsText(
+                text: context.l10n.wins,
+                isTopText: false,
+              ),
+            ),
+            Expanded(
+              child: StatsText(
+                text: context.l10n.avgGuesses,
                 isTopText: false,
               ),
             ),

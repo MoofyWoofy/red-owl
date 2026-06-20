@@ -267,6 +267,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get played => 'Gespeeld';
 
   @override
+  String get wins => 'Gewonnen';
+
+  @override
+  String get avgGuesses => 'Gem. pogingen';
+
+  @override
   String get win => 'Winst %';
 
   @override

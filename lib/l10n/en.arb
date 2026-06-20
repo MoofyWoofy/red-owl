@@ -122,6 +122,8 @@
   "guessDistribution":"Guess Distribution",
   "history":"History",
   "played":"Played",
+  "wins":"Wins",
+  "avgGuesses":"Avg guesses",
   "win":"Win %",
   "currentStreak":"Current Streak",
   "playGameFirst":"Play a game first.",

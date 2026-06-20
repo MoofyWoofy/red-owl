@@ -566,6 +566,18 @@ abstract class AppLocalizations {
   /// **'Played'**
   String get played;
 
+  /// No description provided for @wins.
+  ///
+  /// In en, this message translates to:
+  /// **'Wins'**
+  String get wins;
+
+  /// No description provided for @avgGuesses.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg guesses'**
+  String get avgGuesses;
+
   /// No description provided for @win.
   ///
   /// In en, this message translates to:

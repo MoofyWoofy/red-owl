@@ -201,4 +201,24 @@ void main() {
       expect(getWinRate('750', '1000'), '75');
     });
   });
+
+  group('getAverageGuesses', () {
+    test('returns 0 when there are no wins', () {
+      expect(getAverageGuesses(['0', '0', '0', '0', '0', '0']), '0');
+    });
+
+    test('averages a single bucket', () {
+      // Three wins all in 3 guesses → average 3.0.
+      expect(getAverageGuesses(['0', '0', '3', '0', '0', '0']), '3.0');
+    });
+
+    test('averages across buckets to one decimal', () {
+      // 1 win in 2 guesses + 2 wins in 3 guesses → (2 + 3 + 3) / 3 = 2.666…
+      expect(getAverageGuesses(['0', '1', '2', '0', '0', '0']), '2.7');
+    });
+
+    test('a single one-guess win averages to 1.0', () {
+      expect(getAverageGuesses(['1', '0', '0', '0', '0', '0']), '1.0');
+    });
+  });
 }

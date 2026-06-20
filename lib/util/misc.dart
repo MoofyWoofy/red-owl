@@ -39,6 +39,26 @@ bool isGameInProgress(Grid grid) {
   return grid.tiles.isNotEmpty && !grid.isGameOver;
 }
 
+/// Computes the average number of guesses across won games from the stored
+/// [guessDistribution] (six string-encoded counts for wins in 1–6 guesses).
+///
+/// Returns the average rounded to one decimal place, or `'0'` when no games
+/// have been won yet (so it never divides by zero).
+///
+/// Example: distribution `['0','1','2','0','0','0']` → 1 win in 2 guesses and
+/// 2 wins in 3 guesses → `(2 + 3 + 3) / 3` → `'2.7'`.
+String getAverageGuesses(List<String> guessDistribution) {
+  var totalWins = 0;
+  var totalGuesses = 0;
+  for (var i = 0; i < guessDistribution.length; i++) {
+    final count = int.parse(guessDistribution[i]);
+    totalWins += count;
+    totalGuesses += count * (i + 1);
+  }
+  if (totalWins == 0) return '0';
+  return (totalGuesses / totalWins).toStringAsFixed(1);
+}
+
 /// Computes the win rate as an integer percentage string (0–100).
 ///
 /// Returns `'0'` when [wins] and [games] are both `'0'` to avoid

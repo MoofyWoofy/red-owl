@@ -122,6 +122,8 @@
   "guessDistribution": "Gokverdeling",
   "history": "Geschiedenis",
   "played": "Gespeeld",
+  "wins": "Gewonnen",
+  "avgGuesses": "Gem. pogingen",
   "win": "Winst %",
   "currentStreak": "Huidige Reeks",
   "playGameFirst": "Speel eerst een spel.",

@@ -82,6 +82,22 @@ void main() {
       expect(find.text('70'), findsOneWidget);
     });
 
+    testWidgets('renders the wins count and average guesses', (tester) async {
+      setSharedPreferencesMock({
+        'isDarkMode': false,
+        'statsData': ['10', '7', '3', '5'],
+        // 1+2+3+1 = 7 wins; (1·1 + 2·2 + 3·3 + 1·4) / 7 = 18/7 = 2.6.
+        'guessDistribution': ['1', '2', '3', '1', '0', '0'],
+      });
+      await SharedPreferenceService().init();
+      await pumpStatsPage(tester);
+      expect(find.text('Wins'), findsOneWidget);
+      expect(find.text('Avg guesses'), findsOneWidget);
+      // Wins value (7) and the computed average.
+      expect(find.text('7'), findsWidgets);
+      expect(find.text('2.6'), findsOneWidget);
+    });
+
     testWidgets('help dialog opens on help tap', (tester) async {
       await pumpStatsPage(tester);
       await tester.tap(find.byIcon(Icons.help));
