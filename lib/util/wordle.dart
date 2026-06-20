@@ -110,6 +110,11 @@ class WordleService {
   /// Matches a single valid word: exactly five ASCII letters.
   static final RegExp _wordPattern = RegExp(r'^[a-zA-Z]{5}$');
 
+  /// A custom list with fewer than this many unique words won't last a full
+  /// year of daily play before words repeat. Imports below it still succeed but
+  /// are flagged with a warning.
+  static const int recommendedMinimumWords = 365;
+
   /// Validates [file] as a custom word list and, if it is valid, writes it to
   /// `custom_list.txt` in the application documents directory.
   ///
@@ -158,7 +163,10 @@ class WordleService {
     await dest.writeAsString(uniqueWords.join('\n'));
     _cachedWordList = null;
 
-    return WordListImportResult.success(uniqueWords);
+    return WordListImportResult.success(
+      uniqueWords,
+      belowRecommendedMinimum: uniqueWords.length < recommendedMinimumWords,
+    );
   }
 
   /// Evaluates a single [guessCharacter] at position [idx] against [answer].
@@ -236,9 +244,14 @@ enum WordListImportStatus {
 /// Carries enough detail for the UI to build a specific, localised message
 /// (e.g. which line failed) without the service depending on Flutter widgets.
 class WordListImportResult {
-  /// Successful import; [words] holds the saved, trimmed list.
-  const WordListImportResult.success(this.words)
-      : status = WordListImportStatus.success,
+  /// Successful import; [words] holds the saved, de-duplicated list.
+  ///
+  /// [belowRecommendedMinimum] is `true` when the list has fewer than
+  /// [WordleService.recommendedMinimumWords] words.
+  const WordListImportResult.success(
+    this.words, {
+    this.belowRecommendedMinimum = false,
+  })  : status = WordListImportStatus.success,
         lineNumber = null,
         invalidWord = null;
 
@@ -246,14 +259,16 @@ class WordListImportResult {
   /// offending text.
   const WordListImportResult.invalidWord(this.lineNumber, this.invalidWord)
       : status = WordListImportStatus.invalidWord,
-        words = null;
+        words = null,
+        belowRecommendedMinimum = false;
 
   /// The file could not be read.
   const WordListImportResult.readError()
       : status = WordListImportStatus.readError,
         words = null,
         lineNumber = null,
-        invalidWord = null;
+        invalidWord = null,
+        belowRecommendedMinimum = false;
 
   /// The category of outcome.
   final WordListImportStatus status;
@@ -266,4 +281,7 @@ class WordListImportResult {
 
   /// The offending text for [WordListImportStatus.invalidWord].
   final String? invalidWord;
+
+  /// Whether a successful import had fewer than the recommended number of words.
+  final bool belowRecommendedMinimum;
 }

@@ -92,6 +92,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'File could not be read. Check that it is a valid .txt file.';
 
   @override
+  String importFewWords(int count) {
+    return 'Imported $count words. Fewer than 365 means daily words repeat within a year.';
+  }
+
+  @override
   String get yetAnotherWordApp => 'Yet another wordle app';
 
   @override

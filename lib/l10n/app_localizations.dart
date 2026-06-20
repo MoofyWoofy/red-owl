@@ -248,6 +248,12 @@ abstract class AppLocalizations {
   /// **'File could not be read. Check that it is a valid .txt file.'**
   String get importReadError;
 
+  /// No description provided for @importFewWords.
+  ///
+  /// In en, this message translates to:
+  /// **'Imported {count} words. Fewer than 365 means daily words repeat within a year.'**
+  String importFewWords(int count);
+
   /// No description provided for @yetAnotherWordApp.
   ///
   /// In en, this message translates to:

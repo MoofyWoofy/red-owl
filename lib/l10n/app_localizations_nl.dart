@@ -92,6 +92,11 @@ class AppLocalizationsNl extends AppLocalizations {
       'Bestand kon niet worden gelezen. Controleer of het een geldig .txt-bestand is.';
 
   @override
+  String importFewWords(int count) {
+    return '$count woorden geïmporteerd. Minder dan 365 betekent dat dagelijkse woorden binnen een jaar herhalen.';
+  }
+
+  @override
   String get yetAnotherWordApp => 'Nog een Wordle-app';
 
   @override

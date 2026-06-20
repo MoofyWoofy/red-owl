@@ -242,7 +242,15 @@ class SettingsPage extends ConsumerWidget {
         // The word list changed — reload the word of the day and reset the board.
         await WordleService().init();
         ref.read(gridProvider.notifier).resetGrid();
-        if (context.mounted) showSnackBar(context, context.l10n.success);
+        if (context.mounted) {
+          // Warn (but still import) when the list is too small for a full year.
+          if (result.belowRecommendedMinimum) {
+            showSnackBar(
+                context, context.l10n.importFewWords(result.words!.length), 3);
+          } else {
+            showSnackBar(context, context.l10n.success);
+          }
+        }
       case WordListImportStatus.invalidWord:
         showSnackBar(
           context,

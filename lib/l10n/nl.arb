@@ -31,6 +31,12 @@
     }
   },
   "importReadError": "Bestand kon niet worden gelezen. Controleer of het een geldig .txt-bestand is.",
+  "importFewWords": "{count} woorden geïmporteerd. Minder dan 365 betekent dat dagelijkse woorden binnen een jaar herhalen.",
+  "@importFewWords": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "yetAnotherWordApp": "Nog een Wordle-app",
   "privacyPolicy": "Privacybeleid",
   "about": "Over",

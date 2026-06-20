@@ -66,6 +66,42 @@ void main() {
       expect(result.words, ['apple', 'chair', 'BERRY']);
     });
 
+    test('flags lists below the recommended minimum', () async {
+      final src = File(p.join(docsDir.path, 'source.txt'))
+        ..writeAsStringSync('apple\nchair\nberry\n');
+
+      final result = await WordleService().importWordList(src);
+
+      expect(result.status, WordListImportStatus.success);
+      expect(result.belowRecommendedMinimum, isTrue);
+    });
+
+    test('does not flag lists at or above the recommended minimum', () async {
+      // Generate unique 5-letter all-letter words (aaaaa, aaaab, ...).
+      String wordFor(int index) {
+        var n = index;
+        final letters = List.filled(5, 'a');
+        for (var pos = 4; pos >= 0; pos--) {
+          letters[pos] = String.fromCharCode(97 + (n % 26));
+          n ~/= 26;
+        }
+        return letters.join();
+      }
+
+      final words = List.generate(
+        WordleService.recommendedMinimumWords,
+        wordFor,
+      );
+      final src = File(p.join(docsDir.path, 'source.txt'))
+        ..writeAsStringSync(words.join('\n'));
+
+      final result = await WordleService().importWordList(src);
+
+      expect(result.status, WordListImportStatus.success);
+      expect(result.words, hasLength(WordleService.recommendedMinimumWords));
+      expect(result.belowRecommendedMinimum, isFalse);
+    });
+
     test('rejects a word containing non-letters', () async {
       final src = File(p.join(docsDir.path, 'source.txt'))
         ..writeAsStringSync('apple\nch1ir\n');
