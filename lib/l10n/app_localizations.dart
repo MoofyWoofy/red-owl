@@ -353,7 +353,7 @@ abstract class AppLocalizations {
   /// No description provided for @win.
   ///
   /// In en, this message translates to:
-  /// **'Win %,'**
+  /// **'Win %'**
   String get win;
 
   /// No description provided for @currentStreak.

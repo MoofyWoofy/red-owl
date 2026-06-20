@@ -140,7 +140,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get played => 'Played';
 
   @override
-  String get win => 'Win %,';
+  String get win => 'Win %';
 
   @override
   String get currentStreak => 'Current Streak';
