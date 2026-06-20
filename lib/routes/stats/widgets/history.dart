@@ -24,26 +24,18 @@ class _HistoryState extends State<History> {
   /// Future that resolves to all history rows, ordered by date descending.
   Future<List<HistoryData>>? _historyData;
 
-  /// The database instance used only while this widget is alive.
-  late AppDatabase _database;
-
   @override
   void initState() {
     super.initState();
-    _database = AppDatabase();
+    // Use the shared singleton connection — do NOT close it here, since it is
+    // owned by the app and reused by the rest of the codebase.
+    final database = AppDatabase();
     // Select all rows, most recent first.
-    _historyData = (_database.select(_database.history)
+    _historyData = (database.select(database.history)
           ..orderBy([
             (t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc),
           ]))
         .get();
-  }
-
-  @override
-  void dispose() {
-    // Always close the database connection when the widget is removed.
-    _database.close();
-    super.dispose();
   }
 
   @override

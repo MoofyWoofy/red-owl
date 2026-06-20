@@ -66,10 +66,9 @@ class BackupService {
   }) async {
     final prefs = SharedPreferenceService();
 
-    // Read the whole history table.
+    // Read the whole history table (shared singleton connection).
     final db = AppDatabase();
     final historyRows = await db.select(db.history).get();
-    await db.close();
 
     final history = historyRows
         .map((row) => {
@@ -206,13 +205,12 @@ class BackupService {
       }
     }
 
-    // Replace the history table with the imported rows.
+    // Replace the history table with the imported rows (shared singleton).
     final db = AppDatabase();
     await db.delete(db.history).go();
     for (final entry in historyEntries) {
       await db.into(db.history).insert(entry, mode: InsertMode.insertOrReplace);
     }
-    await db.close();
 
     // Restore the custom word list when present.
     final customWordList = decoded['customWordList'];

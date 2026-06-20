@@ -35,9 +35,17 @@ class History extends Table {
 /// directory on first launch.
 @DriftDatabase(tables: [History])
 class AppDatabase extends _$AppDatabase {
-  /// Creates the production database using a persistent SQLite file named
-  /// `'database'` in the platform's default location.
-  AppDatabase() : super(_openConnection());
+  /// Process-wide singleton. Sharing one connection avoids opening (and
+  /// leaking) a new SQLite handle every time a widget or notifier needs the
+  /// database.
+  static AppDatabase? _instance;
+
+  /// Returns the shared [AppDatabase], opening the persistent SQLite file named
+  /// `'database'` on first use. The instance lives for the whole app session
+  /// and is deliberately never closed.
+  factory AppDatabase() => _instance ??= AppDatabase._internal();
+
+  AppDatabase._internal() : super(_openConnection());
 
   /// Creates an in-memory database for unit tests.
   ///
@@ -45,6 +53,16 @@ class AppDatabase extends _$AppDatabase {
   /// tests run in isolation without touching the file system.
   @visibleForTesting
   AppDatabase.forTesting(super.executor);
+
+  /// Installs [database] as the shared singleton so production code that calls
+  /// `AppDatabase()` (the Grid notifier, History widget, BackupService) talks
+  /// to a test database. Pair with [resetSingleton] in `tearDown`.
+  @visibleForTesting
+  static void setSingleton(AppDatabase database) => _instance = database;
+
+  /// Clears the shared singleton so the next `AppDatabase()` call rebuilds it.
+  @visibleForTesting
+  static void resetSingleton() => _instance = null;
 
   @override
   int get schemaVersion => 1;

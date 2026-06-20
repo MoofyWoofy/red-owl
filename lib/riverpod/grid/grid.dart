@@ -325,6 +325,5 @@ class Grid extends _$Grid {
           date: getDateOnly(date ?? DateTime.now()),
           gameState: gameState.name,
         ));
-    database.close();
   }
 }
