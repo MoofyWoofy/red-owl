@@ -99,6 +99,29 @@ class AppLocalizationsNl extends AppLocalizations {
   String get motionSlow => 'Langzaam';
 
   @override
+  String get a11yEmptyTile => 'Leeg';
+
+  @override
+  String get a11yStatusCorrect => 'correct';
+
+  @override
+  String get a11yStatusPresent => 'aanwezig';
+
+  @override
+  String get a11yStatusAbsent => 'afwezig';
+
+  @override
+  String a11yLetterWithStatus(String letter, String status) {
+    return '$letter, $status';
+  }
+
+  @override
+  String get a11yEnterKey => 'Enter';
+
+  @override
+  String get a11yDeleteKey => 'Verwijderen';
+
+  @override
   String get customWordList => 'Gebruik aangepaste woordenlijst';
 
   @override

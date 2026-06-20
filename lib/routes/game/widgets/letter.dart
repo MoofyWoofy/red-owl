@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:red_owl/config/shared.dart' show GameColors, LetterStatus;
 import 'package:red_owl/riverpod/shared.dart';
+import 'package:red_owl/routes/game/widgets/a11y_labels.dart'
+    show letterStatusLabel;
+import 'package:red_owl/util/shared.dart' show Localization;
 
 /// A single key on the on-screen keyboard.
 ///
@@ -44,10 +47,28 @@ class Letter extends ConsumerWidget {
         break;
     }
 
+    // Screen-reader label: action keys read their name, letter keys read the
+    // letter and (once evaluated) its status.
+    final String semanticLabel;
+    switch (letter) {
+      case 'ENTER':
+        semanticLabel = context.l10n.a11yEnterKey;
+      case 'DELETE':
+        semanticLabel = context.l10n.a11yDeleteKey;
+      default:
+        semanticLabel =
+            letterStatusLabel(context, letter, grid.keyboardStatus[letter]);
+    }
+
     return IgnorePointer(
       // Disable all keys once the game is finished.
       ignoring: grid.isGameOver,
-      child: Padding(
+      child: Semantics(
+        button: true,
+        enabled: !grid.isGameOver,
+        label: semanticLabel,
+        excludeSemantics: true,
+        child: Padding(
         padding: const EdgeInsets.only(right: 5),
         child: InkWell(
           splashFactory: NoSplash.splashFactory,
@@ -86,6 +107,7 @@ class Letter extends ConsumerWidget {
                     ),
                   ),
           ),
+        ),
         ),
       ),
     );

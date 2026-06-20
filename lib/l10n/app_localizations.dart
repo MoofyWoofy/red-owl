@@ -272,6 +272,48 @@ abstract class AppLocalizations {
   /// **'Slow'**
   String get motionSlow;
 
+  /// No description provided for @a11yEmptyTile.
+  ///
+  /// In en, this message translates to:
+  /// **'Empty'**
+  String get a11yEmptyTile;
+
+  /// No description provided for @a11yStatusCorrect.
+  ///
+  /// In en, this message translates to:
+  /// **'correct'**
+  String get a11yStatusCorrect;
+
+  /// No description provided for @a11yStatusPresent.
+  ///
+  /// In en, this message translates to:
+  /// **'present'**
+  String get a11yStatusPresent;
+
+  /// No description provided for @a11yStatusAbsent.
+  ///
+  /// In en, this message translates to:
+  /// **'absent'**
+  String get a11yStatusAbsent;
+
+  /// No description provided for @a11yLetterWithStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'{letter}, {status}'**
+  String a11yLetterWithStatus(String letter, String status);
+
+  /// No description provided for @a11yEnterKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter'**
+  String get a11yEnterKey;
+
+  /// No description provided for @a11yDeleteKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get a11yDeleteKey;
+
   /// No description provided for @customWordList.
   ///
   /// In en, this message translates to:

@@ -7,8 +7,10 @@ import 'package:red_owl/config/shared.dart'
     show GameColors, LetterStatus, SharedPreferencesKeys, animationTiming;
 import 'package:red_owl/riverpod/shared.dart' show gridProvider;
 import 'package:red_owl/models/shared.dart' show Grid;
+import 'package:red_owl/routes/game/widgets/a11y_labels.dart'
+    show letterStatusLabel;
 import 'package:red_owl/util/shared.dart'
-    show SharedPreferenceService, dateToString;
+    show Localization, SharedPreferenceService, dateToString;
 
 /// A single interactive tile in the 5×6 Wordle grid.
 ///
@@ -142,7 +144,19 @@ class _TileState extends ConsumerState<Tile>
       hasFlipAnimationPlayed = false;
     }
 
-    return AnimatedBuilder(
+    // Screen-reader description: the letter and its evaluated status, or
+    // "Empty" for a tile with no letter yet.
+    final String semanticLabel = widget.index < grid.tiles.length
+        ? letterStatusLabel(
+            context,
+            grid.tiles[widget.index].letter,
+            grid.tiles[widget.index].status,
+          )
+        : context.l10n.a11yEmptyTile;
+
+    return Semantics(
+      label: semanticLabel,
+      child: AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
         double flip = 0;
@@ -195,6 +209,7 @@ class _TileState extends ConsumerState<Tile>
           ),
         );
       },
+      ),
     );
   }
 }

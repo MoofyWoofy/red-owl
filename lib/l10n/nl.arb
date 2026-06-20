@@ -29,6 +29,19 @@
   "motionFast": "Snel",
   "motionNormal": "Normaal",
   "motionSlow": "Langzaam",
+  "a11yEmptyTile": "Leeg",
+  "a11yStatusCorrect": "correct",
+  "a11yStatusPresent": "aanwezig",
+  "a11yStatusAbsent": "afwezig",
+  "a11yLetterWithStatus": "{letter}, {status}",
+  "@a11yLetterWithStatus": {
+    "placeholders": {
+      "letter": {"type": "String"},
+      "status": {"type": "String"}
+    }
+  },
+  "a11yEnterKey": "Enter",
+  "a11yDeleteKey": "Verwijderen",
   "customWordList": "Gebruik aangepaste woordenlijst",
   "gameInProgressChangingWordList": "Spel bezig, het wijzigen van de woordenlijst zal het spel resetten",
   "gameInProgressImportingWordList": "Spel bezig, het importeren van de woordenlijst zal het spel resetten",

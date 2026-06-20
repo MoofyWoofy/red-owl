@@ -29,6 +29,19 @@
   "motionFast":"Fast",
   "motionNormal":"Normal",
   "motionSlow":"Slow",
+  "a11yEmptyTile":"Empty",
+  "a11yStatusCorrect":"correct",
+  "a11yStatusPresent":"present",
+  "a11yStatusAbsent":"absent",
+  "a11yLetterWithStatus":"{letter}, {status}",
+  "@a11yLetterWithStatus":{
+    "placeholders":{
+      "letter":{"type":"String"},
+      "status":{"type":"String"}
+    }
+  },
+  "a11yEnterKey":"Enter",
+  "a11yDeleteKey":"Delete",
   "customWordList":"Use custom word list",
   "gameInProgressChangingWordList":"Game in progress, changing word list will reset the game",
   "gameInProgressImportingWordList":"Game in progress, importing word list will reset the game",
