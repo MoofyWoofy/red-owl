@@ -147,4 +147,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get playGameFirst => 'Play a game first.';
+
+  @override
+  String get yes => 'Yes';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get exportData => 'Export Data';
+
+  @override
+  String get importData => 'Import Data';
+
+  @override
+  String get includeWordListTitle => 'Include word list?';
+
+  @override
+  String get includeWordListContent =>
+      'Include your custom word list in the export?';
+
+  @override
+  String get importOverwriteWarning =>
+      'Importing will replace your current stats, history and settings. Continue?';
+
+  @override
+  String get importFailed => 'Import failed: invalid backup file';
+
+  @override
+  String get exportFailed => 'Export failed';
 }

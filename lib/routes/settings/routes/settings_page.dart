@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:red_owl/config/shared.dart'
     show SharedPreferencesKeys, BoolFamilyProviderIDs;
@@ -13,8 +14,10 @@ import 'package:red_owl/routes/settings/routes/view_custom_wordlist.dart';
 import 'package:red_owl/routes/settings/widgets/shared.dart'
     show GameInProgressDialog, SwitchItem;
 import 'package:red_owl/util/misc.dart' show isGameInProgress;
-import 'package:red_owl/util/shared.dart' show Localization, WordleService;
+import 'package:red_owl/util/shared.dart'
+    show BackupService, Localization, WordleService, showSnackBar;
 import 'package:red_owl/widgets/shared.dart' show Logo, appBar;
+import 'package:share_plus/share_plus.dart' show SharePlus, ShareParams, XFile;
 import 'package:url_launcher/url_launcher.dart';
 
 /// The Settings page, accessible from the gear icon in any [AppBar].
@@ -215,6 +218,26 @@ class SettingsPage extends ConsumerWidget {
                           ),
                         ],
                       ),
+                    const SizedBox(height: 32),
+                    const Divider(),
+                    const SizedBox(height: 12),
+                    // ── Backup: export / import all user data ─────────────────
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        OutlinedButton.icon(
+                          onPressed: () => _exportData(context),
+                          icon: const Icon(Icons.upload_file_outlined),
+                          label: Text(context.l10n.exportData),
+                        ),
+                        const SizedBox(width: 16),
+                        OutlinedButton.icon(
+                          onPressed: () => _importData(context, ref),
+                          icon: const Icon(Icons.download_outlined),
+                          label: Text(context.l10n.importData),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -260,5 +283,109 @@ class SettingsPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// Exports settings, stats and history to a JSON file and opens the system
+  /// share sheet.
+  ///
+  /// If the user has a custom word list, first asks whether to bundle it into
+  /// the export. Any failure surfaces as a snack bar rather than crashing.
+  Future<void> _exportData(BuildContext context) async {
+    bool includeWordList = false;
+    if (await BackupService().hasCustomWordList()) {
+      if (!context.mounted) return;
+      includeWordList = await showDialog<bool>(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: Text(context.l10n.includeWordListTitle),
+              content: Text(context.l10n.includeWordListContent),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(context.l10n.no),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text(context.l10n.yes),
+                ),
+              ],
+            ),
+          ) ??
+          false;
+    }
+
+    try {
+      final file =
+          await BackupService().exportToFile(includeWordList: includeWordList);
+      await SharePlus.instance.share(ShareParams(
+        files: [XFile(file.path)],
+        fileNameOverrides: [path.basename(file.path)],
+      ));
+    } catch (_) {
+      if (context.mounted) {
+        showSnackBar(context, context.l10n.exportFailed);
+      }
+    }
+  }
+
+  /// Imports a previously exported JSON backup, replacing the current data.
+  ///
+  /// Warns the user that existing data will be overwritten, picks a `.json`
+  /// file, applies it via [BackupService.importFromJson], then refreshes the
+  /// in-memory providers (theme, custom-list toggle) and resets the board so
+  /// the active game stays consistent with the (possibly changed) word list.
+  Future<void> _importData(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text(context.l10n.importData),
+            content: Text(context.l10n.importOverwriteWarning),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(context.l10n.no),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(context.l10n.yes),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+    if (!confirmed) return;
+
+    final result = await FilePicker.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['json'],
+    );
+    if (result == null) return; // User cancelled the picker.
+
+    try {
+      final file = File(result.files.single.path!);
+      await BackupService().importFromJson(await file.readAsString());
+
+      // Re-load the word of the day and reset the board, since the imported
+      // settings/word list may differ from the active game.
+      await WordleService().init();
+      ref.read(gridProvider.notifier).resetGrid();
+      // Force the theme and custom-list toggle to re-read the imported values.
+      ref.invalidate(boolFamilyProvider(
+        id: BoolFamilyProviderIDs.isDarkMode,
+        sharedPrefsKey: SharedPreferencesKeys.isDarkMode,
+      ));
+      ref.invalidate(boolFamilyProvider(
+        id: BoolFamilyProviderIDs.useCustomList,
+        sharedPrefsKey: SharedPreferencesKeys.useCustomList,
+      ));
+
+      if (context.mounted) {
+        showSnackBar(context, context.l10n.success);
+      }
+    } catch (_) {
+      if (context.mounted) {
+        showSnackBar(context, context.l10n.importFailed);
+      }
+    }
   }
 }

@@ -44,5 +44,14 @@
   "played":"Played",
   "win":"Win %,",
   "currentStreak":"Current Streak",
-  "playGameFirst":"Play a game first."
+  "playGameFirst":"Play a game first.",
+  "yes":"Yes",
+  "no":"No",
+  "exportData":"Export Data",
+  "importData":"Import Data",
+  "includeWordListTitle":"Include word list?",
+  "includeWordListContent":"Include your custom word list in the export?",
+  "importOverwriteWarning":"Importing will replace your current stats, history and settings. Continue?",
+  "importFailed":"Import failed: invalid backup file",
+  "exportFailed":"Export failed"
 }

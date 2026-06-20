@@ -44,5 +44,14 @@
   "played": "Gespeeld",
   "win": "Winst %",
   "currentStreak": "Huidige Reeks",
-  "playGameFirst": "Speel eerst een spel."
+  "playGameFirst": "Speel eerst een spel.",
+  "yes": "Ja",
+  "no": "Nee",
+  "exportData": "Gegevens exporteren",
+  "importData": "Gegevens importeren",
+  "includeWordListTitle": "Woordenlijst opnemen?",
+  "includeWordListContent": "Je aangepaste woordenlijst opnemen in de export?",
+  "importOverwriteWarning": "Importeren vervangt je huidige statistieken, geschiedenis en instellingen. Doorgaan?",
+  "importFailed": "Importeren mislukt: ongeldig back-upbestand",
+  "exportFailed": "Exporteren mislukt"
 }

@@ -147,4 +147,33 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get playGameFirst => 'Speel eerst een spel.';
+
+  @override
+  String get yes => 'Ja';
+
+  @override
+  String get no => 'Nee';
+
+  @override
+  String get exportData => 'Gegevens exporteren';
+
+  @override
+  String get importData => 'Gegevens importeren';
+
+  @override
+  String get includeWordListTitle => 'Woordenlijst opnemen?';
+
+  @override
+  String get includeWordListContent =>
+      'Je aangepaste woordenlijst opnemen in de export?';
+
+  @override
+  String get importOverwriteWarning =>
+      'Importeren vervangt je huidige statistieken, geschiedenis en instellingen. Doorgaan?';
+
+  @override
+  String get importFailed => 'Importeren mislukt: ongeldig back-upbestand';
+
+  @override
+  String get exportFailed => 'Exporteren mislukt';
 }

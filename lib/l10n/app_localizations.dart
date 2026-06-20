@@ -367,6 +367,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Play a game first.'**
   String get playGameFirst;
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
+  /// No description provided for @exportData.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Data'**
+  String get exportData;
+
+  /// No description provided for @importData.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Data'**
+  String get importData;
+
+  /// No description provided for @includeWordListTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Include word list?'**
+  String get includeWordListTitle;
+
+  /// No description provided for @includeWordListContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Include your custom word list in the export?'**
+  String get includeWordListContent;
+
+  /// No description provided for @importOverwriteWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Importing will replace your current stats, history and settings. Continue?'**
+  String get importOverwriteWarning;
+
+  /// No description provided for @importFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Import failed: invalid backup file'**
+  String get importFailed;
+
+  /// No description provided for @exportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed'**
+  String get exportFailed;
 }
 
 class _AppLocalizationsDelegate
