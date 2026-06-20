@@ -80,6 +80,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get view => 'View';
 
   @override
+  String get customList => 'Custom list';
+
+  @override
   String get yetAnotherWordApp => 'Yet another wordle app';
 
   @override

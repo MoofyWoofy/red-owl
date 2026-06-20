@@ -80,6 +80,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get view => 'Bekijken';
 
   @override
+  String get customList => 'Aangepaste lijst';
+
+  @override
   String get yetAnotherWordApp => 'Nog een Wordle-app';
 
   @override

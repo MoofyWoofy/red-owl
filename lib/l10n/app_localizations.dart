@@ -230,6 +230,12 @@ abstract class AppLocalizations {
   /// **'View'**
   String get view;
 
+  /// No description provided for @customList.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom list'**
+  String get customList;
+
   /// No description provided for @yetAnotherWordApp.
   ///
   /// In en, this message translates to:

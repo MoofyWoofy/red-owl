@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:red_owl/util/shared.dart' show WordleService;
+import 'package:red_owl/util/shared.dart' show Localization, WordleService;
 import 'package:red_owl/widgets/shared.dart' show appBar;
 
 /// Displays the currently active word list (standard or custom) as a
@@ -31,7 +31,7 @@ class _ViewCustomListPageState extends State<ViewCustomListPage> {
     return Scaffold(
         appBar: appBar(
           context: context,
-          title: 'Custom list',
+          title: context.l10n.customList,
         ),
         body: FutureBuilder(
           future: _words,
