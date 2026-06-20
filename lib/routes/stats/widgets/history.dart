@@ -151,10 +151,13 @@ class _HistoryState extends State<History> {
         final historyItems = snapshot.data;
         if (historyItems == null || historyItems.isEmpty) {
           // Distinguish "never played" from "nothing in the chosen range".
-          final message = _filter == HistoryFilter.all
-              ? context.l10n.playGameFirst
-              : context.l10n.noGamesInRange;
-          return Center(child: Text(message));
+          final neverPlayed = _filter == HistoryFilter.all;
+          return _EmptyHistory(
+            icon: neverPlayed ? Icons.grid_view_rounded : Icons.event_busy,
+            message: neverPlayed
+                ? context.l10n.playGameFirst
+                : context.l10n.noGamesInRange,
+          );
         }
 
         return ListView.separated(
@@ -191,6 +194,39 @@ class _HistoryState extends State<History> {
           },
         );
       },
+    );
+  }
+}
+
+/// A friendly, centered empty-state placeholder for the history list.
+class _EmptyHistory extends StatelessWidget {
+  const _EmptyHistory({required this.icon, required this.message});
+
+  final IconData icon;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final muted = Theme.of(context).disabledColor;
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 56, color: muted),
+            const SizedBox(height: 12),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge
+                  ?.copyWith(color: muted),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

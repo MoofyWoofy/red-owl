@@ -1,5 +1,6 @@
 // Widget tests for the History list and its date filter on the Stats page.
 import 'package:drift/native.dart';
+import 'package:flutter/material.dart' show Icons;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:red_owl/database/database.dart' hide History;
 import 'package:red_owl/routes/stats/widgets/shared.dart' show History;
@@ -58,6 +59,15 @@ void main() {
     expect(find.text('BBBBB'), findsOneWidget);
     // The 60-day-old game falls outside the rolling window.
     expect(find.text('CCCCC'), findsNothing);
+  });
+
+  testWidgets('shows a friendly empty state when no games are recorded',
+      (tester) async {
+    await tester.pumpWidget(makeTestApp(child: const History()));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Play a game first.'), findsOneWidget);
+    expect(find.byIcon(Icons.grid_view_rounded), findsOneWidget);
   });
 
   testWidgets('shows an empty-range message when nothing matches',
