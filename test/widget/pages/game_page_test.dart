@@ -115,6 +115,21 @@ void main() {
       expect(find.text('H'), findsNWidgets(2));
     });
 
+    testWidgets('share-result button is present but disabled before game over',
+        (tester) async {
+      await tester.pumpWidget(makeTestAppRaw(child: const WordlePage()));
+      await tester.pumpAndSettle();
+
+      final shareButton = tester.widget<IconButton>(
+        find.ancestor(
+          of: find.byIcon(Icons.ios_share),
+          matching: find.byType(IconButton),
+        ),
+      );
+      // Disabled (null onPressed) until the game ends.
+      expect(shareButton.onPressed, isNull);
+    });
+
     testWidgets('keyboard keys expose a tappable button to assistive tech',
         (tester) async {
       final handle = tester.ensureSemantics();

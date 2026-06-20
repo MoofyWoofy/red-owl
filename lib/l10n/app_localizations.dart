@@ -188,6 +188,12 @@ abstract class AppLocalizations {
   /// **'Help'**
   String get help;
 
+  /// No description provided for @shareResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Share result'**
+  String get shareResult;
+
   /// No description provided for @hint.
   ///
   /// In en, this message translates to:

@@ -3,6 +3,7 @@ export 'game_board.dart';
 export 'game_status_announcer.dart';
 export 'hint_button.dart';
 export 'keyboard_row.dart';
+export 'share_result_button.dart';
 export 'tile.dart';
 export 'letter.dart';
 export 'animations/pop_in.dart';

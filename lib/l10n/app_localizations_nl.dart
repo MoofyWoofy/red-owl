@@ -57,6 +57,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get help => 'Help';
 
   @override
+  String get shareResult => 'Resultaat delen';
+
+  @override
   String get hint => 'Hint';
 
   @override

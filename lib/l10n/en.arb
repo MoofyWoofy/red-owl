@@ -15,6 +15,7 @@
   "close":"Close",
   "exit":"Exit",
   "help":"Help",
+  "shareResult":"Share result",
   "hint":"Hint",
   "hintReveal":"Hint: letter {position} is {letter}",
   "@hintReveal":{
