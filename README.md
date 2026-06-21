@@ -38,20 +38,27 @@ Privacy Policy: <https://moofywoofy.github.io/red-owl/>
 
 ## Features
 
-- **Daily word mode** — one puzzle, six guesses, the classic Wordle loop.
+- **Daily word mode** — one deterministic puzzle a day, six guesses, the classic Wordle loop.
+- **Practice / unlimited mode** — play endless rounds against random words; nothing is recorded against your stats.
+- **Hard mode** — every revealed hint must be reused in later guesses; the toggle locks once you start the day's puzzle.
+- **Once-a-day hint** — reveal a single correct letter when you're stuck.
 - **Custom word lists** — import any `.txt` file (one word per line) and play against your own dictionary.
-- **Stats tracking** — local Drift database records every game, surfaces win streak, win rate, guess distribution and a history view via `fl_chart`.
-- **Light and dark themes** — togglable from settings, persisted across sessions.
-- **Localized UI** — English and Dutch out of the box, easy to add more via ARB files.
-- **Offline first** — no network calls, no accounts, no telemetry.
-- **Cross-platform** — Android, iOS, Linux, macOS, Windows and web from a single codebase.
+- **Stats tracking** — local Drift database records every game, surfacing games played/won, win rate, current/max streak, average guesses, guess distribution and a filterable history (all / last 30 days / custom range), with a reset option.
+- **Sharing** — copy a spoiler-free NYT-style emoji result grid, plus celebratory streak-milestone prompts.
+- **Daily reminder** — optional local notification at a time you choose (Android, off by default).
+- **Theming & readability** — light/dark mode, a color-blind / high-contrast palette, adjustable text size, and an animation-speed control.
+- **Accessibility** — screen-reader labels on tiles and keys, win/loss announcements, keyboard/focus operability, and respect for the system "reduce motion" setting.
+- **Localized & RTL-ready UI** — English and Dutch out of the box (easy to add more via ARB files), with right-to-left layout support.
+- **Offline first** — no network calls, no accounts, no telemetry (notifications are scheduled locally).
+- **Cross-platform** — Android, iOS, Linux, macOS, Windows and web from a single codebase (the daily reminder is Android-only).
 
 ## Screens
 
-- **Home** — entry point with Daily and Stats buttons.
-- **Game** — the 5x5 guess grid with on-screen keyboard, pop-in/bounce/shake animations and snackbar feedback for invalid words.
-- **Stats** — totals, current/max streak, win-rate chart and per-game history.
-- **Settings** — theme toggle, language, custom word list import/preview, and about info.
+- **Home** — entry point with Daily, Practice and Stats buttons.
+- **Game** — the 5×6 guess grid with on-screen keyboard, pop-in/bounce/shake animations, snackbar feedback, plus hint, share-result and help actions.
+- **Practice** — the same board with a "new word" action and no stat tracking.
+- **Stats** — totals, streaks, average guesses, win-rate chart and a filterable per-game history.
+- **Settings** — theme, color-blind mode, language, text size, animation speed, hard mode, daily reminder, custom word list import/preview, data backup/restore, and about info.
 
 ## Tech Stack
 
@@ -64,6 +71,7 @@ Privacy Policy: <https://moofywoofy.github.io/red-owl/>
 | Charts | `fl_chart` 1.x |
 | File picking | `file_picker` 11.x |
 | Sharing / launching | `share_plus`, `url_launcher` |
+| Notifications | `flutter_local_notifications` + `timezone` / `flutter_timezone` (Android) |
 | Localization | `flutter_localizations` + ARB files |
 | Linting | `flutter_lints`, `custom_lint`, `riverpod_lint` |
 | Icons / splash | `flutter_launcher_icons`, `flutter_native_splash` |
@@ -79,12 +87,18 @@ lib/
 ├── models/                    # Freezed models (Grid, Tile, GuessResult)
 ├── riverpod/                  # Notifiers and providers
 │   ├── bool_family_notifier/  # Generic boolean settings family
-│   └── grid/                  # Game grid state
+│   ├── grid/                  # Daily game grid state
+│   ├── practice_grid/         # Practice-mode grid (random word, no stats)
+│   ├── hint/                  # Once-a-day hint availability
+│   ├── locale/                # UI language override
+│   ├── font_scale/            # Text-size preference
+│   └── motion_speed/          # Animation-speed preference
 ├── routes/
-│   ├── game/                  # WordlePage and tile/keyboard widgets
+│   ├── game/                  # WordlePage, PracticePage, board/tile/keyboard widgets
 │   ├── settings/              # Settings page and sub-routes
 │   └── stats/                 # Stats page, graph and history widgets
-├── util/                      # SharedPreferenceService, WordleService, helpers
+├── util/                      # SharedPreferenceService, WordleService,
+│                              # NotificationService, share-grid + helpers
 └── widgets/                   # Reusable widgets (AppBar, Logo, etc.)
 
 assets/
@@ -221,6 +235,8 @@ The Android module pins:
 - Gradle wrapper `8.11.1`
 - NDK `28.2.13676358`
 - `targetSdk` `35`, ABI filters `armeabi-v7a`, `arm64-v8a`, `x86_64`
+
+The daily reminder requires **core library desugaring** (enabled in `android/app/build.gradle`) for `flutter_local_notifications`, and the `POST_NOTIFICATIONS` / `RECEIVE_BOOT_COMPLETED` permissions are declared in the Android manifest.
 
 ### iOS
 
