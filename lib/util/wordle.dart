@@ -99,18 +99,29 @@ class WordleService {
       try {
         File file = File(path.join(directory.path, 'custom_list.txt'));
         final lines = await file.readAsLines();
-        words = lines.map((e) => e.trim().toLowerCase()).toList();
+        words = lines
+            .map((e) => e.trim().toLowerCase())
+            .where((e) => e.isNotEmpty)
+            .toList();
       } on PathNotFoundException {
         // File doesn't exist yet — seed it from the bundled asset.
         final String data = await rootBundle.loadString('assets/word_list.txt');
-        words = data.split('\n').map((e) => e.trim().toLowerCase()).toList();
+        words = data
+            .split('\n')
+            .map((e) => e.trim().toLowerCase())
+            .where((e) => e.isNotEmpty)
+            .toList();
 
         File file = File('${directory.path}/custom_list.txt');
         file.writeAsString(words.join('\n'));
       }
     } else {
       final String data = await rootBundle.loadString('assets/word_list.txt');
-      words = data.split('\n').map((e) => e.trim().toLowerCase()).toList();
+      words = data
+          .split('\n')
+          .map((e) => e.trim().toLowerCase())
+          .where((e) => e.isNotEmpty)
+          .toList();
     }
 
     _cachedWordList = words;
