@@ -31,6 +31,7 @@ Privacy Policy: <https://moofywoofy.github.io/red-owl/>
   - [iOS](#ios)
   - [Desktop and Web](#desktop-and-web)
 - [Versioning](#versioning)
+- [Changelog](#changelog)
 - [Inspiration](#inspiration)
 - [License](#license)
 
@@ -266,6 +267,18 @@ The current version is declared in `pubspec.yaml` as `version: <name>+<code>`:
 - `<code>` — monotonically increasing build number used by stores.
 
 Bump both before each release.
+
+## Changelog
+
+### 2.0.0
+
+Stability and startup hardening (no feature changes):
+
+- **Fixed a reveal-animation crash** — leaving the game during the tile flip could call `AnimationController.forward()` after the controller was disposed; the flip and win-bounce animations now guard their widget lifecycle.
+- **No more lost input** — the tile reveal now finalizes from the current board state, so letters typed while a row is flipping are preserved.
+- **Hardened async UI callbacks** — the centred snackbar and the history date-range filter no longer touch a widget that has been disposed.
+- **Word-list robustness** — blank lines in a word list are ignored, and the list is parsed on a background isolate to keep the UI thread free.
+- **Lighter startup** — the daily-reminder plugin now initialises after the first frame instead of blocking it.
 
 ## Inspiration
 
