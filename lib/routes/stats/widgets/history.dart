@@ -98,6 +98,8 @@ class _HistoryState extends State<History> {
         end: getDateOnly(picked.end),
       );
     }
+    // The picker is async — the widget may have been disposed while it was open.
+    if (!mounted) return;
     setState(() {
       _filter = filter;
       _runQuery();
