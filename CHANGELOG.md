@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- New release sections are inserted directly below this marker by the release workflow. Do not remove it. -->
 <!-- BEGIN_VERSIONS -->
 
+## 2.0.1
+
+### Changed
+- Maintenance and internal updates.
+
 ## 2.0.0
 
 A large stability, accessibility and feature release.
