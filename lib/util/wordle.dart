@@ -1,12 +1,23 @@
 import 'dart:io';
 import 'dart:math' as math show Random;
 import 'package:intl/intl.dart';
+import 'package:flutter/foundation.dart' show compute;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart'
     show getApplicationDocumentsDirectory;
 import 'package:red_owl/config/shared.dart' show SharedPreferencesKeys;
 import 'package:red_owl/util/shared.dart' show SharedPreferenceService;
+
+/// Splits raw word-list text into trimmed, lower-case, non-empty words.
+///
+/// Top-level (not a method) so it can be handed to [compute] and run in a
+/// background isolate, keeping the ~13k-line parse off the UI thread.
+List<String> _parseWordList(String data) => data
+    .split('\n')
+    .map((e) => e.trim().toLowerCase())
+    .where((e) => e.isNotEmpty)
+    .toList();
 
 /// Singleton service that manages the word list and evaluates player guesses.
 ///
@@ -98,30 +109,19 @@ class WordleService {
       Directory directory = await getApplicationDocumentsDirectory();
       try {
         File file = File(path.join(directory.path, 'custom_list.txt'));
-        final lines = await file.readAsLines();
-        words = lines
-            .map((e) => e.trim().toLowerCase())
-            .where((e) => e.isNotEmpty)
-            .toList();
+        final contents = await file.readAsString();
+        words = await compute(_parseWordList, contents);
       } on PathNotFoundException {
         // File doesn't exist yet — seed it from the bundled asset.
         final String data = await rootBundle.loadString('assets/word_list.txt');
-        words = data
-            .split('\n')
-            .map((e) => e.trim().toLowerCase())
-            .where((e) => e.isNotEmpty)
-            .toList();
+        words = await compute(_parseWordList, data);
 
         File file = File('${directory.path}/custom_list.txt');
         file.writeAsString(words.join('\n'));
       }
     } else {
       final String data = await rootBundle.loadString('assets/word_list.txt');
-      words = data
-          .split('\n')
-          .map((e) => e.trim().toLowerCase())
-          .where((e) => e.isNotEmpty)
-          .toList();
+      words = await compute(_parseWordList, data);
     }
 
     _cachedWordList = words;
