@@ -17,6 +17,8 @@ import 'package:flutter/material.dart';
 /// [duration]– how many seconds the snack bar stays visible (default 2).
 void showSnackBar(BuildContext context, String text, [int duration = 2]) {
   WidgetsBinding.instance.addPostFrameCallback((timestamp) {
+    // The callback runs a frame later; the widget may be gone by then.
+    if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         // Transparent background so only the Card is visible.
