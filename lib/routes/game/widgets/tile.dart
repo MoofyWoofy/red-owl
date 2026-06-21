@@ -83,7 +83,12 @@ class _TileState extends ConsumerState<Tile>
               milliseconds:
                   (widget.index % 5) * animationTiming.flip.intervalDelay!,
             ), () {
+          // The staggered delay means this can fire after the tile is gone
+          // (e.g. navigating back mid-flip); bail out before touching the
+          // disposed controller or ref.
+          if (!mounted) return;
           _animationController.forward().whenComplete(() {
+            if (!mounted) return;
             var tiles = [...grid.tiles];
             // Mark every tile as animated so colors persist after rebuild.
             var newTiles = tiles
