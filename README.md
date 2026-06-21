@@ -31,6 +31,7 @@ Privacy Policy: <https://moofywoofy.github.io/red-owl/>
   - [iOS](#ios)
   - [Desktop and Web](#desktop-and-web)
 - [Versioning](#versioning)
+- [Releases](#releases)
 - [Changelog](#changelog)
 - [Inspiration](#inspiration)
 - [License](#license)
@@ -268,17 +269,44 @@ The current version is declared in `pubspec.yaml` as `version: <name>+<code>`:
 
 Bump both before each release.
 
+## Releases
+
+Releases are automated by GitHub Actions ([.github/workflows/release.yml](.github/workflows/release.yml)). Pushing a **semver tag** (`X.Y.Z`, e.g. `2.1.0` — no `v` prefix) runs two jobs:
+
+1. **Update changelog** — generates a new section from the commits since the previous tag (grouped by conventional-commit type: `feat` → Added, `fix` → Fixed, `perf` → Performance, `docs` → Documentation, everything else → Changed; `chore`/`ci`/`test` are dropped). The section is inserted below the `<!-- BEGIN_VERSIONS -->` marker in [CHANGELOG.md](CHANGELOG.md) and **committed back to `main`**. Because this commit lands after the tag, the tagged commit itself won't contain the new entry. The step is idempotent — re-tagging an already-documented version is a no-op.
+2. **Build & release signed APK** — builds a single universal **signed** release APK with Flutter `3.41.6`, then publishes a GitHub Release (auto-generated notes) with `red_owl-<tag>.apk` attached.
+
+### Required repository secrets
+
+The APK is signed with the release keystore, which is reconstructed in CI from these **Settings → Secrets and variables → Actions** secrets:
+
+| Secret | Value |
+| --- | --- |
+| `KEYSTORE_BASE64` | base64 of `android/app/upload-keystore.jks` |
+| `KEYSTORE_PASSWORD` | the keystore's `storePassword` |
+| `KEY_PASSWORD` | the key's `keyPassword` |
+| `KEY_ALIAS` | the key alias (e.g. `upload`) |
+
+Generate the base64 value with:
+
+```powershell
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("android/app/upload-keystore.jks"))
+```
+
+### Cutting a release
+
+```bash
+# 1. Bump version in pubspec.yaml (name + build number), commit it.
+# 2. Tag with the matching semver and push:
+git tag 2.1.0
+git push origin 2.1.0
+```
+
+The tag only names the release; it is not checked against `pubspec.yaml`, so keep them in sync manually. The CHANGELOG auto-commit needs push access for the workflow's `GITHUB_TOKEN` — if `main` is protected against the Actions bot, that push will fail.
+
 ## Changelog
 
-### 2.0.0
-
-Stability and startup hardening (no feature changes):
-
-- **Fixed a reveal-animation crash** — leaving the game during the tile flip could call `AnimationController.forward()` after the controller was disposed; the flip and win-bounce animations now guard their widget lifecycle.
-- **No more lost input** — the tile reveal now finalizes from the current board state, so letters typed while a row is flipping are preserved.
-- **Hardened async UI callbacks** — the centred snackbar and the history date-range filter no longer touch a widget that has been disposed.
-- **Word-list robustness** — blank lines in a word list are ignored, and the list is parsed on a background isolate to keep the UI thread free.
-- **Lighter startup** — the daily-reminder plugin now initialises after the first frame instead of blocking it.
+See [CHANGELOG.md](CHANGELOG.md) for the full, versioned history. It is updated automatically when a new version tag is pushed (see [Releases](#releases)).
 
 ## Inspiration
 

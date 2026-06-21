@@ -1,7 +1,7 @@
 name: Release APK
 
 # Builds a signed production APK and publishes a GitHub Release whenever
-# a tag like v2.0.0 is pushed.
+# a semver tag like 2.0.0 is pushed.
 on:
   push:
     tags:
@@ -12,6 +12,107 @@ permissions:
   contents: write
 
 jobs:
+  # Generate a CHANGELOG.md section from the commits since the previous tag
+  # and commit it back to main. Runs independently of the APK build.
+  changelog:
+    name: Update changelog
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main with full history
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Generate changelog entry
+        shell: bash
+        run: |
+          set -euo pipefail
+          NEW_TAG="${GITHUB_REF_NAME}"
+
+          # Idempotent: if this version is already documented, do nothing.
+          if grep -q "^## ${NEW_TAG}$" CHANGELOG.md; then
+            echo "CHANGELOG.md already documents ${NEW_TAG}; skipping."
+            exit 0
+          fi
+
+          # Commits between the previous tag and this one (whole history if first tag).
+          PREV_TAG="$(git describe --tags --abbrev=0 "${NEW_TAG}^" 2>/dev/null || true)"
+          if [ -n "$PREV_TAG" ]; then
+            RANGE="${PREV_TAG}..${NEW_TAG}"
+          else
+            RANGE="${NEW_TAG}"
+          fi
+          echo "Building changelog for ${NEW_TAG} from range '${RANGE}'."
+
+          added=""; changed=""; fixed=""; perf=""; docs=""
+
+          while IFS= read -r subject; do
+            [ -z "$subject" ] && continue
+            if [[ "$subject" =~ ^([a-zA-Z]+)(\([^\)]*\))?!?:[[:space:]]*(.*)$ ]]; then
+              type="${BASH_REMATCH[1],,}"
+              desc="${BASH_REMATCH[3]}"
+            else
+              type="other"
+              desc="$subject"
+            fi
+            desc="${desc^}"   # capitalise first letter
+            case "$type" in
+              feat)                          added+="- ${desc}"$'\n' ;;
+              fix)                           fixed+="- ${desc}"$'\n' ;;
+              perf)                          perf+="- ${desc}"$'\n' ;;
+              docs)                          docs+="- ${desc}"$'\n' ;;
+              refactor|i18n|style|build|other) changed+="- ${desc}"$'\n' ;;
+              chore|ci|test)                 : ;;  # internal noise, skipped
+              *)                             changed+="- ${desc}"$'\n' ;;
+            esac
+          done < <(git log --no-merges --pretty=%s "$RANGE")
+
+          section="## ${NEW_TAG}"$'\n'
+          have_any=false
+          append_group () {
+            if [ -n "$2" ]; then
+              section+=$'\n'"### $1"$'\n'"$2"
+              have_any=true
+            fi
+          }
+          append_group "Added" "$added"
+          append_group "Changed" "$changed"
+          append_group "Fixed" "$fixed"
+          append_group "Performance" "$perf"
+          append_group "Documentation" "$docs"
+          if [ "$have_any" = false ]; then
+            section+=$'\n'"### Changed"$'\n'"- Maintenance and internal updates."$'\n'
+          fi
+
+          printf '%s' "$section" > new_section.md
+
+          # Insert the new section directly below the BEGIN_VERSIONS marker.
+          awk '
+            { print }
+            /<!-- BEGIN_VERSIONS -->/ && !done {
+              print ""
+              while ((getline line < "new_section.md") > 0) print line
+              done = 1
+            }
+          ' CHANGELOG.md > CHANGELOG.tmp
+          mv CHANGELOG.tmp CHANGELOG.md
+          rm -f new_section.md
+
+      - name: Commit and push changelog
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          if git diff --cached --quiet; then
+            echo "No changelog changes to commit."
+          else
+            git commit -m "docs(changelog): add ${GITHUB_REF_NAME} [skip ci]"
+            git push origin HEAD:main
+          fi
+
   build:
     name: Build & release signed APK
     runs-on: ubuntu-latest
