@@ -44,6 +44,17 @@ void main() {
       expect(find.text('Statistics'), findsOneWidget);
     });
 
+    testWidgets('plays an entrance animation that settles fully visible',
+        (tester) async {
+      await pumpStatsPage(tester);
+      // The content is wrapped in an entrance animation...
+      expect(find.byType(TweenAnimationBuilder<double>), findsOneWidget);
+      await tester.pump(const Duration(seconds: 1));
+      // ...which finishes fully opaque.
+      final opacity = tester.widgetList<Opacity>(find.byType(Opacity)).first;
+      expect(opacity.opacity, 1.0);
+    });
+
     testWidgets('renders Guess Distribution heading', (tester) async {
       await pumpStatsPage(tester);
       expect(find.text('Guess Distribution'), findsOneWidget);

@@ -189,21 +189,52 @@ ${context.l10n.checkOutWordleStats}!
         ],
       ),
       // Keying the whole body on _reloadKey re-inits the data-reading children
-      // after a reset so they reflect the cleared stores.
-      body: Column(
+      // after a reset so they reflect the cleared stores (and replays the
+      // entrance animation).
+      body: _StatsEntrance(
         key: ValueKey(_reloadKey),
-        children: [
-          StatsHeading(text: context.l10n.statistics),
-          const StatsInfo(),
-          StatsHeading(text: context.l10n.guessDistribution),
-          const StatsGraph(),
-          StatsHeading(text: context.l10n.history),
-          // History list takes all remaining vertical space.
-          const Expanded(
-            child: History(),
-          )
-        ],
+        child: Column(
+          children: [
+            StatsHeading(text: context.l10n.statistics),
+            const StatsInfo(),
+            StatsHeading(text: context.l10n.guessDistribution),
+            const StatsGraph(),
+            StatsHeading(text: context.l10n.history),
+            // History list takes all remaining vertical space.
+            const Expanded(
+              child: History(),
+            )
+          ],
+        ),
       ),
+    );
+  }
+}
+
+/// Fades and slides [child] up into place when the Stats page opens.
+///
+/// Uses a [TweenAnimationBuilder], so the motion is driven by an internal
+/// [AnimationController] and therefore honours the global animation-speed /
+/// reduce-motion preference (`timeDilation`).
+class _StatsEntrance extends StatelessWidget {
+  const _StatsEntrance({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeOut,
+      builder: (context, t, child) {
+        return Opacity(
+          opacity: t,
+          // Slide up from 24px below its final position.
+          child: Transform.translate(offset: Offset(0, 24 * (1 - t)), child: child),
+        );
+      },
+      child: child,
     );
   }
 }
