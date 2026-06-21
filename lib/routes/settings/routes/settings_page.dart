@@ -158,7 +158,7 @@ class SettingsPage extends ConsumerWidget {
                       // Custom callback: warn the player if a game is in progress
                       // before switching word lists (the board will be reset).
                       callback: (value) async {
-                        var grid = ref.watch(gridProvider);
+                        var grid = ref.read(gridProvider);
                         bool updateCustomList = true;
                         if (isGameInProgress(grid)) {
                           updateCustomList = await showDialog(
