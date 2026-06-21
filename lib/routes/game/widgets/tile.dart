@@ -89,15 +89,25 @@ class _TileState extends ConsumerState<Tile>
           if (!mounted) return;
           _animationController.forward().whenComplete(() {
             if (!mounted) return;
-            var tiles = [...grid.tiles];
-            // Mark every tile as animated so colors persist after rebuild.
-            var newTiles = tiles
-                .map((e) => e.copyWith(hasFlipAnimationPlayed: true))
-                .toList();
-            var newGrid =
-                grid.copyWith(runFlipAnimation: false, tiles: newTiles);
+            // Read the *current* grid, not the one captured when this flip was
+            // scheduled: the player may have typed into the next row during the
+            // animation, and those tiles must not be clobbered.
+            final notifier = ref.read(gridProvider.notifier);
+            final current = ref.read(gridProvider);
+            // Another tile in this row may have already finalized the flip.
+            if (!current.runFlipAnimation) return;
+            // Mark only already-revealed tiles as played; leave freshly-typed
+            // (still-initial) tiles alone so their future flip still runs.
+            final newTiles = [
+              for (final tile in current.tiles)
+                tile.status == LetterStatus.initial
+                    ? tile
+                    : tile.copyWith(hasFlipAnimationPlayed: true),
+            ];
+            final newGrid =
+                current.copyWith(runFlipAnimation: false, tiles: newTiles);
 
-            ref.read(gridProvider.notifier).updateState(newGrid);
+            notifier.updateState(newGrid);
 
             // The practice board opts out of persistence so it never clobbers
             // the saved daily game.
