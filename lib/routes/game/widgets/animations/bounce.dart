@@ -79,6 +79,9 @@ class _BounceAnimationState extends State<BounceAnimation>
     super.didUpdateWidget(oldWidget);
     if (widget.runAnimation) {
       Future.delayed(Duration(milliseconds: widget.delay), () {
+        // The delay can outlive the widget (e.g. leaving the page right after a
+        // win); don't drive a disposed controller.
+        if (!mounted) return;
         _animationController.forward();
       });
     }
