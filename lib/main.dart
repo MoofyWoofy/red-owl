@@ -41,10 +41,15 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharedPreferenceService().init();
   await WordleService().init();
-  // Prepare the (opt-in) daily reminder plugin; scheduling itself only happens
-  // when the user enables the reminder in Settings.
-  await NotificationService().init();
   runApp(const ProviderScope(child: App()));
+  // Prepare the (opt-in) daily reminder plugin *after* the first frame: it loads
+  // the full timezone database and makes platform-channel calls, none of which
+  // the startup screen needs. Keeping it off the first-frame critical path
+  // avoids blocking the initial render. Scheduling still only happens when the
+  // user enables the reminder in Settings.
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    NotificationService().init();
+  });
 }
 
 /// Root widget that wires up theming and localization.
