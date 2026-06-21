@@ -81,7 +81,7 @@ class Letter extends ConsumerWidget {
         onTap: grid.isGameOver ? null : press,
         excludeSemantics: true,
         child: Padding(
-        padding: const EdgeInsets.only(right: 5),
+        padding: const EdgeInsetsDirectional.only(end: 5),
         child: InkWell(
           splashFactory: NoSplash.splashFactory,
           highlightColor: Colors.black38,

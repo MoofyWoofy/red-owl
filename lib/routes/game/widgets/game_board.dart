@@ -80,7 +80,11 @@ class _GameBoardState extends ConsumerState<GameBoard> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    // The board is inherently left-to-right (5-letter Latin words and a QWERTY
+    // keyboard), so pin it to LTR even when the rest of the UI is RTL.
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Column(
       children: [
         // ── Tile grid (5 columns × 6 rows = 30 cells) ───────────────────
         Expanded(
@@ -166,6 +170,7 @@ class _GameBoardState extends ConsumerState<GameBoard> {
           ),
         ),
       ],
+      ),
     );
   }
 }
