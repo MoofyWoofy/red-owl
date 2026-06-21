@@ -24,10 +24,13 @@ class Letter extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     Color? backgroundColor;
     Color? textColor;
-    var grid = ref.watch(gridProvider);
+    // Only depend on this key's own status and the game-over flag, so a key
+    // rebuilds only when its colour changes (not on every keystroke).
+    final (status, isGameOver) = ref.watch(gridProvider
+        .select((g) => (g.keyboardStatus[letter], g.isGameOver)));
 
     // Determine background and text color from the current keyboard status.
-    switch (grid.keyboardStatus[letter]) {
+    switch (status) {
       case LetterStatus.initial:
         backgroundColor = Theme.of(context).extension<GameColors>()?.initial;
         break;
@@ -56,8 +59,7 @@ class Letter extends ConsumerWidget {
       case 'DELETE':
         semanticLabel = context.l10n.a11yDeleteKey;
       default:
-        semanticLabel =
-            letterStatusLabel(context, letter, grid.keyboardStatus[letter]);
+        semanticLabel = letterStatusLabel(context, letter, status);
     }
 
     // Forwards the key press to the grid notifier. Shared by pointer taps and
@@ -71,14 +73,14 @@ class Letter extends ConsumerWidget {
 
     return IgnorePointer(
       // Disable all keys once the game is finished.
-      ignoring: grid.isGameOver,
+      ignoring: isGameOver,
       child: Semantics(
         button: true,
-        enabled: !grid.isGameOver,
+        enabled: !isGameOver,
         label: semanticLabel,
         // Let assistive tech activate the key directly (the inner InkWell's
         // own semantics are excluded to avoid a duplicate node).
-        onTap: grid.isGameOver ? null : press,
+        onTap: isGameOver ? null : press,
         excludeSemantics: true,
         child: Padding(
         padding: const EdgeInsetsDirectional.only(end: 5),
@@ -86,7 +88,7 @@ class Letter extends ConsumerWidget {
           splashFactory: NoSplash.splashFactory,
           highlightColor: Colors.black38,
           // Keep keys out of the focus traversal once the game is over.
-          canRequestFocus: !grid.isGameOver,
+          canRequestFocus: !isGameOver,
           onTap: press,
           child: Ink(
             padding: const EdgeInsets.symmetric(vertical: 8),
