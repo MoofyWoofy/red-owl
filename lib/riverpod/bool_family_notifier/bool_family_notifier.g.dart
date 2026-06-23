@@ -87,7 +87,7 @@ final class BoolFamilyNotifierProvider
 }
 
 String _$boolFamilyNotifierHash() =>
-    r'd77308a8283feef24263eae722bed7ec6496eb86';
+    r'f21acfa995ef8b8fd97a27e026dc1bb5f1450821';
 
 /// Riverpod family notifier for boolean settings backed by SharedPreferences.
 ///
