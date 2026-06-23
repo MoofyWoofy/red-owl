@@ -19,41 +19,29 @@ part 'bool_family_notifier.g.dart';
 class BoolFamilyNotifier extends _$BoolFamilyNotifier {
   /// Reads the initial boolean value from SharedPreferences.
   ///
-  /// Key-specific defaults:
-  /// - [SharedPreferencesKeys.isDarkMode]: falls back to the system brightness
-  ///   when no user preference has been saved yet.
-  /// - [SharedPreferencesKeys.useCustomList]: defaults to `false` (standard
-  ///   word list) when not set.
-  /// - Any other key: defaults to `false`.
+  /// Every key reads back its persisted value so the toggle survives restarts.
+  /// Key-specific defaults (used only when nothing is stored yet):
+  /// - [SharedPreferencesKeys.isDarkMode]: falls back to the system brightness.
+  /// - Any other key (hard mode, color-blind mode, reminder, custom list):
+  ///   defaults to `false`.
   @override
   bool build({
     required BoolFamilyProviderIDs id,
     required SharedPreferencesKeys sharedPrefsKey,
   }) {
-    switch (sharedPrefsKey) {
-      case SharedPreferencesKeys.isDarkMode:
-        bool? dataFromSharedPref =
-            SharedPreferenceService().getBool(sharedPrefsKey);
+    final bool? dataFromSharedPref =
+        SharedPreferenceService().getBool(sharedPrefsKey);
 
-        if (dataFromSharedPref == null) {
-          // No saved preference — mirror the device's current theme setting.
-          var brightness =
-              WidgetsBinding.instance.platformDispatcher.platformBrightness;
-          return brightness == Brightness.dark;
-        } else {
-          // Return the explicitly saved user preference.
-          return dataFromSharedPref;
-        }
-
-      case SharedPreferencesKeys.useCustomList:
-        bool? dataFromSharedPref =
-            SharedPreferenceService().getBool(sharedPrefsKey);
-        // Default to false (use standard list) when not previously set.
-        return dataFromSharedPref ?? false;
-
-      default:
-        return false;
+    if (dataFromSharedPref == null &&
+        sharedPrefsKey == SharedPreferencesKeys.isDarkMode) {
+      // No saved dark-mode preference — mirror the device's current theme.
+      final brightness =
+          WidgetsBinding.instance.platformDispatcher.platformBrightness;
+      return brightness == Brightness.dark;
     }
+
+    // Return the explicitly saved value, or false when nothing is stored.
+    return dataFromSharedPref ?? false;
   }
 
   /// Persists [val] to SharedPreferences under [sharedPrefKey] and
