@@ -65,6 +65,10 @@ class ReminderSetting extends ConsumerWidget {
     final granted = await NotificationService().requestPermission();
     if (!granted) return; // Leave the toggle off if permission was denied.
 
+    // Best-effort: ask for exact-alarm access so the reminder fires to the
+    // minute. If declined it still works via inexact scheduling.
+    await NotificationService().requestExactAlarmPermission();
+
     final time = ref.read(reminderTimeProvider);
     if (!context.mounted) return;
     await NotificationService().scheduleDailyReminder(

@@ -43,5 +43,24 @@ void main() {
       expect(manifest, contains('android.permission.POST_NOTIFICATIONS'));
       expect(manifest, contains('android.permission.RECEIVE_BOOT_COMPLETED'));
     });
+
+    test('declares SCHEDULE_EXACT_ALARM so reminders can fire to the minute',
+        () {
+      expect(manifest, contains('android.permission.SCHEDULE_EXACT_ALARM'));
+    });
+  });
+
+  group('notification icons', () {
+    const densities = ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi'];
+
+    for (final d in densities) {
+      test('drawable-$d has the reminder small and large icons', () {
+        final res = 'android/app/src/main/res/drawable-$d';
+        expect(File('$res/ic_stat_reminder.png').existsSync(), isTrue,
+            reason: 'monochrome status-bar icon used as AndroidNotificationDetails.icon');
+        expect(File('$res/ic_notification_large.png').existsSync(), isTrue,
+            reason: 'full-color logo used as the notification large icon');
+      });
+    }
   });
 }

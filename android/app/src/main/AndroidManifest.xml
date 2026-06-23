@@ -2,6 +2,9 @@
     <!-- Daily reminder notifications (opt-in, off by default). -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <!-- Lets the daily reminder fire at the exact minute. Requestable at
+         runtime; the app falls back to inexact scheduling if not granted. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     <application
         android:label="Red Owl"
         android:name="${applicationName}"

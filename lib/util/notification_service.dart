@@ -52,14 +52,45 @@ class NotificationService {
     }
   }
 
+  /// The Android-specific plugin implementation, or `null` on other platforms.
+  AndroidFlutterLocalNotificationsPlugin? get _androidPlugin =>
+      _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+
   /// Requests the runtime notification permission (Android 13+). Returns
   /// whether permission is granted, defaulting to `true` on platforms that do
   /// not gate notifications behind a runtime prompt.
   Future<bool> requestPermission() async {
-    final android = _plugin.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>();
+    final android = _androidPlugin;
     if (android == null) return true;
     return await android.requestNotificationsPermission() ?? false;
+  }
+
+  /// Best-effort request for the "alarms & reminders" (exact alarm) permission
+  /// so the daily reminder can fire to the exact minute.
+  ///
+  /// Does nothing if already granted or on platforms without the concept. When
+  /// not granted, this opens the system settings screen (Android 12+); the
+  /// reminder still works via inexact scheduling if the user declines, so the
+  /// caller does not need to react to the outcome.
+  Future<void> requestExactAlarmPermission() async {
+    final android = _androidPlugin;
+    if (android == null) return;
+    final canExact = await android.canScheduleExactNotifications() ?? false;
+    if (!canExact) {
+      await android.requestExactAlarmsPermission();
+    }
+  }
+
+  /// Picks the schedule mode based on whether exact alarms are permitted:
+  /// exact (to-the-minute) when allowed, otherwise the inexact variant so the
+  /// reminder still works without the special permission.
+  Future<AndroidScheduleMode> _scheduleMode() async {
+    final canExact =
+        await _androidPlugin?.canScheduleExactNotifications() ?? false;
+    return canExact
+        ? AndroidScheduleMode.exactAllowWhileIdle
+        : AndroidScheduleMode.inexactAllowWhileIdle;
   }
 
   /// Schedules (or reschedules) the daily reminder at [hour]:[minute] with the
@@ -84,9 +115,13 @@ class NotificationService {
           _channelName,
           importance: Importance.defaultImportance,
           priority: Priority.defaultPriority,
+          // Monochrome status-bar icon (white owl silhouette) + full-color logo
+          // shown as the large icon in the expanded notification.
+          icon: 'ic_stat_reminder',
+          largeIcon: DrawableResourceAndroidBitmap('ic_notification_large'),
         ),
       ),
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      androidScheduleMode: await _scheduleMode(),
       // Repeat every day at the same wall-clock time.
       matchDateTimeComponents: DateTimeComponents.time,
     );
