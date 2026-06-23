@@ -3,12 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:red_owl/config/shared.dart'
     show BoolFamilyProviderIDs, SharedPreferencesKeys;
 import 'package:red_owl/routes/settings/widgets/shared.dart' show SwitchItem;
-import 'package:red_owl/riverpod/shared.dart' show boolFamilyProvider;
+import 'package:red_owl/riverpod/shared.dart'
+    show boolFamilyProvider, reminderTimeProvider;
 import 'package:red_owl/util/shared.dart'
-    show Localization, NotificationService, SharedPreferenceService;
-
-/// Default reminder time (8 PM) when the user hasn't chosen one.
-const TimeOfDay _defaultReminderTime = TimeOfDay(hour: 20, minute: 0);
+    show Localization, NotificationService;
 
 /// The opt-in daily-reminder setting: a toggle (off by default) plus a time
 /// row shown when enabled.
@@ -25,7 +23,9 @@ class ReminderSetting extends ConsumerWidget {
       id: BoolFamilyProviderIDs.reminderEnabled,
       sharedPrefsKey: SharedPreferencesKeys.reminderEnabled,
     ));
-    final time = _storedTime();
+    // Watch the time so the row updates immediately when the user picks a new
+    // one (rather than only after a restart).
+    final time = ref.watch(reminderTimeProvider);
 
     return Column(
       children: [
@@ -47,18 +47,6 @@ class ReminderSetting extends ConsumerWidget {
     );
   }
 
-  /// Reads the stored reminder time, or the default if unset/malformed.
-  TimeOfDay _storedTime() {
-    final raw =
-        SharedPreferenceService().getString(SharedPreferencesKeys.reminderTime);
-    if (raw == null) return _defaultReminderTime;
-    final parts = raw.split(':');
-    final hour = int.tryParse(parts.first);
-    final minute = parts.length > 1 ? int.tryParse(parts[1]) : null;
-    if (hour == null || minute == null) return _defaultReminderTime;
-    return TimeOfDay(hour: hour, minute: minute);
-  }
-
   /// Persists the boolean and schedules or cancels the reminder.
   Future<void> _setEnabled(
       BuildContext context, WidgetRef ref, bool value) async {
@@ -77,7 +65,7 @@ class ReminderSetting extends ConsumerWidget {
     final granted = await NotificationService().requestPermission();
     if (!granted) return; // Leave the toggle off if permission was denied.
 
-    final time = _storedTime();
+    final time = ref.read(reminderTimeProvider);
     if (!context.mounted) return;
     await NotificationService().scheduleDailyReminder(
       hour: time.hour,
@@ -95,10 +83,8 @@ class ReminderSetting extends ConsumerWidget {
         await showTimePicker(context: context, initialTime: current);
     if (picked == null) return;
 
-    final value =
-        '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
-    SharedPreferenceService()
-        .setString(SharedPreferencesKeys.reminderTime, value);
+    // Persist + update the notifier so the time row rebuilds immediately.
+    ref.read(reminderTimeProvider.notifier).setTime(picked);
 
     if (!context.mounted) return;
     await NotificationService().scheduleDailyReminder(
@@ -107,10 +93,5 @@ class ReminderSetting extends ConsumerWidget {
       title: context.l10n.appName,
       body: context.l10n.reminderBody,
     );
-    // Rebuild so the new time shows.
-    ref.invalidate(boolFamilyProvider(
-      id: BoolFamilyProviderIDs.reminderEnabled,
-      sharedPrefsKey: SharedPreferencesKeys.reminderEnabled,
-    ));
   }
 }

@@ -5,3 +5,4 @@ export 'bool_family_notifier/bool_family_notifier.dart';
 export 'locale/locale_notifier.dart';
 export 'font_scale/font_scale_notifier.dart';
 export 'motion_speed/motion_speed_notifier.dart';
+export 'reminder_time/reminder_time_notifier.dart';

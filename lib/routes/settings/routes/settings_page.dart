@@ -17,7 +17,8 @@ import 'package:red_owl/riverpod/shared.dart'
         fontScaleProvider,
         fontScaleCodes,
         motionSpeedProvider,
-        motionSpeedCodes;
+        motionSpeedCodes,
+        reminderTimeProvider;
 import 'package:red_owl/routes/settings/routes/view_custom_wordlist.dart';
 import 'package:red_owl/routes/settings/widgets/shared.dart'
     show GameInProgressDialog, ReminderSetting, SwitchItem;
@@ -569,6 +570,8 @@ class SettingsPage extends ConsumerWidget {
         id: BoolFamilyProviderIDs.useCustomList,
         sharedPrefsKey: SharedPreferencesKeys.useCustomList,
       ));
+      // The reminder time is provider-cached, so re-read the imported value.
+      ref.invalidate(reminderTimeProvider);
 
       if (context.mounted) {
         showSnackBar(context, context.l10n.success);
