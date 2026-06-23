@@ -1,11 +1,16 @@
 import 'dart:convert';
 
-import 'package:flutter/widgets.dart' show BuildContext;
+import 'package:flutter/widgets.dart' show BuildContext, Locale, WidgetsBinding;
 import 'package:red_owl/database/database.dart';
+import 'package:red_owl/l10n/app_localizations.dart'
+    show AppLocalizations, lookupAppLocalizations;
+import 'package:red_owl/riverpod/shared.dart'
+    show localeProvider, parseReminderTime, defaultReminderTime;
 import 'package:red_owl/util/misc.dart';
 import 'package:red_owl/util/shared.dart'
     show
         Localization,
+        NotificationService,
         SharedPreferenceService,
         WordleService,
         getDateOnly,
@@ -310,6 +315,49 @@ class Grid extends _$Grid {
     _updateStatsData(gameWon: gameWon);
     await _addToDatabase(
         gameState: gameWon ? GameState.won : GameState.lost);
+    // Mark today as played so an enable/time change later today also skips it.
+    SharedPreferenceService().setString(
+        SharedPreferencesKeys.lastPlayedDate, dateToString(DateTime.now()));
+    // Today's game is done — push the next reminder to tomorrow so the player
+    // isn't nudged to play what they've already played.
+    await _skipReminderForToday();
+  }
+
+  /// Reschedules the daily reminder to start tomorrow, if it is enabled.
+  ///
+  /// Called after the player finishes today's game. The notification text is
+  /// localised here (away from any [BuildContext]) via [lookupAppLocalizations]
+  /// so it matches the user's chosen UI language. A no-op when the reminder is
+  /// off; the practice notifier never reaches here since it overrides
+  /// [recordOutcome].
+  Future<void> _skipReminderForToday() async {
+    final enabled = SharedPreferenceService()
+            .getBool(SharedPreferencesKeys.reminderEnabled) ??
+        false;
+    if (!enabled) return;
+
+    final time = parseReminderTime(SharedPreferenceService()
+            .getString(SharedPreferencesKeys.reminderTime)) ??
+        defaultReminderTime;
+    final l10n = lookupAppLocalizations(_reminderLocale());
+    await NotificationService().scheduleDailyReminder(
+      hour: time.hour,
+      minute: time.minute,
+      title: l10n.appName,
+      body: l10n.reminderBody,
+      skipToday: true,
+    );
+  }
+
+  /// The locale to localise the reminder text in: the user's override if set,
+  /// otherwise the device language when supported, falling back to English.
+  Locale _reminderLocale() {
+    final override = ref.read(localeProvider);
+    if (override != null) return override;
+    final device = WidgetsBinding.instance.platformDispatcher.locale;
+    final supported = AppLocalizations.supportedLocales
+        .any((l) => l.languageCode == device.languageCode);
+    return supported ? Locale(device.languageCode) : const Locale('en');
   }
 
   /// Directly replaces the board state. Used by the [Tile] widget after the

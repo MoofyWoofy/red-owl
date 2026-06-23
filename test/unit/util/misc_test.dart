@@ -3,9 +3,13 @@
 // Covers: dateToString, stringToDate, getDateOnly,
 // convertListStringToListDouble, isGameInProgress, and getWinRate.
 import 'package:flutter_test/flutter_test.dart';
-import 'package:red_owl/config/shared.dart' show LetterStatus, keyboardStatus;
+import 'package:red_owl/config/shared.dart'
+    show LetterStatus, SharedPreferencesKeys, keyboardStatus;
 import 'package:red_owl/models/shared.dart' show Grid, Tile;
 import 'package:red_owl/util/misc.dart';
+import 'package:red_owl/util/shared.dart' show SharedPreferenceService;
+
+import '../../helpers/test_helpers.dart';
 
 void main() {
   group('dateToString', () {
@@ -235,6 +239,32 @@ void main() {
       expect(isStreakMilestone(4), isFalse);
       expect(isStreakMilestone(7), isFalse);
       expect(isStreakMilestone(99), isFalse);
+    });
+  });
+
+  group('hasPlayedDailyToday', () {
+    test('false when no last-played date is stored', () async {
+      setSharedPreferencesMock();
+      await SharedPreferenceService().init();
+      expect(hasPlayedDailyToday(), isFalse);
+    });
+
+    test('true when the last-played date is today', () async {
+      setSharedPreferencesMock({
+        SharedPreferencesKeys.lastPlayedDate.name:
+            dateToString(DateTime.now()),
+      });
+      await SharedPreferenceService().init();
+      expect(hasPlayedDailyToday(), isTrue);
+    });
+
+    test('false when the last-played date is a previous day', () async {
+      setSharedPreferencesMock({
+        SharedPreferencesKeys.lastPlayedDate.name: dateToString(
+            DateTime.now().subtract(const Duration(days: 1))),
+      });
+      await SharedPreferenceService().init();
+      expect(hasPlayedDailyToday(), isFalse);
     });
   });
 }

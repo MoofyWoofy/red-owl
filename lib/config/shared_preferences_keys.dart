@@ -64,4 +64,8 @@ enum SharedPreferencesKeys {
 
   /// The daily reminder time as a `HH:mm` 24-hour string. Absent → `20:00`.
   reminderTime,
+
+  /// ISO-8601 date string (`yyyy-MM-dd`) of the day the player last completed
+  /// the daily game. Used to skip the reminder on days already played.
+  lastPlayedDate,
 }

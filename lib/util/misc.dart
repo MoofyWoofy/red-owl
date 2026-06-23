@@ -1,6 +1,9 @@
 import 'package:intl/intl.dart';
 
+import 'package:red_owl/config/shared.dart' show SharedPreferencesKeys;
 import 'package:red_owl/models/shared.dart' show Grid;
+import 'package:red_owl/util/shared_preference_service.dart'
+    show SharedPreferenceService;
 
 /// Formats [date] as an ISO-8601 date string (`yyyy-MM-dd`).
 ///
@@ -37,6 +40,18 @@ List<double> convertListStringToListDouble(List<String> arg) =>
 /// warn the player before destructive actions (e.g. changing the word list).
 bool isGameInProgress(Grid grid) {
   return grid.tiles.isNotEmpty && !grid.isGameOver;
+}
+
+/// Whether today's daily game has already been completed.
+///
+/// Reads [SharedPreferencesKeys.lastPlayedDate] (written when a daily game
+/// finishes) and compares it to today. Used to decide whether the daily
+/// reminder should skip today.
+bool hasPlayedDailyToday() {
+  final raw = SharedPreferenceService()
+      .getString(SharedPreferencesKeys.lastPlayedDate);
+  if (raw == null) return false;
+  return getDateOnly(stringToDate(raw)) == getDateOnly(DateTime.now());
 }
 
 /// Notable streak lengths that earn a celebratory share prompt.

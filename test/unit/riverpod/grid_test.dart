@@ -13,8 +13,10 @@ import 'dart:convert';
 
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:red_owl/config/shared.dart'
     show LetterStatus, SharedPreferencesKeys, keyboardStatus;
 import 'package:red_owl/database/database.dart';
@@ -22,9 +24,13 @@ import 'package:red_owl/models/shared.dart' as models;
 import 'package:red_owl/riverpod/shared.dart' show gridProvider;
 import 'package:red_owl/util/misc.dart' show dateToString;
 import 'package:red_owl/util/shared.dart'
-    show SharedPreferenceService, WordleService;
+    show NotificationService, SharedPreferenceService, WordleService;
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 import '../../helpers/test_helpers.dart';
+
+class MockPlugin extends Mock implements FlutterLocalNotificationsPlugin {}
 
 /// A small, fixed word list with no repeated letters across enough entries to
 /// build six distinct wrong guesses for the loss path.
@@ -44,6 +50,14 @@ void main() {
   /// and supply a BuildContext to `onKeyboardPressed`.
   late WidgetRef capturedRef;
   late BuildContext capturedContext;
+
+  setUpAll(() {
+    tz.initializeTimeZones();
+    tz.setLocalLocation(tz.getLocation('UTC'));
+    registerFallbackValue(tz.TZDateTime.now(tz.local));
+    registerFallbackValue(const NotificationDetails());
+    registerFallbackValue(AndroidScheduleMode.inexactAllowWhileIdle);
+  });
 
   setUp(() async {
     setSharedPreferencesMock();
@@ -181,6 +195,87 @@ void main() {
       final rows = await AppDatabase().select(AppDatabase().history).get();
       expect(rows, hasLength(1));
       expect(rows.first.gameState, GameState.won.name);
+
+      await drainSnackBars(tester);
+    });
+
+    testWidgets(
+        'finishing the daily game reschedules an enabled reminder for tomorrow',
+        (tester) async {
+      // Enable the reminder (8 AM) before the game is built.
+      setSharedPreferencesMock({
+        SharedPreferencesKeys.reminderEnabled.name: true,
+        SharedPreferencesKeys.reminderTime.name: '08:00',
+      });
+      await SharedPreferenceService().init();
+
+      final plugin = MockPlugin();
+      when(() => plugin.cancel(any())).thenAnswer((_) async {});
+      when(() => plugin.zonedSchedule(
+            any(),
+            any(),
+            any(),
+            captureAny(),
+            any(),
+            androidScheduleMode: any(named: 'androidScheduleMode'),
+            matchDateTimeComponents: any(named: 'matchDateTimeComponents'),
+          )).thenAnswer((_) async {});
+      NotificationService().pluginForTesting = plugin;
+
+      await pumpHost(tester);
+      await type(WordleService().wordOfTheDay);
+      await enter();
+      await tester.pumpAndSettle();
+
+      final scheduled = verify(() => plugin.zonedSchedule(
+            any(),
+            any(),
+            any(),
+            captureAny(),
+            any(),
+            androidScheduleMode: any(named: 'androidScheduleMode'),
+            matchDateTimeComponents: any(named: 'matchDateTimeComponents'),
+          )).captured.single as tz.TZDateTime;
+
+      final tomorrow = tz.TZDateTime.now(tz.local).add(const Duration(days: 1));
+      expect(scheduled.year, tomorrow.year);
+      expect(scheduled.month, tomorrow.month);
+      expect(scheduled.day, tomorrow.day);
+      expect(scheduled.hour, 8);
+      expect(scheduled.minute, 0);
+
+      await drainSnackBars(tester);
+    });
+
+    testWidgets('finishing the game does not schedule when the reminder is off',
+        (tester) async {
+      final plugin = MockPlugin();
+      when(() => plugin.cancel(any())).thenAnswer((_) async {});
+      when(() => plugin.zonedSchedule(
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            androidScheduleMode: any(named: 'androidScheduleMode'),
+            matchDateTimeComponents: any(named: 'matchDateTimeComponents'),
+          )).thenAnswer((_) async {});
+      NotificationService().pluginForTesting = plugin;
+
+      await pumpHost(tester);
+      await type(WordleService().wordOfTheDay);
+      await enter();
+      await tester.pumpAndSettle();
+
+      verifyNever(() => plugin.zonedSchedule(
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            androidScheduleMode: any(named: 'androidScheduleMode'),
+            matchDateTimeComponents: any(named: 'matchDateTimeComponents'),
+          ));
 
       await drainSnackBars(tester);
     });

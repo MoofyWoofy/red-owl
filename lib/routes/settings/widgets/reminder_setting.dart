@@ -6,7 +6,7 @@ import 'package:red_owl/routes/settings/widgets/shared.dart' show SwitchItem;
 import 'package:red_owl/riverpod/shared.dart'
     show boolFamilyProvider, reminderTimeProvider;
 import 'package:red_owl/util/shared.dart'
-    show Localization, NotificationService;
+    show Localization, NotificationService, hasPlayedDailyToday;
 
 /// The opt-in daily-reminder setting: a toggle (off by default) plus a time
 /// row shown when enabled.
@@ -76,6 +76,8 @@ class ReminderSetting extends ConsumerWidget {
       minute: time.minute,
       title: context.l10n.appName,
       body: context.l10n.reminderBody,
+      // If today's game is already finished, start tomorrow.
+      skipToday: hasPlayedDailyToday(),
     );
     notifier.updateBoolean(SharedPreferencesKeys.reminderEnabled, true);
   }
@@ -96,6 +98,8 @@ class ReminderSetting extends ConsumerWidget {
       minute: picked.minute,
       title: context.l10n.appName,
       body: context.l10n.reminderBody,
+      // Keep skipping today if the player has already finished today's game.
+      skipToday: hasPlayedDailyToday(),
     );
   }
 }

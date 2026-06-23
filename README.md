@@ -47,7 +47,7 @@ Privacy Policy: <https://moofywoofy.github.io/red-owl/>
 - **Custom word lists** — import any `.txt` file (one word per line) and play against your own dictionary.
 - **Stats tracking** — local Drift database records every game, surfacing games played/won, win rate, current/max streak, average guesses, guess distribution and a filterable history (all / last 30 days / custom range), with a reset option.
 - **Sharing** — copy a spoiler-free NYT-style emoji result grid, plus celebratory streak-milestone prompts.
-- **Daily reminder** — optional local notification at a time you choose (Android, off by default).
+- **Daily reminder** — optional local notification at a time you choose, which automatically skips days you've already played (Android, off by default).
 - **Theming & readability** — light/dark mode, a color-blind / high-contrast palette, adjustable text size, and an animation-speed control.
 - **Accessibility** — screen-reader labels on tiles and keys, win/loss announcements, keyboard/focus operability, and respect for the system "reduce motion" setting.
 - **Localized & RTL-ready UI** — English and Dutch out of the box (easy to add more via ARB files), with right-to-left layout support.
@@ -238,7 +238,7 @@ The Android module pins:
 - NDK `28.2.13676358`
 - `targetSdk` `35`, ABI filters `armeabi-v7a`, `arm64-v8a`, `x86_64`
 
-The daily reminder requires **core library desugaring** (enabled in `android/app/build.gradle`) for `flutter_local_notifications`, and the `POST_NOTIFICATIONS` / `RECEIVE_BOOT_COMPLETED` permissions are declared in the Android manifest.
+The daily reminder requires **core library desugaring** (enabled in `android/app/build.gradle`) for `flutter_local_notifications`. The Android manifest declares the `POST_NOTIFICATIONS`, `RECEIVE_BOOT_COMPLETED` and `SCHEDULE_EXACT_ALARM` permissions, plus the plugin's broadcast receivers (`ScheduledNotificationReceiver`, `ScheduledNotificationBootReceiver`, `ActionBroadcastReceiver`) — the plugin does not declare these itself, and without them a scheduled reminder never posts. The reminder is scheduled one notification at a time and re-armed after each completed game so it can skip days you've already played.
 
 ### iOS
 
