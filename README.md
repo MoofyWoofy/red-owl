@@ -92,6 +92,7 @@ lib/
 │   ├── grid/                  # Daily game grid state
 │   ├── practice_grid/         # Practice-mode grid (random word, no stats)
 │   ├── hint/                  # Once-a-day hint availability
+│   ├── reminder_time/         # Daily-reminder time preference
 │   ├── locale/                # UI language override
 │   ├── font_scale/            # Text-size preference
 │   └── motion_speed/          # Animation-speed preference
