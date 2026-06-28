@@ -151,5 +151,14 @@
   "includeWordListContent": "Je aangepaste woordenlijst opnemen in de export?",
   "importOverwriteWarning": "Importeren vervangt je huidige statistieken, geschiedenis en instellingen. Doorgaan?",
   "importFailed": "Importeren mislukt: ongeldig back-upbestand",
-  "exportFailed": "Exporteren mislukt"
+  "exportFailed": "Exporteren mislukt",
+  "youGotIt": "Gelukt!",
+  "notEnoughLetters": "Niet genoeg letters",
+  "notInWordList": "'{word}' staat niet in de woordenlijst",
+  "@notInWordList": {
+    "placeholders": {
+      "word": {"type": "String"}
+    }
+  },
+  "betterLuckNextTime": "Volgende keer beter"
 }

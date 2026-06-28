@@ -151,5 +151,14 @@
   "includeWordListContent":"Include your custom word list in the export?",
   "importOverwriteWarning":"Importing will replace your current stats, history and settings. Continue?",
   "importFailed":"Import failed: invalid backup file",
-  "exportFailed":"Export failed"
+  "exportFailed":"Export failed",
+  "youGotIt":"You got it!",
+  "notEnoughLetters":"Not enough letters",
+  "notInWordList":"'{word}' is not in the word list",
+  "@notInWordList":{
+    "placeholders":{
+      "word":{"type":"String"}
+    }
+  },
+  "betterLuckNextTime":"Better luck next time"
 }

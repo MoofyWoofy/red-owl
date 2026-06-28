@@ -715,6 +715,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Export failed'**
   String get exportFailed;
+
+  /// No description provided for @youGotIt.
+  ///
+  /// In en, this message translates to:
+  /// **'You got it!'**
+  String get youGotIt;
+
+  /// No description provided for @notEnoughLetters.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough letters'**
+  String get notEnoughLetters;
+
+  /// No description provided for @notInWordList.
+  ///
+  /// In en, this message translates to:
+  /// **'\'{word}\' is not in the word list'**
+  String notInWordList(String word);
+
+  /// No description provided for @betterLuckNextTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Better luck next time'**
+  String get betterLuckNextTime;
 }
 
 class _AppLocalizationsDelegate

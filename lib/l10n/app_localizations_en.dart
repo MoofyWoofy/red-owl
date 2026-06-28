@@ -344,4 +344,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exportFailed => 'Export failed';
+
+  @override
+  String get youGotIt => 'You got it!';
+
+  @override
+  String get notEnoughLetters => 'Not enough letters';
+
+  @override
+  String notInWordList(String word) {
+    return '\'$word\' is not in the word list';
+  }
+
+  @override
+  String get betterLuckNextTime => 'Better luck next time';
 }
