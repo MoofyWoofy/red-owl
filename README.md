@@ -239,7 +239,7 @@ The Android module pins:
 - NDK `28.2.13676358`
 - `targetSdk` `35`, ABI filters `armeabi-v7a`, `arm64-v8a`, `x86_64`
 
-The daily reminder requires **core library desugaring** (enabled in `android/app/build.gradle`) for `flutter_local_notifications`. The Android manifest declares the `POST_NOTIFICATIONS`, `RECEIVE_BOOT_COMPLETED` and `SCHEDULE_EXACT_ALARM` permissions, plus the plugin's broadcast receivers (`ScheduledNotificationReceiver`, `ScheduledNotificationBootReceiver`, `ActionBroadcastReceiver`) — the plugin does not declare these itself, and without them a scheduled reminder never posts. The reminder is scheduled one notification at a time and re-armed after each completed game so it can skip days you've already played.
+The daily reminder requires **core library desugaring** (enabled in `android/app/build.gradle`) for `flutter_local_notifications`. The Android manifest declares the `POST_NOTIFICATIONS`, `RECEIVE_BOOT_COMPLETED` and `SCHEDULE_EXACT_ALARM` permissions, plus the plugin's broadcast receivers (`ScheduledNotificationReceiver`, `ScheduledNotificationBootReceiver`, `ActionBroadcastReceiver`) — the plugin does not declare these itself, and without them a scheduled reminder never posts. The reminder's status-bar and large icons (`ic_stat_reminder`, `ic_notification_large`) live in `res/drawable-*` and are referenced only by name at runtime, so `res/raw/keep.xml` keeps them from being removed by release resource shrinking — without it, enabling the reminder fails in release builds. The reminder is scheduled one notification at a time and re-armed after each completed game so it can skip days you've already played.
 
 ### iOS
 
