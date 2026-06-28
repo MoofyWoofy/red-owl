@@ -716,6 +716,12 @@ abstract class AppLocalizations {
   /// **'Export failed'**
   String get exportFailed;
 
+  /// No description provided for @areYouSure.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure?'**
+  String get areYouSure;
+
   /// No description provided for @youGotIt.
   ///
   /// In en, this message translates to:

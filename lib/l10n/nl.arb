@@ -152,6 +152,7 @@
   "importOverwriteWarning": "Importeren vervangt je huidige statistieken, geschiedenis en instellingen. Doorgaan?",
   "importFailed": "Importeren mislukt: ongeldig back-upbestand",
   "exportFailed": "Exporteren mislukt",
+  "areYouSure": "Weet je het zeker?",
   "youGotIt": "Gelukt!",
   "notEnoughLetters": "Niet genoeg letters",
   "notInWordList": "'{word}' staat niet in de woordenlijst",

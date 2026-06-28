@@ -347,6 +347,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get exportFailed => 'Exporteren mislukt';
 
   @override
+  String get areYouSure => 'Weet je het zeker?';
+
+  @override
   String get youGotIt => 'Gelukt!';
 
   @override

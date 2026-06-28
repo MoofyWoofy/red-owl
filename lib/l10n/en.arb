@@ -152,6 +152,7 @@
   "importOverwriteWarning":"Importing will replace your current stats, history and settings. Continue?",
   "importFailed":"Import failed: invalid backup file",
   "exportFailed":"Export failed",
+  "areYouSure":"Are you sure?",
   "youGotIt":"You got it!",
   "notEnoughLetters":"Not enough letters",
   "notInWordList":"'{word}' is not in the word list",
