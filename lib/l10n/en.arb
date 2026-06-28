@@ -161,5 +161,6 @@
       "word":{"type":"String"}
     }
   },
-  "betterLuckNextTime":"Better luck next time"
+  "betterLuckNextTime":"Better luck next time",
+  "reminderError":"Couldn't enable the reminder. Please try again."
 }

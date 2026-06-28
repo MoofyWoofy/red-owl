@@ -362,4 +362,8 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get betterLuckNextTime => 'Volgende keer beter';
+
+  @override
+  String get reminderError =>
+      'Kon de herinnering niet inschakelen. Probeer het opnieuw.';
 }

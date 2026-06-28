@@ -745,6 +745,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Better luck next time'**
   String get betterLuckNextTime;
+
+  /// No description provided for @reminderError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t enable the reminder. Please try again.'**
+  String get reminderError;
 }
 
 class _AppLocalizationsDelegate

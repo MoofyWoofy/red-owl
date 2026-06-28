@@ -361,4 +361,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get betterLuckNextTime => 'Better luck next time';
+
+  @override
+  String get reminderError =>
+      'Couldn\'t enable the reminder. Please try again.';
 }

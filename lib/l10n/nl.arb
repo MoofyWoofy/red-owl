@@ -161,5 +161,6 @@
       "word": {"type": "String"}
     }
   },
-  "betterLuckNextTime": "Volgende keer beter"
+  "betterLuckNextTime": "Volgende keer beter",
+  "reminderError": "Kon de herinnering niet inschakelen. Probeer het opnieuw."
 }
