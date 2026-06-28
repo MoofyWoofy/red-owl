@@ -143,7 +143,7 @@ abstract class AppLocalizations {
   /// No description provided for @helpLine0.
   ///
   /// In en, this message translates to:
-  /// **'The color of the letters will change to show how if they are correct.'**
+  /// **'The color of the letters will change to show if they are correct.'**
   String get helpLine0;
 
   /// No description provided for @example.

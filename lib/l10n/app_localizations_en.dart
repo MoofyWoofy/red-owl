@@ -31,7 +31,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get helpLine0 =>
-      'The color of the letters will change to show how if they are correct.';
+      'The color of the letters will change to show if they are correct.';
 
   @override
   String get example => 'Example';
