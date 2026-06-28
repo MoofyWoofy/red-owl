@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:red_owl/util/shared.dart' show Localization;
 
 /// A confirmation dialog shown before destructive settings changes when a
 /// game is currently in progress.
@@ -20,8 +21,8 @@ class GameInProgressDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text(
-        'Are you sure?',
+      title: Text(
+        context.l10n.areYouSure,
         textAlign: TextAlign.center,
       ),
       content: Text(content),
@@ -31,14 +32,14 @@ class GameInProgressDialog extends StatelessWidget {
           onPressed: () {
             Navigator.of(context).pop(false);
           },
-          child: const Text('No'),
+          child: Text(context.l10n.no),
         ),
         // "Yes" — confirm the operation and return true.
         TextButton(
           onPressed: () {
             Navigator.of(context).pop(true);
           },
-          child: const Text('Yes'),
+          child: Text(context.l10n.yes),
         )
       ],
     );

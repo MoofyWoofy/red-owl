@@ -163,7 +163,7 @@ class Grid extends _$Grid {
               if (isStreakMilestone(streak)) {
                 showSnackBar(context, context.l10n.streakMilestone(streak), 3);
               } else {
-                showSnackBar(context, 'You got it!');
+                showSnackBar(context, context.l10n.youGotIt);
               }
             }
           } else if (!result.isWordInList) {
@@ -171,7 +171,7 @@ class Grid extends _$Grid {
             // Reuse the notEnoughCharacters flag to trigger the shake animation.
             state = state.copyWith(notEnoughCharacters: true);
             if (context.mounted) {
-              showSnackBar(context, "'$guessWord' is not in wordlist");
+              showSnackBar(context, context.l10n.notInWordList(guessWord));
             }
           } else {
             // ── Valid word, evaluate each character ────────────────────────
@@ -196,7 +196,7 @@ class Grid extends _$Grid {
             if (state.row + 1 == 6) {
               // Player used all 6 rows without winning — game over.
               if (context.mounted) {
-                showSnackBar(context, 'Better luck next time');
+                showSnackBar(context, context.l10n.betterLuckNextTime);
               }
               state = state.copyWith(
                 isGameWon: false,
@@ -218,7 +218,7 @@ class Grid extends _$Grid {
           // Row does not have 5 letters — trigger shake animation.
           state = state.copyWith(notEnoughCharacters: true);
           if (context.mounted) {
-            showSnackBar(context, 'Not enough letters');
+            showSnackBar(context, context.l10n.notEnoughLetters);
           }
         }
         break;

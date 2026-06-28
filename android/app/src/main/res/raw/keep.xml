@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Keeps the daily-reminder notification icons from being removed by the release
+  resource shrinker (Flutter enables R8 + shrinkResources for release builds).
+
+  These drawables are referenced only by name string at runtime
+  (NotificationService.scheduleDailyReminder: icon: 'ic_stat_reminder' and
+  DrawableResourceAndroidBitmap('ic_notification_large')), never via R.drawable,
+  so the shrinker marks them unreachable and strips them from the APK. When that
+  happens, zonedSchedule throws PlatformException(invalid_icon) and the daily
+  reminder toggle silently fails to turn on (only in release builds).
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_stat_reminder,@drawable/ic_notification_large" />

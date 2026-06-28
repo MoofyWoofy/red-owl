@@ -7,7 +7,7 @@
   "stats": "Stats",
   "howToPlay":"HOW TO PLAY",
   "sixTries":"You have 6 tries to guess the word.",
-  "helpLine0":"The color of the letters will change to show how if they are correct.",
+  "helpLine0":"The color of the letters will change to show if they are correct.",
   "example":"Example",
   "helpLine1":"is green, because it is in the word and in the correct spot",
   "helpLine2":"is yellow, because it is in the word but in the wrong spot",
@@ -151,5 +151,16 @@
   "includeWordListContent":"Include your custom word list in the export?",
   "importOverwriteWarning":"Importing will replace your current stats, history and settings. Continue?",
   "importFailed":"Import failed: invalid backup file",
-  "exportFailed":"Export failed"
+  "exportFailed":"Export failed",
+  "areYouSure":"Are you sure?",
+  "youGotIt":"You got it!",
+  "notEnoughLetters":"Not enough letters",
+  "notInWordList":"'{word}' is not in the word list",
+  "@notInWordList":{
+    "placeholders":{
+      "word":{"type":"String"}
+    }
+  },
+  "betterLuckNextTime":"Better luck next time",
+  "reminderError":"Couldn't enable the reminder. Please try again."
 }

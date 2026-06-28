@@ -6,7 +6,7 @@ import 'package:red_owl/routes/settings/widgets/shared.dart' show SwitchItem;
 import 'package:red_owl/riverpod/shared.dart'
     show boolFamilyProvider, reminderTimeProvider;
 import 'package:red_owl/util/shared.dart'
-    show Localization, NotificationService, hasPlayedDailyToday;
+    show Localization, NotificationService, hasPlayedDailyToday, showSnackBar;
 
 /// The opt-in daily-reminder setting: a toggle (off by default) plus a time
 /// row shown when enabled.
@@ -71,14 +71,24 @@ class ReminderSetting extends ConsumerWidget {
 
     final time = ref.read(reminderTimeProvider);
     if (!context.mounted) return;
-    await NotificationService().scheduleDailyReminder(
-      hour: time.hour,
-      minute: time.minute,
-      title: context.l10n.appName,
-      body: context.l10n.reminderBody,
-      // If today's game is already finished, start tomorrow.
-      skipToday: hasPlayedDailyToday(),
-    );
+    try {
+      await NotificationService().scheduleDailyReminder(
+        hour: time.hour,
+        minute: time.minute,
+        title: context.l10n.appName,
+        body: context.l10n.reminderBody,
+        // If today's game is already finished, start tomorrow.
+        skipToday: hasPlayedDailyToday(),
+      );
+    } catch (_) {
+      // Scheduling can fail at the platform layer (e.g. a notification icon
+      // resource missing from the build). Surface it and leave the toggle off
+      // rather than silently doing nothing.
+      if (context.mounted) {
+        showSnackBar(context, context.l10n.reminderError, 3);
+      }
+      return;
+    }
     notifier.updateBoolean(SharedPreferencesKeys.reminderEnabled, true);
   }
 

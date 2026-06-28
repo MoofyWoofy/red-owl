@@ -31,7 +31,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get helpLine0 =>
-      'The color of the letters will change to show how if they are correct.';
+      'The color of the letters will change to show if they are correct.';
 
   @override
   String get example => 'Example';
@@ -344,4 +344,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exportFailed => 'Export failed';
+
+  @override
+  String get areYouSure => 'Are you sure?';
+
+  @override
+  String get youGotIt => 'You got it!';
+
+  @override
+  String get notEnoughLetters => 'Not enough letters';
+
+  @override
+  String notInWordList(String word) {
+    return '\'$word\' is not in the word list';
+  }
+
+  @override
+  String get betterLuckNextTime => 'Better luck next time';
+
+  @override
+  String get reminderError =>
+      'Couldn\'t enable the reminder. Please try again.';
 }

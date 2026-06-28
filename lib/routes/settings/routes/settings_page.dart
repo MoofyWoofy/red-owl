@@ -198,8 +198,10 @@ class SettingsPage extends ConsumerWidget {
                         sharedPrefsKey: SharedPreferencesKeys.useCustomList,
                       ),
                     ))
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 16,
+                        runSpacing: 12,
                         children: [
                           // Import button: opens file picker and validates the file.
                           OutlinedButton.icon(
@@ -208,7 +210,6 @@ class SettingsPage extends ConsumerWidget {
                             icon: const Icon(Icons.file_upload_outlined),
                             label: Text(context.l10n.import),
                           ),
-                          const SizedBox(width: 16),
                           // View button: navigate to the word list viewer.
                           OutlinedButton.icon(
                             onPressed: () {
@@ -228,15 +229,19 @@ class SettingsPage extends ConsumerWidget {
                     const Divider(),
                     const SizedBox(height: 12),
                     // ── Backup: export / import all user data ─────────────────
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    // Wrap (not Row) so the buttons stack onto a second line
+                    // rather than overflowing when the localized labels are long
+                    // (e.g. Dutch) or the user picks a large text size.
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 16,
+                      runSpacing: 12,
                       children: [
                         OutlinedButton.icon(
                           onPressed: () => _exportData(context),
                           icon: const Icon(Icons.upload_file_outlined),
                           label: Text(context.l10n.exportData),
                         ),
-                        const SizedBox(width: 16),
                         OutlinedButton.icon(
                           onPressed: () => _importData(context, ref),
                           icon: const Icon(Icons.download_outlined),

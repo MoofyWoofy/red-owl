@@ -345,4 +345,25 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get exportFailed => 'Exporteren mislukt';
+
+  @override
+  String get areYouSure => 'Weet je het zeker?';
+
+  @override
+  String get youGotIt => 'Gelukt!';
+
+  @override
+  String get notEnoughLetters => 'Niet genoeg letters';
+
+  @override
+  String notInWordList(String word) {
+    return '\'$word\' staat niet in de woordenlijst';
+  }
+
+  @override
+  String get betterLuckNextTime => 'Volgende keer beter';
+
+  @override
+  String get reminderError =>
+      'Kon de herinnering niet inschakelen. Probeer het opnieuw.';
 }
