@@ -8,6 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- New release sections are inserted directly below this marker by the release workflow. Do not remove it. -->
 <!-- BEGIN_VERSIONS -->
 
+## 2.1.0
+
+### Added
+- Skip daily reminder on days already played
+- Exact-minute daily reminder with logo icons
+
+### Fixed
+- Post scheduled daily reminder via manifest receivers
+- Refresh reminder time in UI without a restart
+- Persist hard mode, color-blind & reminder toggles
+
+## 2.0.1
+
+### Changed
+- Maintenance and internal updates.
+
 ## 2.0.0
 
 A large stability, accessibility and feature release.
