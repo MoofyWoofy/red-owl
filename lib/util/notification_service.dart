@@ -120,10 +120,8 @@ class NotificationService {
           _channelName,
           importance: Importance.defaultImportance,
           priority: Priority.defaultPriority,
-          // Monochrome status-bar icon (white owl silhouette) + full-color logo
-          // shown as the large icon in the expanded notification.
+          // Monochrome status-bar icon (white owl silhouette).
           icon: 'ic_stat_reminder',
-          largeIcon: DrawableResourceAndroidBitmap('ic_notification_large'),
         ),
       ),
       androidScheduleMode: await _scheduleMode(),

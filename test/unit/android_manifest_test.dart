@@ -54,19 +54,17 @@ void main() {
     const densities = ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi'];
 
     for (final d in densities) {
-      test('drawable-$d has the reminder small and large icons', () {
+      test('drawable-$d has the reminder small icon', () {
         final res = 'android/app/src/main/res/drawable-$d';
         expect(File('$res/ic_stat_reminder.png').existsSync(), isTrue,
             reason: 'monochrome status-bar icon used as AndroidNotificationDetails.icon');
-        expect(File('$res/ic_notification_large.png').existsSync(), isTrue,
-            reason: 'full-color logo used as the notification large icon');
       });
     }
   });
 
-  // The reminder icons are referenced only by name string at runtime, so the
-  // release resource shrinker treats them as unused and strips them — which
-  // makes scheduleDailyReminder throw PlatformException(invalid_icon) and the
+  // The reminder icon is referenced only by name string at runtime, so the
+  // release resource shrinker treats it as unused and strips it — which makes
+  // scheduleDailyReminder throw PlatformException(invalid_icon) and the
   // reminder toggle silently fail. res/raw/keep.xml prevents that. This only
   // reproduces in a real release build, so guard the keep rule here.
   group('res/raw/keep.xml', () {
@@ -76,7 +74,7 @@ void main() {
       final file = File('android/app/src/main/res/raw/keep.xml');
       expect(file.existsSync(), isTrue,
           reason: 'keep.xml must exist so the resource shrinker retains the '
-              'notification icons in release builds');
+              'notification icon in release builds');
       keep = file.readAsStringSync();
     });
 
@@ -84,11 +82,6 @@ void main() {
       expect(keep, contains('@drawable/ic_stat_reminder'),
           reason: 'without this keep rule the status-bar icon is stripped and '
               'enabling the daily reminder throws invalid_icon in release');
-    });
-
-    test('keeps ic_notification_large from being shrunk out of release builds',
-        () {
-      expect(keep, contains('@drawable/ic_notification_large'));
     });
   });
 }
