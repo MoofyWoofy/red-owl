@@ -61,8 +61,8 @@ void main() {
   });
 
   group('SharedPreferencesKeys', () {
-    test('has fifteen values', () {
-      expect(SharedPreferencesKeys.values, hasLength(15));
+    test('has fourteen values', () {
+      expect(SharedPreferencesKeys.values, hasLength(14));
     });
 
     test('contains all expected keys', () {
@@ -81,7 +81,6 @@ void main() {
         SharedPreferencesKeys.hintUsedDate,
         SharedPreferencesKeys.reminderEnabled,
         SharedPreferencesKeys.reminderTime,
-        SharedPreferencesKeys.lastPlayedDate,
       ]));
     });
   });

@@ -93,23 +93,18 @@ class NotificationService {
         : AndroidScheduleMode.inexactAllowWhileIdle;
   }
 
-  /// Schedules the next daily reminder at [hour]:[minute] with the given
-  /// [title] and [body].
+  /// Schedules the daily reminder at [hour]:[minute] with the given [title]
+  /// and [body].
   ///
-  /// This is a **one-shot** notification (not an OS-level daily repeat): the
-  /// app re-arms it after each completed game and whenever the reminder is
-  /// enabled or its time changed. This lets the reminder skip days the player
-  /// has already played — an OS daily repeat cannot skip individual days.
-  ///
-  /// When [skipToday] is true the reminder is scheduled for tomorrow (used when
-  /// today's game is already done); otherwise for the next occurrence of the
-  /// time (today if still in the future, else tomorrow).
+  /// This is an **OS-level daily repeat** (`matchDateTimeComponents: time`): the
+  /// plugin re-fires it at the next occurrence of the time every day, so the
+  /// reminder keeps nudging even if the app is never reopened. It fires every
+  /// day regardless of whether the player has already played that day.
   Future<void> scheduleDailyReminder({
     required int hour,
     required int minute,
     required String title,
     required String body,
-    bool skipToday = false,
   }) async {
     // Cancel any prior schedule so changing the time doesn't stack reminders.
     await _plugin.cancel(reminderId);
@@ -118,7 +113,7 @@ class NotificationService {
       reminderId,
       title,
       body,
-      skipToday ? _tomorrowAt(hour, minute) : _nextInstanceOf(hour, minute),
+      _nextInstanceOf(hour, minute),
       const NotificationDetails(
         android: AndroidNotificationDetails(
           _channelId,
@@ -132,6 +127,8 @@ class NotificationService {
         ),
       ),
       androidScheduleMode: await _scheduleMode(),
+      // Repeat daily at the same wall-clock time.
+      matchDateTimeComponents: DateTimeComponents.time,
     );
   }
 
@@ -148,13 +145,5 @@ class NotificationService {
       scheduled = scheduled.add(const Duration(days: 1));
     }
     return scheduled;
-  }
-
-  /// Tomorrow's [tz.TZDateTime] at [hour]:[minute] in local time. Used to skip
-  /// a reminder for the current day.
-  tz.TZDateTime _tomorrowAt(int hour, int minute) {
-    final now = tz.TZDateTime.now(tz.local);
-    return tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute)
-        .add(const Duration(days: 1));
   }
 }

@@ -58,8 +58,8 @@ void main() {
           any(),
           any(),
           androidScheduleMode: any(named: 'androidScheduleMode'),
-          // One-shot: no daily matchDateTimeComponents.
-          matchDateTimeComponents: null,
+          // Daily repeat: fires at the same wall-clock time every day.
+          matchDateTimeComponents: DateTimeComponents.time,
         )).called(1);
   });
 
@@ -96,30 +96,6 @@ void main() {
         )).thenAnswer((_) async {});
     return android;
   }
-
-  test('skipToday schedules the first reminder for tomorrow', () async {
-    stubAndroid(canScheduleExact: false);
-
-    await NotificationService().scheduleDailyReminder(
-        hour: 8, minute: 0, title: 'Red Owl', body: 'Play!', skipToday: true);
-
-    final scheduled = verify(() => plugin.zonedSchedule(
-          any(),
-          any(),
-          any(),
-          captureAny(),
-          any(),
-          androidScheduleMode: any(named: 'androidScheduleMode'),
-          matchDateTimeComponents: any(named: 'matchDateTimeComponents'),
-        )).captured.single as tz.TZDateTime;
-
-    final tomorrow = tz.TZDateTime.now(tz.local).add(const Duration(days: 1));
-    expect(scheduled.year, tomorrow.year);
-    expect(scheduled.month, tomorrow.month);
-    expect(scheduled.day, tomorrow.day);
-    expect(scheduled.hour, 8);
-    expect(scheduled.minute, 0);
-  });
 
   AndroidScheduleMode capturedScheduleMode() {
     return verify(() => plugin.zonedSchedule(
