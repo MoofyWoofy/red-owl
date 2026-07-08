@@ -64,20 +64,17 @@ class SettingsPage extends ConsumerWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
-        child: Column(
-          children: [
-            Expanded(
-              // Scroll when the settings list is taller than the viewport (small
-              // screens, large text scale), but keep it vertically centred when
-              // it fits.
-              child: LayoutBuilder(
-                builder: (context, constraints) => SingleChildScrollView(
-                  child: ConstrainedBox(
-                    constraints:
-                        BoxConstraints(minHeight: constraints.maxHeight),
-                    child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+        // Scroll when the settings list is taller than the viewport (small
+        // screens, large text scale), but keep it vertically centred when it
+        // fits. The About button lives at the bottom of this scrolling content
+        // (not pinned), so it scrolls away with everything else.
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                     // ── Dark Mode ────────────────────────────────────────────
                     SwitchItem(
                       title: context.l10n.darkMode,
@@ -249,50 +246,49 @@ class SettingsPage extends ConsumerWidget {
                         ),
                       ],
                     ),
-                  ],
+                  const SizedBox(height: 24),
+                  // ── About button (scrolls with the content, not pinned) ────
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      splashFactory: NoSplash.splashFactory,
+                      overlayColor: Colors.transparent,
+                    ),
+                    onPressed: () async {
+                      PackageInfo packageInfo =
+                          await PackageInfo.fromPlatform();
+                      if (context.mounted) {
+                        showAboutDialog(
+                          context: context,
+                          applicationIcon: const Logo(size: 75),
+                          applicationVersion: packageInfo.version,
+                          children: [
+                            Text(
+                              context.l10n.yetAnotherWordApp,
+                              textAlign: TextAlign.center,
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                final uri = Uri.parse(
+                                    'https://moofywoofy.github.io/red-owl/');
+                                if (!await launchUrl(uri)) {
+                                  throw Exception('Could not launch $uri');
+                                }
+                              },
+                              child: Text(context.l10n.privacyPolicy),
+                            )
+                          ],
+                        );
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(context.l10n.about),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
-            // ── About button ─────────────────────────────────────────────────
-            TextButton(
-              style: TextButton.styleFrom(
-                splashFactory: NoSplash.splashFactory,
-                overlayColor: Colors.transparent,
-              ),
-              onPressed: () async {
-                PackageInfo packageInfo = await PackageInfo.fromPlatform();
-                if (context.mounted) {
-                  showAboutDialog(
-                    context: context,
-                    applicationIcon: const Logo(size: 75),
-                    applicationVersion: packageInfo.version,
-                    children: [
-                      Text(
-                        context.l10n.yetAnotherWordApp,
-                        textAlign: TextAlign.center,
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          final uri = Uri.parse(
-                              'https://moofywoofy.github.io/red-owl/');
-                          if (!await launchUrl(uri)) {
-                            throw Exception('Could not launch $uri');
-                          }
-                        },
-                        child: Text(context.l10n.privacyPolicy),
-                      )
-                    ],
-                  );
-                }
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(context.l10n.about),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
