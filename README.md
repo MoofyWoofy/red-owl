@@ -47,7 +47,7 @@ Privacy Policy: <https://moofywoofy.github.io/red-owl/>
 - **Custom word lists** — import any `.txt` file (one word per line) and play against your own dictionary.
 - **Stats tracking** — local Drift database records every game, surfacing games played/won, win rate, current/max streak, average guesses, guess distribution and a filterable history (all / last 30 days / custom range), with a reset option.
 - **Sharing** — copy a spoiler-free NYT-style emoji result grid, plus celebratory streak-milestone prompts.
-- **Daily reminder** — optional local notification at a time you choose, which automatically skips days you've already played (Android, off by default).
+- **Daily reminder** — optional local notification at a time you choose that repeats every day (Android, off by default).
 - **Theming & readability** — light/dark mode, a color-blind / high-contrast palette, adjustable text size, and an animation-speed control.
 - **Accessibility** — screen-reader labels on tiles and keys, win/loss announcements, keyboard/focus operability, and respect for the system "reduce motion" setting.
 - **Localized & RTL-ready UI** — English and Dutch out of the box (easy to add more via ARB files), with right-to-left layout support.
