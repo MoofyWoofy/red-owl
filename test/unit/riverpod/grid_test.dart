@@ -185,6 +185,45 @@ void main() {
       await drainSnackBars(tester);
     });
 
+    testWidgets(
+        'finishing a second game on the same day replaces the history row',
+        (tester) async {
+      // Regression: `date` is the History primary key, so recording a second
+      // outcome for today used to raise
+      // `SqliteException(1555): UNIQUE constraint failed: history.date`.
+      // `resetGrid()` makes this reachable — the Settings page calls it when the
+      // word-list toggle flips, a word list is imported, or a backup is
+      // restored, none of which clear the day's existing row.
+      await pumpHost(tester);
+      final answer = WordleService().wordOfTheDay;
+
+      // Game 1: win it, writing today's row.
+      await type(answer);
+      await enter();
+      expect(await AppDatabase().select(AppDatabase().history).get(),
+          hasLength(1));
+
+      // Restart the board the way the Settings page does, then lose game 2.
+      capturedRef.read(gridProvider.notifier).resetGrid();
+      await tester.pump();
+      final wrong = _testWords
+          .map((w) => w.toUpperCase())
+          .where((w) => w != answer)
+          .take(6)
+          .toList();
+      for (final guess in wrong) {
+        await type(guess);
+        await enter();
+      }
+
+      // One row for the day, holding the later (actually finished) result.
+      final rows = await AppDatabase().select(AppDatabase().history).get();
+      expect(rows, hasLength(1));
+      expect(rows.first.gameState, GameState.lost.name);
+
+      await drainSnackBars(tester);
+    });
+
     testWidgets('winning onto a streak milestone shows a celebratory message',
         (tester) async {
       // Seed a current streak of 4 so this win lands on the 5-day milestone.

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:drift/drift.dart' show InsertMode;
 import 'package:flutter/widgets.dart' show BuildContext;
 import 'package:red_owl/database/database.dart';
 import 'package:red_owl/util/misc.dart';
@@ -391,6 +392,13 @@ class Grid extends _$Grid {
   /// [gameState] describes the outcome; [date] defaults to today but can be
   /// overridden (used when archiving the previous day's incomplete game in
   /// [build]).
+  ///
+  /// Uses [InsertMode.insertOrReplace] because `date` is the table's primary
+  /// key and a day can legitimately be recorded twice: `resetGrid()` restarts
+  /// the board (word-list toggle, word-list import, backup restore) without
+  /// clearing that day's existing row, so finishing the replacement game would
+  /// otherwise raise `UNIQUE constraint failed: history.date`. The later result
+  /// is the one the player actually finished, so replacing is correct.
   Future<void> _addToDatabase({
     required GameState gameState,
     DateTime? date,
@@ -399,10 +407,13 @@ class Grid extends _$Grid {
     final word = await WordleService().getWordOfTheDay(date);
 
     final database = AppDatabase();
-    await database.into(database.history).insert(HistoryCompanion.insert(
-          word: word,
-          date: getDateOnly(date ?? DateTime.now()),
-          gameState: gameState.name,
-        ));
+    await database.into(database.history).insert(
+          HistoryCompanion.insert(
+            word: word,
+            date: getDateOnly(date ?? DateTime.now()),
+            gameState: gameState.name,
+          ),
+          mode: InsertMode.insertOrReplace,
+        );
   }
 }
