@@ -16,7 +16,7 @@ void main() {
 
   setUpAll(() {
     tz.initializeTimeZones();
-    tz.setLocalLocation(tz.getLocation('UTC'));
+    tz.setLocalLocation(tz.UTC);
     registerFallbackValue(tz.TZDateTime.now(tz.local));
     registerFallbackValue(const NotificationDetails());
     registerFallbackValue(AndroidScheduleMode.inexactAllowWhileIdle);
@@ -32,13 +32,13 @@ void main() {
 
   test('scheduleDailyReminder cancels the old schedule then schedules a new one',
       () async {
-    when(() => plugin.cancel(any())).thenAnswer((_) async {});
+    when(() => plugin.cancel(id: any(named: 'id'))).thenAnswer((_) async {});
     when(() => plugin.zonedSchedule(
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          notificationDetails: any(named: 'notificationDetails'),
           androidScheduleMode: any(named: 'androidScheduleMode'),
           matchDateTimeComponents: any(named: 'matchDateTimeComponents'),
         )).thenAnswer((_) async {});
@@ -50,13 +50,13 @@ void main() {
       body: 'Play!',
     );
 
-    verify(() => plugin.cancel(NotificationService.reminderId)).called(1);
+    verify(() => plugin.cancel(id: NotificationService.reminderId)).called(1);
     verify(() => plugin.zonedSchedule(
-          NotificationService.reminderId,
-          'Red Owl',
-          'Play!',
-          any(),
-          any(),
+          id: NotificationService.reminderId,
+          title: 'Red Owl',
+          body: 'Play!',
+          scheduledDate: any(named: 'scheduledDate'),
+          notificationDetails: any(named: 'notificationDetails'),
           androidScheduleMode: any(named: 'androidScheduleMode'),
           // Daily repeat: fires at the same wall-clock time every day.
           matchDateTimeComponents: DateTimeComponents.time,
@@ -75,13 +75,13 @@ void main() {
     // A zone that actually observes DST.
     tz.setLocalLocation(tz.getLocation('America/New_York'));
 
-    when(() => plugin.cancel(any())).thenAnswer((_) async {});
+    when(() => plugin.cancel(id: any(named: 'id'))).thenAnswer((_) async {});
     when(() => plugin.zonedSchedule(
-          any(),
-          any(),
-          any(),
-          captureAny(),
-          any(),
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: captureAny(named: 'scheduledDate'),
+          notificationDetails: any(named: 'notificationDetails'),
           androidScheduleMode: any(named: 'androidScheduleMode'),
           matchDateTimeComponents: any(named: 'matchDateTimeComponents'),
         )).thenAnswer((_) async {});
@@ -98,11 +98,11 @@ void main() {
     }
 
     final scheduled = verify(() => plugin.zonedSchedule(
-          any(),
-          any(),
-          any(),
-          captureAny(),
-          any(),
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: captureAny(named: 'scheduledDate'),
+          notificationDetails: any(named: 'notificationDetails'),
           androidScheduleMode: any(named: 'androidScheduleMode'),
           matchDateTimeComponents: any(named: 'matchDateTimeComponents'),
         )).captured.cast<tz.TZDateTime>();
@@ -117,9 +117,9 @@ void main() {
   });
 
   test('cancelReminder cancels the reminder id', () async {
-    when(() => plugin.cancel(any())).thenAnswer((_) async {});
+    when(() => plugin.cancel(id: any(named: 'id'))).thenAnswer((_) async {});
     await NotificationService().cancelReminder();
-    verify(() => plugin.cancel(NotificationService.reminderId)).called(1);
+    verify(() => plugin.cancel(id: NotificationService.reminderId)).called(1);
   });
 
   test('requestPermission returns true when there is no Android implementation',
@@ -137,13 +137,13 @@ void main() {
         AndroidFlutterLocalNotificationsPlugin>()).thenReturn(android);
     when(() => android.canScheduleExactNotifications())
         .thenAnswer((_) async => canScheduleExact);
-    when(() => plugin.cancel(any())).thenAnswer((_) async {});
+    when(() => plugin.cancel(id: any(named: 'id'))).thenAnswer((_) async {});
     when(() => plugin.zonedSchedule(
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          notificationDetails: any(named: 'notificationDetails'),
           androidScheduleMode: any(named: 'androidScheduleMode'),
           matchDateTimeComponents: any(named: 'matchDateTimeComponents'),
         )).thenAnswer((_) async {});
@@ -152,11 +152,11 @@ void main() {
 
   AndroidScheduleMode capturedScheduleMode() {
     return verify(() => plugin.zonedSchedule(
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          notificationDetails: any(named: 'notificationDetails'),
           androidScheduleMode: captureAny(named: 'androidScheduleMode'),
           matchDateTimeComponents: any(named: 'matchDateTimeComponents'),
         )).captured.single as AndroidScheduleMode;

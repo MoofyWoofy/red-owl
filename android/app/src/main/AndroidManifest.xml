@@ -37,10 +37,11 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
-        <!-- flutter_local_notifications broadcast receivers. These are NOT
-             declared by the plugin's own manifest (v19), so they must live
-             here or scheduled daily reminders fire the alarm but never post a
-             notification (the broadcast reaches no receiver).
+        <!-- flutter_local_notifications broadcast receivers. These are still
+             NOT declared by the plugin's own manifest as of v22 (it declares
+             only the VIBRATE and POST_NOTIFICATIONS permissions), so they must
+             live here or scheduled daily reminders fire the alarm but never
+             post a notification (the broadcast reaches no receiver).
              ScheduledNotificationReceiver posts a scheduled notification when
              its alarm fires; ScheduledNotificationBootReceiver reschedules
              pending notifications after a reboot/app update. -->

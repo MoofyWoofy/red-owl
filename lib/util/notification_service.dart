@@ -37,7 +37,7 @@ class NotificationService {
     const settings = InitializationSettings(
       android: AndroidInitializationSettings('@mipmap/ic_launcher'),
     );
-    await _plugin.initialize(settings);
+    await _plugin.initialize(settings: settings);
   }
 
   /// Resolves and sets the device's local time zone so scheduled times match
@@ -48,7 +48,10 @@ class NotificationService {
       final name = result is String ? result : result.identifier as String;
       tz.setLocalLocation(tz.getLocation(name));
     } catch (_) {
-      tz.setLocalLocation(tz.getLocation('UTC'));
+      // `tz.UTC` rather than `getLocation('UTC')`: timezone 0.11 renamed the
+      // database entry to `Etc/UTC`, so looking it up by the old name throws.
+      // The getter is a built-in Location and does not depend on the name.
+      tz.setLocalLocation(tz.UTC);
     }
   }
 
@@ -107,14 +110,14 @@ class NotificationService {
     required String body,
   }) async {
     // Cancel any prior schedule so changing the time doesn't stack reminders.
-    await _plugin.cancel(reminderId);
+    await _plugin.cancel(id: reminderId);
 
     await _plugin.zonedSchedule(
-      reminderId,
-      title,
-      body,
-      _nextInstanceOf(hour, minute),
-      const NotificationDetails(
+      id: reminderId,
+      title: title,
+      body: body,
+      scheduledDate: _nextInstanceOf(hour, minute),
+      notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           _channelId,
           _channelName,
@@ -131,7 +134,7 @@ class NotificationService {
   }
 
   /// Cancels the daily reminder, if any.
-  Future<void> cancelReminder() => _plugin.cancel(reminderId);
+  Future<void> cancelReminder() => _plugin.cancel(id: reminderId);
 
   /// The next [tz.TZDateTime] matching [hour]:[minute] in local time (today if
   /// still in the future, otherwise tomorrow).

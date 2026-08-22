@@ -22,7 +22,7 @@ void main() {
 
   setUpAll(() {
     tz.initializeTimeZones();
-    tz.setLocalLocation(tz.getLocation('UTC'));
+    tz.setLocalLocation(tz.UTC);
     registerFallbackValue(tz.TZDateTime.now(tz.local));
     registerFallbackValue(const NotificationDetails());
     registerFallbackValue(AndroidScheduleMode.inexactAllowWhileIdle);
@@ -33,13 +33,13 @@ void main() {
     setSharedPreferencesMock();
     await SharedPreferenceService().init();
     plugin = MockPlugin();
-    when(() => plugin.cancel(any())).thenAnswer((_) async {});
+    when(() => plugin.cancel(id: any(named: 'id'))).thenAnswer((_) async {});
     when(() => plugin.zonedSchedule(
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          notificationDetails: any(named: 'notificationDetails'),
           androidScheduleMode: any(named: 'androidScheduleMode'),
           matchDateTimeComponents: any(named: 'matchDateTimeComponents'),
         )).thenAnswer((_) async {});
@@ -67,11 +67,11 @@ void main() {
 
     // Scheduled and persisted.
     verify(() => plugin.zonedSchedule(
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          notificationDetails: any(named: 'notificationDetails'),
           androidScheduleMode: any(named: 'androidScheduleMode'),
           matchDateTimeComponents: any(named: 'matchDateTimeComponents'),
         )).called(1);
