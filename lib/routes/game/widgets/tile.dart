@@ -87,7 +87,17 @@ class _TileState extends ConsumerState<Tile>
           // (e.g. navigating back mid-flip); bail out before touching the
           // disposed controller or ref.
           if (!mounted) return;
-          _animationController.forward().whenComplete(() {
+          // Every rebuild inside the flip window schedules another callback,
+          // so skip the ones that arrive while the flip is already running or
+          // after it has been finalized.
+          if (_animationController.isAnimating) return;
+          if (!ref.read(gridProvider).runFlipAnimation) return;
+          // Start from 0 explicitly. The controller keeps its value between
+          // games, so after `resetGrid()` it is still at 1.0 and a plain
+          // `forward()` would complete instantly — tiles snapped straight to
+          // their colour with no flip at all. Most visible in practice mode,
+          // where every "New word" resets the board.
+          _animationController.forward(from: 0).whenComplete(() {
             if (!mounted) return;
             // Read the *current* grid, not the one captured when this flip was
             // scheduled: the player may have typed into the next row during the
