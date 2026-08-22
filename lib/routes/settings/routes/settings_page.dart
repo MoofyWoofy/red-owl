@@ -440,14 +440,18 @@ class SettingsPage extends ConsumerWidget {
       if (proceed != true) return;
     }
 
+    // file_picker 12 returns a (non-nullable) list that is empty when the user
+    // cancels, rather than a nullable FilePickerResult.
     final picked = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['txt'],
     );
-    if (picked == null) return; // User cancelled the picker.
+    if (picked.isEmpty) return; // User cancelled the picker.
 
-    final result =
-        await WordleService().importWordList(File(picked.files.single.path!));
+    final path = picked.single.path;
+    if (path == null) return; // No readable on-disk path for the selection.
+
+    final result = await WordleService().importWordList(File(path));
     if (!context.mounted) return;
 
     switch (result.status) {
@@ -554,10 +558,13 @@ class SettingsPage extends ConsumerWidget {
       type: FileType.custom,
       allowedExtensions: ['json'],
     );
-    if (result == null) return; // User cancelled the picker.
+    if (result.isEmpty) return; // User cancelled the picker.
+
+    final path = result.single.path;
+    if (path == null) return; // No readable on-disk path for the selection.
 
     try {
-      final file = File(result.files.single.path!);
+      final file = File(path);
       await BackupService().importFromJson(await file.readAsString());
 
       // Re-load the word of the day and reset the board, since the imported
