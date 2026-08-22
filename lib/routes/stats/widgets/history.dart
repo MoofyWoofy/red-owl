@@ -147,7 +147,12 @@ class _HistoryState extends State<History> {
           return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
-          return Center(child: Text('error: ${snapshot.error}'));
+          // Don't render the raw exception: it is untranslated and exposes
+          // internal detail (SQL, file paths) to the player.
+          return _EmptyHistory(
+            icon: Icons.error_outline,
+            message: context.l10n.historyLoadError,
+          );
         }
 
         final historyItems = snapshot.data;

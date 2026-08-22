@@ -134,6 +134,7 @@
   "filterLast30":"30 days",
   "filterDateRange":"Range",
   "noGamesInRange":"No games in this range.",
+  "historyLoadError":"Your game history could not be loaded.",
   "played":"Played",
   "wins":"Wins",
   "avgGuesses":"Avg guesses",

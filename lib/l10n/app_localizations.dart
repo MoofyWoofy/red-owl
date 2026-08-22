@@ -638,6 +638,12 @@ abstract class AppLocalizations {
   /// **'No games in this range.'**
   String get noGamesInRange;
 
+  /// No description provided for @historyLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Your game history could not be loaded.'**
+  String get historyLoadError;
+
   /// No description provided for @played.
   ///
   /// In en, this message translates to:

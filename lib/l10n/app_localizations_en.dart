@@ -304,6 +304,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noGamesInRange => 'No games in this range.';
 
   @override
+  String get historyLoadError => 'Your game history could not be loaded.';
+
+  @override
   String get played => 'Played';
 
   @override

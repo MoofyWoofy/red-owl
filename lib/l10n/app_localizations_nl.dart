@@ -305,6 +305,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get noGamesInRange => 'Geen spellen in dit bereik.';
 
   @override
+  String get historyLoadError => 'Je spelgeschiedenis kon niet worden geladen.';
+
+  @override
   String get played => 'Gespeeld';
 
   @override
