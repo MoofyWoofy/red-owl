@@ -1,3 +1,4 @@
+import 'dart:async' show unawaited;
 import 'dart:convert';
 
 import 'package:drift/drift.dart' show InsertMode;
@@ -59,7 +60,14 @@ class Grid extends _$Grid {
         final grid = models.Grid.fromJson(jsonDecode(gridJsonString));
         if (!grid.isGameOver) {
           // Only save to history if the game was not already finished.
-          _addToDatabase(gameState: GameState.incomplete, date: gameDate);
+          // `build` is synchronous, so this write cannot be awaited; make that
+          // explicit and swallow failures rather than letting them surface as
+          // an unhandled async error that takes down the zone. Losing one
+          // archived row is not worth crashing the app on startup.
+          unawaited(
+            _addToDatabase(gameState: GameState.incomplete, date: gameDate)
+                .catchError((Object _) {}),
+          );
         }
       }
 
@@ -69,7 +77,9 @@ class Grid extends _$Grid {
       gameDate = getDateOnly(DateTime.now());
 
       gridBase64 = null;
-      SharedPreferenceService().remove(SharedPreferencesKeys.gridState);
+      unawaited(SharedPreferenceService()
+          .remove(SharedPreferencesKeys.gridState)
+          .catchError((Object _) {}));
     }
 
     if (gridBase64 == null) {
@@ -92,6 +102,16 @@ class Grid extends _$Grid {
     }
   }
 
+  /// Set while an ENTER press is being evaluated.
+  ///
+  /// Evaluation awaits [getGuessResult] partway through. Any key handled during
+  /// that await would mutate `state`, and the writes after the await index the
+  /// tile list by row — a DELETE arriving mid-evaluation shortens the row and
+  /// the scored writes then run off the end of the list. Input is ignored until
+  /// the guess is committed; this does not affect typing during the flip
+  /// animation, which happens after the evaluation completes.
+  bool _isEvaluatingGuess = false;
+
   /// Handles a key press from the on-screen keyboard or a hardware keyboard.
   ///
   /// - **Letter (A-Z)**: adds a [models.Tile] to the current row (up to 5).
@@ -99,16 +119,6 @@ class Grid extends _$Grid {
   /// - **ENTER**: evaluates the guess when the row has exactly 5 letters.
   ///   Updates tile colors, keyboard status, win/loss state, stats, and the
   ///   history database. Shows a snack bar feedback message.
-  /// Set while an ENTER press is being evaluated.
-  ///
-  /// Evaluation awaits [getGuessResult] partway through. Any key handled during
-  /// that await would mutate `state`, and the writes after the await index the
-  /// tile list by row — a letter arriving mid-evaluation could shift the row and
-  /// send the scored tiles to the wrong positions. Input is ignored until the
-  /// guess is committed; this does not affect typing during the flip animation,
-  /// which happens after the evaluation completes.
-  bool _isEvaluatingGuess = false;
-
   Future<void> onKeyboardPressed({
     required String key,
     required BuildContext context,

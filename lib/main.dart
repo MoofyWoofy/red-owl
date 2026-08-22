@@ -1,3 +1,4 @@
+import 'dart:async' show unawaited;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -48,7 +49,11 @@ Future<void> main() async {
   // avoids blocking the initial render. Scheduling still only happens when the
   // user enables the reminder in Settings.
   WidgetsBinding.instance.addPostFrameCallback((_) {
-    NotificationService().init();
+    // Nothing awaits this, so an initialisation failure (timezone database,
+    // platform channel) would otherwise surface as an unhandled async error.
+    // The reminder is opt-in and everything else works without it, so failing
+    // quietly is the right trade-off here.
+    unawaited(NotificationService().init().catchError((Object _) {}));
   });
 }
 
