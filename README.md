@@ -8,6 +8,8 @@ A clean, offline-first Wordle clone built with Flutter. Bring your own word list
 
 Privacy Policy: <https://moofywoofy.github.io/red-owl/>
 
+> **AI-assisted development** — This codebase is developed and maintained with the help of AI coding assistants. Changes are human-reviewed before release. See [AGENTS.md](AGENTS.md) for the guidance those agents follow.
+
 ---
 
 ## Table of Contents
@@ -109,6 +111,7 @@ assets/
 └── word_list.txt              # Default 5-letter word list
 
 l10n.yaml                      # Flutter l10n configuration
+AGENTS.md                      # Architecture notes and conventions for AI coding agents
 ```
 
 ## Getting Started
@@ -196,6 +199,8 @@ dart run custom_lint                         # riverpod_lint and other custom li
 dart format lib test                         # format
 flutter test                                 # widget/unit tests
 ```
+
+`flutter analyze` does not run the Riverpod lints, so run `custom_lint` separately. If `custom_lint` fails with `PathNotFoundException: Directory listing failed` on a path under `build/`, run `flutter clean` first — it scans `build/` for pubspecs and trips over stale Gradle artifacts.
 
 ## Custom Word Lists
 
