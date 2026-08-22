@@ -66,77 +66,90 @@ class _TileState extends ConsumerState<Tile>
     super.dispose();
   }
 
+  /// Starts this tile's staggered reveal flip if the new [grid] calls for one.
+  ///
+  /// Driven from a `ref.listen` callback rather than from `build`, so starting
+  /// an animation and writing to SharedPreferences are never side effects of
+  /// rendering.
+  void _maybeStartFlip(Grid grid) {
+    if (widget.index >= grid.tiles.length) return;
+    if (!grid.runFlipAnimation) return;
+    if (grid.tiles[widget.index].hasFlipAnimationPlayed) return;
+
+    // Stagger each tile in the row by (column % 5) * intervalDelay ms.
+    Future.delayed(
+        Duration(
+          milliseconds:
+              (widget.index % 5) * animationTiming.flip.intervalDelay!,
+        ), () {
+      // The staggered delay means this can fire after the tile is gone
+      // (e.g. navigating back mid-flip); bail out before touching the
+      // disposed controller or ref.
+      if (!mounted) return;
+      // Several state changes land inside the flip window (the tile update and
+      // the keyboard update are separate writes), so skip callbacks that arrive
+      // while the flip is already running or after it has been finalized.
+      if (_animationController.isAnimating) return;
+      if (!ref.read(gridProvider).runFlipAnimation) return;
+      // Start from 0 explicitly. The controller keeps its value between
+      // games, so after `resetGrid()` it is still at 1.0 and a plain
+      // `forward()` would complete instantly — tiles snapped straight to
+      // their colour with no flip at all. Most visible in practice mode,
+      // where every "New word" resets the board.
+      _animationController.forward(from: 0).whenComplete(() {
+        if (!mounted) return;
+        // Read the *current* grid, not the one captured when this flip was
+        // scheduled: the player may have typed into the next row during the
+        // animation, and those tiles must not be clobbered.
+        final notifier = ref.read(gridProvider.notifier);
+        final current = ref.read(gridProvider);
+        // Another tile in this row may have already finalized the flip.
+        if (!current.runFlipAnimation) return;
+        // Mark only already-revealed tiles as played; leave freshly-typed
+        // (still-initial) tiles alone so their future flip still runs.
+        final newTiles = [
+          for (final tile in current.tiles)
+            tile.status == LetterStatus.initial
+                ? tile
+                : tile.copyWith(hasFlipAnimationPlayed: true),
+        ];
+        final newGrid =
+            current.copyWith(runFlipAnimation: false, tiles: newTiles);
+
+        notifier.updateState(newGrid);
+
+        // The practice board opts out of persistence so it never clobbers
+        // the saved daily game.
+        if (newGrid.persistState) {
+          // Persist the updated grid to SharedPreferences as Base64 JSON.
+          String gameState = jsonEncode(newGrid.toJson());
+          String gameStateBase64 = base64.encode(utf8.encode(gameState));
+
+          SharedPreferenceService()
+              .setString(SharedPreferencesKeys.gridState, gameStateBase64);
+
+          // Update the date stamp alongside the grid.
+          SharedPreferenceService().setString(
+              SharedPreferencesKeys.gameDate, dateToString(DateTime.now()));
+        }
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    // React to board changes here instead of scheduling from the render pass.
+    // The flip is always triggered by a gridProvider write, so a listener sees
+    // every case the old in-build check did, without re-scheduling on unrelated
+    // rebuilds (a theme or font-scale change used to queue another callback).
+    ref.listen(gridProvider, (_, next) => _maybeStartFlip(next));
+
     Grid grid = ref.watch(gridProvider);
     Color borderColor =
         Theme.of(context).extension<GameColors>()!.borderInactive!;
     bool hasFlipAnimationPlayed = widget.hasFlipAnimationPlayed;
 
     if (widget.index < grid.tiles.length) {
-      // This tile has a letter — schedule the flip animation if needed.
-      if (grid.runFlipAnimation &&
-          !grid.tiles[widget.index].hasFlipAnimationPlayed) {
-        // Stagger each tile in the row by (column % 5) * intervalDelay ms.
-        Future.delayed(
-            Duration(
-              milliseconds:
-                  (widget.index % 5) * animationTiming.flip.intervalDelay!,
-            ), () {
-          // The staggered delay means this can fire after the tile is gone
-          // (e.g. navigating back mid-flip); bail out before touching the
-          // disposed controller or ref.
-          if (!mounted) return;
-          // Every rebuild inside the flip window schedules another callback,
-          // so skip the ones that arrive while the flip is already running or
-          // after it has been finalized.
-          if (_animationController.isAnimating) return;
-          if (!ref.read(gridProvider).runFlipAnimation) return;
-          // Start from 0 explicitly. The controller keeps its value between
-          // games, so after `resetGrid()` it is still at 1.0 and a plain
-          // `forward()` would complete instantly — tiles snapped straight to
-          // their colour with no flip at all. Most visible in practice mode,
-          // where every "New word" resets the board.
-          _animationController.forward(from: 0).whenComplete(() {
-            if (!mounted) return;
-            // Read the *current* grid, not the one captured when this flip was
-            // scheduled: the player may have typed into the next row during the
-            // animation, and those tiles must not be clobbered.
-            final notifier = ref.read(gridProvider.notifier);
-            final current = ref.read(gridProvider);
-            // Another tile in this row may have already finalized the flip.
-            if (!current.runFlipAnimation) return;
-            // Mark only already-revealed tiles as played; leave freshly-typed
-            // (still-initial) tiles alone so their future flip still runs.
-            final newTiles = [
-              for (final tile in current.tiles)
-                tile.status == LetterStatus.initial
-                    ? tile
-                    : tile.copyWith(hasFlipAnimationPlayed: true),
-            ];
-            final newGrid =
-                current.copyWith(runFlipAnimation: false, tiles: newTiles);
-
-            notifier.updateState(newGrid);
-
-            // The practice board opts out of persistence so it never clobbers
-            // the saved daily game.
-            if (newGrid.persistState) {
-              // Persist the updated grid to SharedPreferences as Base64 JSON.
-              String gameState = jsonEncode(newGrid.toJson());
-              String gameStateBase64 = base64.encode(utf8.encode(gameState));
-
-              SharedPreferenceService()
-                  .setString(SharedPreferencesKeys.gridState, gameStateBase64);
-
-              // Update the date stamp alongside the grid.
-              SharedPreferenceService().setString(
-                  SharedPreferencesKeys.gameDate, dateToString(DateTime.now()));
-            }
-          });
-        });
-      }
-
       // Map [LetterStatus] to the corresponding theme color.
       switch (grid.tiles[widget.index].status) {
         case LetterStatus.initial:
