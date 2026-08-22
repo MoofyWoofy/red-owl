@@ -24,16 +24,33 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() async {
-    // Start each test with a clean, empty preferences store.
-    SharedPreferences.setMockInitialValues({});
+    // Start each test from an empty store.
+    //
+    // `SharedPreferences.setMockInitialValues` is deliberately NOT used here:
+    // it only patches the legacy synchronous interface, while the app reads
+    // through `SharedPreferencesWithCache` (the async interface). On a real
+    // device it is a no-op, so preferences written by one test used to survive
+    // into the next one and across whole runs — which made the dark-mode
+    // assertion below pass or fail depending on what the previous run left
+    // behind. Clearing the real store is what actually isolates these tests.
+    await SharedPreferencesAsync().clear();
   });
+
+  /// Boots the app and settles the first frame.
+  ///
+  /// [app.main] is asynchronous — it awaits `SharedPreferenceService.init()`
+  /// and `WordleService.init()` before calling `runApp`. Awaiting it matters:
+  /// calling it bare let `pumpAndSettle` run against a tree where `runApp` had
+  /// not happened yet, so the very first test intermittently found nothing.
+  Future<void> launchApp(WidgetTester tester) async {
+    await app.main();
+    await tester.pumpAndSettle();
+  }
 
   group('Full App E2E', () {
     /// Verifies that the app boots without error and the home page is visible.
     testWidgets('app launches and shows home page', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      app.main();
-      await tester.pumpAndSettle();
+      await launchApp(tester);
 
       expect(find.text('Red Owl'), findsOneWidget);
       expect(find.text('Daily'), findsOneWidget);
@@ -42,9 +59,7 @@ void main() {
 
     /// Tapping "Daily" should push [WordlePage] which contains a [GridView].
     testWidgets('navigate to game page via Daily button', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      app.main();
-      await tester.pumpAndSettle();
+      await launchApp(tester);
 
       await tester.tap(find.text('Daily'));
       await tester.pumpAndSettle();
@@ -54,9 +69,7 @@ void main() {
 
     /// Tapping "Stats" should push [StatsPage] with all three section headings.
     testWidgets('navigate to stats page via Stats button', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      app.main();
-      await tester.pumpAndSettle();
+      await launchApp(tester);
 
       await tester.tap(find.text('Stats'));
       await tester.pumpAndSettle();
@@ -68,9 +81,7 @@ void main() {
 
     /// Tapping the settings gear from the home page should push [SettingsPage].
     testWidgets('navigate to settings from home page', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      app.main();
-      await tester.pumpAndSettle();
+      await launchApp(tester);
 
       await tester.tap(find.byIcon(Icons.settings));
       await tester.pumpAndSettle();
@@ -79,29 +90,29 @@ void main() {
       expect(find.text('Dark Mode'), findsOneWidget);
     });
 
-    /// Toggling the dark-mode switch should flip its value to true.
+    /// Toggling the dark-mode switch should flip its value.
     testWidgets('toggle dark mode in settings', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      app.main();
-      await tester.pumpAndSettle();
+      await launchApp(tester);
 
       await tester.tap(find.byIcon(Icons.settings));
       await tester.pumpAndSettle();
 
       final darkModeSwitch = find.byType(SwitchListTile).first;
+      // Assert against the value actually rendered rather than a hard-coded
+      // `true`: with no stored preference the toggle defaults to the system
+      // brightness, so its starting state depends on the device theme.
+      final before = tester.widget<SwitchListTile>(darkModeSwitch).value;
+
       await tester.tap(darkModeSwitch);
       await tester.pumpAndSettle();
 
-      final switchWidget =
-          tester.widget<SwitchListTile>(find.byType(SwitchListTile).first);
-      expect(switchWidget.value, true);
+      final after = tester.widget<SwitchListTile>(darkModeSwitch).value;
+      expect(after, !before);
     });
 
     /// Tapping keyboard letter keys should register letters on the game board.
     testWidgets('type letters on game keyboard', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      app.main();
-      await tester.pumpAndSettle();
+      await launchApp(tester);
 
       await tester.tap(find.text('Daily'));
       await tester.pumpAndSettle();
@@ -122,9 +133,7 @@ void main() {
 
     /// Navigate to the game page and programmatically pop back to home.
     testWidgets('navigate to game and back to home', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      app.main();
-      await tester.pumpAndSettle();
+      await launchApp(tester);
 
       await tester.tap(find.text('Daily'));
       await tester.pumpAndSettle();
@@ -141,9 +150,7 @@ void main() {
 
     /// Navigate to the stats page and pop back to home.
     testWidgets('navigate to stats and back to home', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      app.main();
-      await tester.pumpAndSettle();
+      await launchApp(tester);
 
       await tester.tap(find.text('Stats'));
       await tester.pumpAndSettle();
