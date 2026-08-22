@@ -385,38 +385,56 @@ class Grid extends _$Grid {
   /// On a win the current row index is used to increment the appropriate
   /// distribution bucket. On a loss the current streak resets to 0.
   void _updateStatsData({required bool gameWon}) {
-    List<String> statsData = SharedPreferenceService()
-            .getStringList(SharedPreferencesKeys.statsData) ??
-        ['0', '0', '0', '0'];
-    List<String> guessDistribution = SharedPreferenceService()
-            .getStringList(SharedPreferencesKeys.guessDistribution) ??
-        ['0', '0', '0', '0', '0', '0'];
+    // Read the stored arrays defensively. `BackupService` rejects malformed
+    // stats on import, but an install that ran an older build may already hold
+    // a short or non-numeric array, and this runs on every finished game —
+    // rebuilding from zero beats throwing and breaking the board.
+    final storedStats = SharedPreferenceService()
+        .getStringList(SharedPreferencesKeys.statsData);
+    final storedDistribution = SharedPreferenceService()
+        .getStringList(SharedPreferencesKeys.guessDistribution);
 
-    var [gamesPlayed, gamesWon, currentStreak, maxStreak] = statsData;
+    int counterAt(List<String>? source, int index) =>
+        (source != null && index < source.length)
+            ? (int.tryParse(source[index]) ?? 0)
+            : 0;
 
-    gamesPlayed = (int.parse(gamesPlayed) + 1).toString();
+    var gamesPlayed = counterAt(storedStats, 0);
+    var gamesWon = counterAt(storedStats, 1);
+    var currentStreak = counterAt(storedStats, 2);
+    var maxStreak = counterAt(storedStats, 3);
+    final guessDistribution = [
+      for (var i = 0; i < 6; i++) counterAt(storedDistribution, i),
+    ];
+
+    gamesPlayed += 1;
 
     if (gameWon) {
-      gamesWon = (int.parse(gamesWon) + 1).toString();
-      currentStreak = (int.parse(currentStreak) + 1).toString();
+      gamesWon += 1;
+      currentStreak += 1;
 
       // Increment the bucket for the number of guesses taken (row is 0-based).
-      guessDistribution[state.row] =
-          (int.parse(guessDistribution[state.row]) + 1).toString();
+      if (state.row >= 0 && state.row < guessDistribution.length) {
+        guessDistribution[state.row] += 1;
+      }
     } else {
       // Streak breaks on any loss.
-      currentStreak = '0';
+      currentStreak = 0;
     }
 
     // Max streak is the greater of the current and previous max.
-    maxStreak = int.parse(currentStreak) > int.parse(maxStreak)
-        ? currentStreak
-        : maxStreak;
+    if (currentStreak > maxStreak) maxStreak = currentStreak;
 
-    SharedPreferenceService().setStringList(SharedPreferencesKeys.statsData,
-        [gamesPlayed, gamesWon, currentStreak, maxStreak]);
     SharedPreferenceService().setStringList(
-        SharedPreferencesKeys.guessDistribution, guessDistribution);
+      SharedPreferencesKeys.statsData,
+      [gamesPlayed, gamesWon, currentStreak, maxStreak]
+          .map((value) => value.toString())
+          .toList(),
+    );
+    SharedPreferenceService().setStringList(
+      SharedPreferencesKeys.guessDistribution,
+      guessDistribution.map((value) => value.toString()).toList(),
+    );
   }
 
   /// Writes a [History] record to the Drift database.

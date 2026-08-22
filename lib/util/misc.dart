@@ -27,9 +27,13 @@ DateTime getDateOnly(DateTime date) =>
 /// Used to convert the raw `guessDistribution` strings stored in
 /// SharedPreferences into numeric values accepted by the fl_chart library.
 ///
+/// Unparseable entries become `0` rather than throwing: the input comes from
+/// persisted preferences, and a single bad value should render as an empty bar
+/// instead of taking down the whole Stats page.
+///
 /// Example: `['1', '2', '3']` → `[1.0, 2.0, 3.0]`.
 List<double> convertListStringToListDouble(List<String> arg) =>
-    arg.map((e) => double.parse(e)).toList();
+    arg.map((e) => double.tryParse(e) ?? 0).toList();
 
 /// Returns `true` if the player has started but not finished today's game.
 ///
@@ -58,7 +62,8 @@ String getAverageGuesses(List<String> guessDistribution) {
   var totalWins = 0;
   var totalGuesses = 0;
   for (var i = 0; i < guessDistribution.length; i++) {
-    final count = int.parse(guessDistribution[i]);
+    // Persisted values; treat anything unparseable as zero rather than throwing.
+    final count = int.tryParse(guessDistribution[i]) ?? 0;
     totalWins += count;
     totalGuesses += count * (i + 1);
   }
@@ -68,14 +73,16 @@ String getAverageGuesses(List<String> guessDistribution) {
 
 /// Computes the win rate as an integer percentage string (0–100).
 ///
-/// Returns `'0'` when [wins] and [games] are both `'0'` to avoid
-/// division-by-zero. Otherwise, rounds the result to the nearest integer.
+/// Returns `'0'` whenever [games] is zero or unparseable. The previous guard
+/// only caught the exact `'0'`/`'0'` pair, so any other zero-games input
+/// divided by zero and `Infinity.round()` threw an [UnsupportedError].
+/// Unparseable values are treated as zero rather than throwing, since both
+/// come straight from persisted preferences.
 ///
 /// Example: `getWinRate('7', '10')` → `'70'`.
 String getWinRate(String wins, String games) {
-  if (wins == '0' && games == '0') {
-    return '0';
-  } else {
-    return (double.parse(wins) / double.parse(games) * 100).round().toString();
-  }
+  final gamesPlayed = double.tryParse(games) ?? 0;
+  final gamesWon = double.tryParse(wins) ?? 0;
+  if (gamesPlayed <= 0) return '0';
+  return (gamesWon / gamesPlayed * 100).round().toString();
 }

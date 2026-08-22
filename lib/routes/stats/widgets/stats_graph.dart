@@ -148,7 +148,9 @@ class _GuessDistributionChartState extends State<_GuessDistributionChart> {
               x: e.key + 1,
               barRods: [
                 BarChartRodData(
-                  toY: double.parse(e.value),
+                  // Persisted value; render a bad entry as an empty bar rather
+                  // than throwing out of the chart build.
+                  toY: double.tryParse(e.value) ?? 0,
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ],

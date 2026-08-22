@@ -224,6 +224,35 @@ void main() {
       await drainSnackBars(tester);
     });
 
+    testWidgets('recovers from stats left corrupted by an older build',
+        (tester) async {
+      // An install that predates the backup-import validation may already hold
+      // a short or non-numeric array. `_updateStatsData` runs on every finished
+      // game, so it rebuilds from zero rather than throwing.
+      SharedPreferenceService()
+          .setStringList(SharedPreferencesKeys.statsData, ['abc', '2']);
+      SharedPreferenceService()
+          .setStringList(SharedPreferencesKeys.guessDistribution, ['1']);
+      await pumpHost(tester);
+
+      await type(WordleService().wordOfTheDay);
+      await enter();
+
+      // The win was counted; unreadable and missing fields restarted at zero.
+      expect(
+        SharedPreferenceService()
+            .getStringList(SharedPreferencesKeys.statsData),
+        ['1', '3', '1', '1'],
+      );
+      expect(
+        SharedPreferenceService()
+            .getStringList(SharedPreferencesKeys.guessDistribution),
+        ['2', '0', '0', '0', '0', '0'],
+      );
+
+      await drainSnackBars(tester);
+    });
+
     testWidgets('a key pressed during evaluation cannot corrupt the row',
         (tester) async {
       // Regression: `onKeyboardPressed` awaits `getGuessResult` and then wrote

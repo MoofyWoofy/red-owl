@@ -99,11 +99,11 @@ void main() {
       );
     });
 
-    test('throws on non-numeric input', () {
-      expect(
-        () => convertListStringToListDouble(['abc']),
-        throwsFormatException,
-      );
+    // Deliberately lenient: the input is persisted preference data, so one bad
+    // entry renders as an empty bar instead of taking down the Stats page.
+    test('treats non-numeric input as zero', () {
+      expect(convertListStringToListDouble(['abc']), [0.0]);
+      expect(convertListStringToListDouble(['1', 'abc', '3']), [1.0, 0.0, 3.0]);
     });
   });
 
@@ -200,6 +200,18 @@ void main() {
     test('handles large numbers', () {
       expect(getWinRate('750', '1000'), '75');
     });
+
+    // Regression: the old guard only caught the exact '0'/'0' pair, so any
+    // other zero-games input divided by zero and `Infinity.round()` threw.
+    test('returns 0 for any zero-games input', () {
+      expect(getWinRate('3', '0'), '0');
+      expect(getWinRate('0', '0'), '0');
+    });
+
+    test('treats non-numeric input as zero', () {
+      expect(getWinRate('abc', '10'), '0');
+      expect(getWinRate('5', 'abc'), '0');
+    });
   });
 
   group('getAverageGuesses', () {
@@ -219,6 +231,10 @@ void main() {
 
     test('a single one-guess win averages to 1.0', () {
       expect(getAverageGuesses(['1', '0', '0', '0', '0', '0']), '1.0');
+    });
+
+    test('treats non-numeric entries as zero', () {
+      expect(getAverageGuesses(['0', 'x', '3', '0', '0', '0']), '3.0');
     });
   });
 
