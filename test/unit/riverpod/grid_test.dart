@@ -224,6 +224,47 @@ void main() {
       await drainSnackBars(tester);
     });
 
+    testWidgets('a key pressed during evaluation cannot corrupt the row',
+        (tester) async {
+      // Regression: `onKeyboardPressed` awaits `getGuessResult` and then wrote
+      // tiles indexed by `state.row`. A key handled during that await mutated
+      // the state in between, so the scored tiles could land on the wrong row.
+      await pumpHost(tester);
+      final notifier = capturedRef.read(gridProvider.notifier);
+      final answer = WordleService().wordOfTheDay;
+      final wrong = _testWords
+          .map((w) => w.toUpperCase())
+          .firstWhere((w) => w != answer);
+
+      await type(wrong);
+
+      // Fire ENTER and DELETE concurrently, without awaiting ENTER first.
+      // DELETE is the dangerous one: a letter key is ignored while the row is
+      // full, but DELETE removes a tile, leaving the row short when the
+      // post-await code indexes it.
+      final submit =
+          notifier.onKeyboardPressed(key: 'ENTER', context: capturedContext);
+      final interleaved =
+          notifier.onKeyboardPressed(key: 'DELETE', context: capturedContext);
+      await Future.wait([submit, interleaved]);
+
+      final grid = capturedRef.read(gridProvider);
+      // The guess was committed to row 0 and the board advanced to row 1.
+      expect(grid.row, 1);
+      // Exactly the five scored tiles exist; the DELETE was ignored.
+      expect(grid.tiles, hasLength(5));
+      expect(
+        grid.tiles.map((t) => t.letter).join(),
+        wrong,
+      );
+      expect(
+        grid.tiles.every((t) => t.status != LetterStatus.initial),
+        isTrue,
+      );
+
+      await drainSnackBars(tester);
+    });
+
     testWidgets('winning onto a streak milestone shows a celebratory message',
         (tester) async {
       // Seed a current streak of 4 so this win lands on the 5-day milestone.

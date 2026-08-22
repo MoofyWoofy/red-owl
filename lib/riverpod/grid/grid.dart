@@ -99,10 +99,22 @@ class Grid extends _$Grid {
   /// - **ENTER**: evaluates the guess when the row has exactly 5 letters.
   ///   Updates tile colors, keyboard status, win/loss state, stats, and the
   ///   history database. Shows a snack bar feedback message.
+  /// Set while an ENTER press is being evaluated.
+  ///
+  /// Evaluation awaits [getGuessResult] partway through. Any key handled during
+  /// that await would mutate `state`, and the writes after the await index the
+  /// tile list by row — a letter arriving mid-evaluation could shift the row and
+  /// send the scored tiles to the wrong positions. Input is ignored until the
+  /// guess is committed; this does not affect typing during the flip animation,
+  /// which happens after the evaluation completes.
+  bool _isEvaluatingGuess = false;
+
   Future<void> onKeyboardPressed({
     required String key,
     required BuildContext context,
   }) async {
+    if (_isEvaluatingGuess) return;
+
     // Build the current guess from the tiles in the active row.
     String guessWord = state.tiles
         .skip(state.row * 5)
@@ -128,13 +140,23 @@ class Grid extends _$Grid {
           // Mark that ENTER was pressed so the pop-in animation is suppressed.
           state = state.copyWith(isEnterOrDeletePressed: true);
 
-          var result = await getGuessResult(guessWord);
+          // The row this guess belongs to, pinned before the await so the
+          // writes below cannot land on a different row.
+          final row = state.row;
+
+          _isEvaluatingGuess = true;
+          final models.GuessResult result;
+          try {
+            result = await getGuessResult(guessWord);
+          } finally {
+            _isEvaluatingGuess = false;
+          }
           var tiles = state.tiles.toList();
           var keyboardStatusTemp = {...state.keyboardStatus};
 
           if (result.isCorrect) {
             // ── Correct guess ──────────────────────────────────────────────
-            for (var i = state.row * 5; i < state.row * 5 + 5; i++) {
+            for (var i = row * 5; i < row * 5 + 5; i++) {
               tiles[i] = tiles[i].copyWith(status: LetterStatus.green);
               keyboardStatusTemp[tiles[i].letter] = LetterStatus.green;
             }
@@ -171,7 +193,7 @@ class Grid extends _$Grid {
             }
           } else {
             // ── Valid word, evaluate each character ────────────────────────
-            for (var i = state.row * 5; i < state.row * 5 + 5; i++) {
+            for (var i = row * 5; i < row * 5 + 5; i++) {
               if (result.characterInfo![i % 5].scoring.correctIndex) {
                 // Green: correct letter, correct position.
                 tiles[i] = tiles[i].copyWith(status: LetterStatus.green);
@@ -189,7 +211,7 @@ class Grid extends _$Grid {
                 keyboardStatusTemp[tiles[i].letter] = LetterStatus.notInWord;
               }
             }
-            if (state.row + 1 == 6) {
+            if (row + 1 == 6) {
               // Player used all 6 rows without winning — game over.
               if (context.mounted) {
                 showSnackBar(context, context.l10n.betterLuckNextTime);
@@ -203,7 +225,7 @@ class Grid extends _$Grid {
             // Advance to the next row and trigger the flip animation.
             state = state.copyWith(
               column: 0,
-              row: state.row + 1,
+              row: row + 1,
               tiles: tiles,
               runFlipAnimation: true,
               notEnoughCharacters: false,
