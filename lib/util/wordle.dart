@@ -206,19 +206,61 @@ class WordleService {
     );
   }
 
-  /// Evaluates a single [guessCharacter] at position [idx] against [answer].
+  /// Scores every character of [guessWord] against [answer] using the standard
+  /// Wordle two-pass algorithm, returning raw JSON-compatible maps with `char`,
+  /// `in_word` and `correct_idx` fields for [CharacterInfo].
   ///
-  /// Returns a raw JSON-compatible map with `char`, `in_word`, and
-  /// `correct_idx` fields used to build [CharacterInfo] objects.
-  Map<String, dynamic> _checkCharacter(
-      String guessCharacter, String answer, int idx) {
-    return {
-      'char': guessCharacter,
-      'scoring': {
-        'in_word': answer.contains(guessCharacter),
-        'correct_idx': guessCharacter == answer[idx],
+  /// Each letter of the answer may only be consumed **once**. A naive
+  /// `answer.contains(letter)` test over-reports repeated letters: for answer
+  /// `CRANE` and guess `EERIE` it would mark all three `E`s, when only the
+  /// final (exact-match) `E` may be credited.
+  ///
+  /// Pass 1 claims exact matches (green) and tallies the answer letters they
+  /// did *not* consume. Pass 2 walks left to right and marks a letter present
+  /// (yellow) only while unclaimed copies of it remain, so the number of
+  /// green + yellow marks for a letter never exceeds its count in the answer.
+  ///
+  /// Example — answer `CRANE`, guess `EERIE`:
+  /// `[grey, grey, yellow, grey, green]` (the single `E` is spent on the
+  /// exact match at index 4, leaving none for indices 0 and 1).
+  static List<Map<String, dynamic>> _scoreGuess(
+      String guessWord, String answer) {
+    final length = guessWord.length;
+    final isCorrectIndex = List<bool>.filled(length, false);
+    final isPresent = List<bool>.filled(length, false);
+
+    // Pass 1 — exact matches, tallying the answer letters left over.
+    final unclaimed = <String, int>{};
+    for (var idx = 0; idx < length; idx++) {
+      if (idx < answer.length && guessWord[idx] == answer[idx]) {
+        isCorrectIndex[idx] = true;
+      } else if (idx < answer.length) {
+        unclaimed.update(answer[idx], (count) => count + 1, ifAbsent: () => 1);
       }
-    };
+    }
+
+    // Pass 2 — present-but-misplaced, consuming from the leftovers.
+    for (var idx = 0; idx < length; idx++) {
+      if (isCorrectIndex[idx]) continue;
+      final character = guessWord[idx];
+      final remaining = unclaimed[character] ?? 0;
+      if (remaining > 0) {
+        isPresent[idx] = true;
+        unclaimed[character] = remaining - 1;
+      }
+    }
+
+    return [
+      for (var idx = 0; idx < length; idx++)
+        {
+          'char': guessWord[idx],
+          'scoring': {
+            // Greens are in the word too; the grid checks `correct_idx` first.
+            'in_word': isCorrectIndex[idx] || isPresent[idx],
+            'correct_idx': isCorrectIndex[idx],
+          }
+        }
+    ];
   }
 
   /// Evaluates [guessWord] against the answer and returns a raw JSON map
@@ -256,10 +298,7 @@ class WordleService {
     }
 
     // Word is valid — evaluate each character against the answer.
-    List<Map<String, dynamic>> guessResult = [];
-    for (int idx = 0; idx < guessWord.length; idx++) {
-      guessResult.add(_checkCharacter(guessWord[idx], target, idx));
-    }
+    final guessResult = _scoreGuess(guessWord, target);
     return {
       'guess': guessWord,
       'is_correct': false,

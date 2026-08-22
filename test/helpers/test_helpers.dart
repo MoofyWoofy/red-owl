@@ -160,7 +160,12 @@ Future<Directory> installFakePathProvider() async {
 ///
 /// Implemented by intercepting the `flutter/assets` platform message channel
 /// — the same channel [rootBundle] uses internally.
+///
+/// [rootBundle] memoises every string it has loaded, so its cache is cleared
+/// here as well: without that, a test installing a *different* word list would
+/// silently keep receiving the list loaded by an earlier test.
 void setAssetBundleMock(List<String>? wordList) {
+  rootBundle.clear();
   final binding = TestDefaultBinaryMessengerBinding.instance;
   binding.defaultBinaryMessenger.setMockMessageHandler(
     'flutter/assets',

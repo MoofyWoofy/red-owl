@@ -22,6 +22,10 @@ void main() {
       setSharedPreferencesMock();
       await SharedPreferenceService().init();
       setAssetBundleMock(words);
+      // WordleService is a singleton that caches the parsed list, so re-init
+      // before every test — otherwise a group installing its own word list
+      // leaves that list cached for the tests that follow.
+      await WordleService().init();
     });
 
     tearDown(() => setAssetBundleMock(null));
@@ -75,12 +79,32 @@ void main() {
 
       final info = result['character_info'] as List;
       expect(info, hasLength(5));
-      // Each character is scored relative to the answer.
+      // `correct_idx` is an exact positional match — assert it directly rather
+      // than by re-deriving it the way the implementation does.
       for (var i = 0; i < 5; i++) {
         final scoring = info[i]['scoring'] as Map;
-        expect(scoring['in_word'], answer.contains(guess[i]));
         expect(scoring['correct_idx'], guess[i] == answer[i]);
+        // A green is always also "in the word".
+        if (scoring['correct_idx'] as bool) {
+          expect(scoring['in_word'], isTrue);
+        }
       }
+
+      // Core Wordle invariant: a letter is never marked (green or yellow) more
+      // often than it actually occurs in the answer.
+      final marked = <String, int>{};
+      for (var i = 0; i < 5; i++) {
+        final scoring = info[i]['scoring'] as Map;
+        if (scoring['in_word'] as bool) {
+          marked.update(guess[i], (c) => c + 1, ifAbsent: () => 1);
+        }
+      }
+      marked.forEach((letter, count) {
+        final available = answer.split('').where((c) => c == letter).length;
+        expect(count, lessThanOrEqualTo(available),
+            reason: '"$letter" marked $count times in guess $guess but occurs '
+                'only $available time(s) in answer $answer');
+      });
     });
 
     test('checkGuessWord lower-cases the guess for list membership', () async {
@@ -107,10 +131,84 @@ void main() {
           await WordleService().checkGuessWord('BERRY', answer: 'APPLE');
       expect(wrong['is_correct'], isFalse);
       final info = wrong['character_info'] as List;
+      // BERRY vs APPLE: only the single E is present (misplaced); B, R, R and
+      // Y are absent, and nothing lands on its exact index.
+      const expectedInWord = [false, true, false, false, false];
       for (var i = 0; i < 5; i++) {
         final scoring = info[i]['scoring'] as Map;
-        expect(scoring['in_word'], 'APPLE'.contains('BERRY'[i]));
-        expect(scoring['correct_idx'], 'BERRY'[i] == 'APPLE'[i]);
+        expect(scoring['in_word'], expectedInWord[i],
+            reason: 'BERRY[$i] vs APPLE');
+        expect(scoring['correct_idx'], isFalse);
+      }
+    });
+
+    // Regression: a repeated letter in the guess must not be credited more
+    // often than it occurs in the answer. The naive `answer.contains(letter)`
+    // test marked every copy, so e.g. CRANE/EERIE showed three yellows.
+    //
+    // Each case lists the expected tile colours, hand-derived from the standard
+    // NYT rules: exact matches are claimed first, then the remaining answer
+    // letters are spent left to right on misplaced letters.
+    group('duplicate letters are only credited as often as they occur', () {
+      const cases = <String, Map<String, List<String>>>{
+        // The single E of CRANE is spent on the exact match at index 4,
+        // leaving nothing for the E's at indices 0 and 1.
+        'CRANE': {
+          'EERIE': ['grey', 'grey', 'yellow', 'grey', 'green'],
+        },
+        // ABIDE has one E: the first E of SPEED takes it, the second gets grey.
+        'ABIDE': {
+          'SPEED': ['grey', 'grey', 'yellow', 'grey', 'yellow'],
+        },
+        // Both E's of THESE are consumed by exact matches, so GEESE's leading
+        // E has none left.
+        'THESE': {
+          'GEESE': ['grey', 'grey', 'green', 'green', 'green'],
+        },
+        // ALLEY has one A: LLAMA's first A takes it, the trailing A is grey.
+        'ALLEY': {
+          'LLAMA': ['yellow', 'green', 'yellow', 'grey', 'grey'],
+        },
+      };
+
+      setUp(() async {
+        setAssetBundleMock(const [
+          'crane',
+          'eerie',
+          'abide',
+          'speed',
+          'these',
+          'geese',
+          'alley',
+          'llama',
+        ]);
+        // The service caches the parsed list; re-init so this group's words are
+        // the ones guess-validation sees.
+        await WordleService().init();
+      });
+
+      for (final answer in cases.keys) {
+        for (final guess in cases[answer]!.keys) {
+          final expected = cases[answer]![guess]!;
+          test('$answer / $guess -> ${expected.join(",")}', () async {
+            final result =
+                await WordleService().checkGuessWord(guess, answer: answer);
+            expect(result['is_word_in_list'], isTrue);
+            final info = result['character_info'] as List;
+            expect(info, hasLength(5));
+
+            final actual = [
+              for (var i = 0; i < 5; i++)
+                if ((info[i]['scoring'] as Map)['correct_idx'] as bool)
+                  'green'
+                else if ((info[i]['scoring'] as Map)['in_word'] as bool)
+                  'yellow'
+                else
+                  'grey'
+            ];
+            expect(actual, expected);
+          });
+        }
       }
     });
 
