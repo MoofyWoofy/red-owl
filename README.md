@@ -280,7 +280,7 @@ Bump both before each release.
 Releases are automated by GitHub Actions ([.github/workflows/release.yml](.github/workflows/release.yml)). Pushing a **semver tag** (`X.Y.Z`, e.g. `2.1.0` — no `v` prefix) runs two jobs:
 
 1. **Update changelog** — generates a new section from the commits since the previous tag (grouped by conventional-commit type: `feat` → Added, `fix` → Fixed, `perf` → Performance, `docs` → Documentation, everything else → Changed; `chore`/`ci`/`test` are dropped). The section is inserted below the `<!-- BEGIN_VERSIONS -->` marker in [CHANGELOG.md](CHANGELOG.md) and **committed back to `main`**. Because this commit lands after the tag, the tagged commit itself won't contain the new entry. The step is idempotent — re-tagging an already-documented version is a no-op.
-2. **Build & release signed APK** — builds a single universal **signed** release APK with Flutter `3.41.6`, then publishes a GitHub Release (auto-generated notes) with `red_owl-<tag>.apk` attached.
+2. **Build & release signed APK** — builds a single universal **signed** release APK with Flutter `3.47.1`, then publishes a GitHub Release (auto-generated notes) with `red_owl-<tag>.apk` attached.
 
 ### Required repository secrets
 
