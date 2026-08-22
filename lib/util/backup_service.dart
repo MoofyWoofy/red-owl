@@ -36,6 +36,43 @@ class BackupService {
 
   static const String _customListFileName = 'custom_list.txt';
 
+  /// Expected length of the `statsData` array:
+  /// `[gamesPlayed, gamesWon, currentStreak, maxStreak]`. `Grid._updateStatsData`
+  /// destructures exactly these four positions.
+  static const int statsDataLength = 4;
+
+  /// Expected length of the `guessDistribution` array: one counter per possible
+  /// winning row (1–6). `Grid._updateStatsData` indexes it by row.
+  static const int guessDistributionLength = 6;
+
+  /// Validates one persisted counter array, returning it as the list of strings
+  /// the preference store holds, or `null` when the section is absent.
+  ///
+  /// Requires exactly [expectedLength] entries, each a non-negative integer, so
+  /// the array can never break the `int.parse` / positional-index reads that
+  /// consume it. Throws a [FormatException] describing [label] otherwise.
+  static List<String>? _parseCounters(
+      Object? raw, int expectedLength, String label) {
+    if (raw == null) return null;
+    if (raw is! List) {
+      throw FormatException('"$label" must be a list');
+    }
+    if (raw.length != expectedLength) {
+      throw FormatException(
+          '"$label" must have $expectedLength entries, got ${raw.length}');
+    }
+    return [
+      for (final entry in raw)
+        () {
+          final value = int.tryParse(entry.toString());
+          if (value == null || value < 0) {
+            throw FormatException('"$label" has a non-numeric entry: $entry');
+          }
+          return value.toString();
+        }(),
+    ];
+  }
+
   static final BackupService _instance = BackupService._internal();
 
   /// Returns the singleton [BackupService] instance.
@@ -118,10 +155,11 @@ class BackupService {
   /// Parses [jsonString] and applies it, replacing the current settings, stats,
   /// history and (when present) custom word list.
   ///
-  /// Validation runs to completion **before** anything is written, so an
-  /// invalid file throws a [FormatException] and leaves all existing data
-  /// untouched. Unknown or missing sections are skipped rather than treated as
-  /// errors, so partial backups still import cleanly.
+  /// Validation of both the `history` rows and the `stats` counter arrays runs
+  /// to completion **before** anything is written, so an invalid file throws a
+  /// [FormatException] and leaves all existing data untouched. Unknown or
+  /// missing sections are skipped rather than treated as errors, so partial
+  /// backups still import cleanly.
   Future<void> importFromJson(String jsonString) async {
     final Object? decoded;
     try {
@@ -176,6 +214,21 @@ class BackupService {
       }
     }
 
+    // ── Validate stats up-front too ──────────────────────────────────────────
+    // These arrays are read back with `int.parse` and positional destructuring
+    // (`Grid._updateStatsData`) and with `double.parse` (the Stats page), so a
+    // wrong length or a non-numeric entry does not fail here — it breaks the
+    // next finished game instead. Reject the file rather than write it.
+    List<String>? statsData;
+    List<String>? guessDistribution;
+    final stats = decoded['stats'];
+    if (stats is Map) {
+      statsData = _parseCounters(
+          stats['statsData'], statsDataLength, 'stats.statsData');
+      guessDistribution = _parseCounters(stats['guessDistribution'],
+          guessDistributionLength, 'stats.guessDistribution');
+    }
+
     // ── All validation passed — apply the backup ─────────────────────────────
     final prefs = SharedPreferenceService();
 
@@ -190,19 +243,12 @@ class BackupService {
       }
     }
 
-    final stats = decoded['stats'];
-    if (stats is Map) {
-      if (stats['statsData'] is List) {
-        prefs.setStringList(SharedPreferencesKeys.statsData,
-            (stats['statsData'] as List).map((e) => e.toString()).toList());
-      }
-      if (stats['guessDistribution'] is List) {
-        prefs.setStringList(
-            SharedPreferencesKeys.guessDistribution,
-            (stats['guessDistribution'] as List)
-                .map((e) => e.toString())
-                .toList());
-      }
+    if (statsData != null) {
+      prefs.setStringList(SharedPreferencesKeys.statsData, statsData);
+    }
+    if (guessDistribution != null) {
+      prefs.setStringList(
+          SharedPreferencesKeys.guessDistribution, guessDistribution);
     }
 
     // Replace the history table with the imported rows (shared singleton).
