@@ -63,6 +63,59 @@ void main() {
         )).called(1);
   });
 
+  // The scheduled instant must always carry the requested wall-clock time.
+  // `_nextInstanceOf` used to roll a past time forward with
+  // `add(Duration(days: 1))`, which is an absolute 24 hours and lands an hour
+  // off across a DST transition. `now` is not injectable, so this pins the
+  // invariant on every run but only reproduces the old bug on a transition day.
+  test('the scheduled time keeps the requested wall-clock hour and minute',
+      () async {
+    final previousLocation = tz.local;
+    addTearDown(() => tz.setLocalLocation(previousLocation));
+    // A zone that actually observes DST.
+    tz.setLocalLocation(tz.getLocation('America/New_York'));
+
+    when(() => plugin.cancel(any())).thenAnswer((_) async {});
+    when(() => plugin.zonedSchedule(
+          any(),
+          any(),
+          any(),
+          captureAny(),
+          any(),
+          androidScheduleMode: any(named: 'androidScheduleMode'),
+          matchDateTimeComponents: any(named: 'matchDateTimeComponents'),
+        )).thenAnswer((_) async {});
+
+    // Cover both branches: a time already past today (forcing the rollover)
+    // and one still ahead of it.
+    for (final hour in [0, 23]) {
+      await NotificationService().scheduleDailyReminder(
+        hour: hour,
+        minute: 30,
+        title: 'Red Owl',
+        body: 'Play!',
+      );
+    }
+
+    final scheduled = verify(() => plugin.zonedSchedule(
+          any(),
+          any(),
+          any(),
+          captureAny(),
+          any(),
+          androidScheduleMode: any(named: 'androidScheduleMode'),
+          matchDateTimeComponents: any(named: 'matchDateTimeComponents'),
+        )).captured.cast<tz.TZDateTime>();
+
+    expect(scheduled, hasLength(2));
+    expect(scheduled[0].hour, 0);
+    expect(scheduled[1].hour, 23);
+    for (final instant in scheduled) {
+      expect(instant.minute, 30);
+      expect(instant.isAfter(tz.TZDateTime.now(tz.local)), isTrue);
+    }
+  });
+
   test('cancelReminder cancels the reminder id', () async {
     when(() => plugin.cancel(any())).thenAnswer((_) async {});
     await NotificationService().cancelReminder();

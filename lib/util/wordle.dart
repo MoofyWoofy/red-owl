@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:math' as math show Random;
-import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart' show compute;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart' as path;
@@ -70,8 +69,13 @@ class WordleService {
   Future<String> getWordOfTheDay([DateTime? wordDate]) async {
     final wordlist = await getWordList;
     final date = wordDate ?? DateTime.now();
-    // Deterministic seed: same date → same word everywhere.
-    final random = math.Random(int.parse(DateFormat('yyyyMMdd').format(date)));
+    // Deterministic seed: same date → same word everywhere. Built arithmetically
+    // rather than via `DateFormat('yyyyMMdd')`, which formats with the ambient
+    // `Intl.defaultLocale` — a locale that renders non-ASCII digits would make
+    // the seed unparseable and change the word of the day per device. The value
+    // is identical to the old one for every Gregorian date.
+    final seed = date.year * 10000 + date.month * 100 + date.day;
+    final random = math.Random(seed);
     return wordlist[random.nextInt(wordlist.length)].trim().toUpperCase();
   }
 

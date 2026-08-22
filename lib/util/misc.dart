@@ -1,14 +1,20 @@
-import 'package:intl/intl.dart';
 
 import 'package:red_owl/config/shared.dart' show SharedPreferencesKeys;
 import 'package:red_owl/models/shared.dart' show Grid;
 
 /// Formats [date] as an ISO-8601 date string (`yyyy-MM-dd`).
 ///
+/// Built from the numeric fields rather than `DateFormat`, which renders with
+/// the ambient `Intl.defaultLocale`. This value is a storage key, not display
+/// text: it is written to [SharedPreferencesKeys.gameDate] and read back by
+/// [stringToDate] (`DateTime.parse`), so it has to stay ASCII digits in every
+/// locale. Output is unchanged for all Gregorian dates.
+///
 /// Example: `DateTime(2024, 5, 23)` → `'2024-05-23'`.
-/// Used when persisting [SharedPreferencesKeys.gameDate] and when displaying
-/// the current date in the GamePage AppBar.
-String dateToString(DateTime date) => DateFormat('yyyy-MM-dd').format(date);
+String dateToString(DateTime date) =>
+    '${date.year.toString().padLeft(4, '0')}-'
+    '${date.month.toString().padLeft(2, '0')}-'
+    '${date.day.toString().padLeft(2, '0')}';
 
 /// Parses an ISO-8601 date string (`yyyy-MM-dd`) back into a [DateTime].
 ///

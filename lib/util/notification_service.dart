@@ -140,7 +140,12 @@ class NotificationService {
     var scheduled =
         tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
     if (!scheduled.isAfter(now)) {
-      scheduled = scheduled.add(const Duration(days: 1));
+      // Rebuild on the next calendar day rather than adding 24 hours. Adding a
+      // Duration is absolute, so across a DST transition it would land an hour
+      // off the requested wall-clock time. The constructor normalises a day
+      // past the end of the month.
+      scheduled = tz.TZDateTime(
+          tz.local, now.year, now.month, now.day + 1, hour, minute);
     }
     return scheduled;
   }

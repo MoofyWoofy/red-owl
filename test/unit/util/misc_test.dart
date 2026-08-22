@@ -3,6 +3,7 @@
 // Covers: dateToString, stringToDate, getDateOnly,
 // convertListStringToListDouble, isGameInProgress, and getWinRate.
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart' show Intl;
 import 'package:red_owl/config/shared.dart' show LetterStatus, keyboardStatus;
 import 'package:red_owl/models/shared.dart' show Grid, Tile;
 import 'package:red_owl/util/misc.dart';
@@ -17,6 +18,21 @@ void main() {
     test('pads single-digit month and day with zero', () {
       final date = DateTime(2024, 3, 5);
       expect(dateToString(date), '2024-03-05');
+    });
+
+    // The result is a storage key read back by DateTime.parse, so it must stay
+    // ASCII digits regardless of the active locale. `DateFormat` would follow
+    // `Intl.defaultLocale` and could emit non-ASCII numerals.
+    test('is independent of the ambient locale', () {
+      final previous = Intl.defaultLocale;
+      addTearDown(() => Intl.defaultLocale = previous);
+
+      final date = DateTime(2024, 3, 5);
+      for (final locale in ['en_US', 'nl', 'ar', 'hi', 'fa']) {
+        Intl.defaultLocale = locale;
+        expect(dateToString(date), '2024-03-05', reason: 'locale $locale');
+        expect(stringToDate(dateToString(date)), date, reason: 'locale $locale');
+      }
     });
 
     test('handles December 31', () {
