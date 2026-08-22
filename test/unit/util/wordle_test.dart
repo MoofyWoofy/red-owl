@@ -213,6 +213,28 @@ void main() {
       }
     });
 
+    test('concurrent first reads share a single load', () async {
+      // Startup asks for the list from more than one place at once. Each miss
+      // used to read the file and spawn its own `compute` isolate to parse it;
+      // the in-flight future is now shared.
+      await WordleService().init();
+      // Force a cold cache, then race several readers.
+      setAssetBundleMock(words);
+      await WordleService().init();
+
+      final results = await Future.wait([
+        WordleService().getWordList,
+        WordleService().getWordList,
+        WordleService().getWordList,
+      ]);
+      // All callers see the same list, and it is the same instance — proof they
+      // joined one load rather than each parsing their own copy.
+      for (final result in results) {
+        expect(result, words);
+        expect(identical(result, results.first), isTrue);
+      }
+    });
+
     test('randomWord returns an uppercase word from the active list', () async {
       final upper = words.map((w) => w.toUpperCase()).toSet();
       for (var i = 0; i < 20; i++) {

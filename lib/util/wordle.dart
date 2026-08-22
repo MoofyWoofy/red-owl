@@ -41,6 +41,14 @@ class WordleService {
   /// changed (custom-list toggle, import, or backup restore).
   List<String>? _cachedWordList;
 
+  /// The in-flight load, if one is running.
+  ///
+  /// Startup issues concurrent reads (the word of the day and the rehydrated
+  /// board both want the list), and each miss would otherwise read the file and
+  /// spawn its own `compute` isolate to parse ~13k lines. Sharing the future
+  /// collapses those into one load.
+  Future<List<String>>? _pendingLoad;
+
   static final WordleService _instance = WordleService._internal();
 
   /// Returns the singleton [WordleService] instance.
@@ -59,6 +67,7 @@ class WordleService {
   /// cached list so the new source is re-read.
   Future<void> init() async {
     _cachedWordList = null;
+    _pendingLoad = null;
     _wordOfTheDay = await getWordOfTheDay();
   }
 
@@ -101,11 +110,26 @@ class WordleService {
   /// Every word is normalised to a trimmed, lower-case form so that guess
   /// matching in [checkGuessWord] (which lower-cases the guess) is independent
   /// of how the imported file was cased or spaced.
-  Future<List<String>> get getWordList async {
+  Future<List<String>> get getWordList {
     // Serve the cached copy if it has already been loaded for this source.
     final cached = _cachedWordList;
-    if (cached != null) return cached;
+    if (cached != null) return Future.value(cached);
 
+    // Join the load already in flight rather than starting a second one.
+    return _pendingLoad ??= _loadWordList().then((words) {
+      _cachedWordList = words;
+      _pendingLoad = null;
+      return words;
+    }, onError: (Object error, StackTrace stackTrace) {
+      // Clear the slot so a later call can retry instead of replaying the
+      // failure forever.
+      _pendingLoad = null;
+      Error.throwWithStackTrace(error, stackTrace);
+    });
+  }
+
+  /// Reads and parses the active word list from disk or the bundled asset.
+  Future<List<String>> _loadWordList() async {
     var useCustomList =
         SharedPreferenceService().getBool(SharedPreferencesKeys.useCustomList);
     List<String> words;
@@ -138,7 +162,6 @@ class WordleService {
       words = await compute(_parseWordList, data);
     }
 
-    _cachedWordList = words;
     return words;
   }
 
@@ -221,6 +244,7 @@ class WordleService {
     final dest = File(path.join(directory.path, 'custom_list.txt'));
     await dest.writeAsString(uniqueWords.join('\n'));
     _cachedWordList = null;
+    _pendingLoad = null;
 
     return WordListImportResult.success(
       uniqueWords,
