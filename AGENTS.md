@@ -80,7 +80,11 @@ The flip is scheduled from `ref.listen(gridProvider, ...)` (`_maybeStartFlip`), 
 - Aggregate stats (games played/won, current/max streak, guess distribution) are plain string-list arrays in SharedPreferences, updated in `_updateStatsData`. The Stats page derives win rate and average guesses from these (`getWinRate`, `getAverageGuesses` in `lib/util/misc.dart`).
 - Per-game history is a Drift/SQLite `History` table (`lib/database/database.dart`), one row per day (`date` is the primary key), written in `_addToDatabase` with `InsertMode.insertOrReplace`. The replace matters: `resetGrid()` restarts the board (word-list toggle, word-list import, backup restore) without clearing that day's existing row, so a plain insert raises `UNIQUE constraint failed: history.date` when the replacement game finishes. Any new write to this table needs the same mode. The `History` widget reads it for the list and supports a date filter (all / rolling 30 days / custom range) by adding a `where` to the query. The Stats page's reset action clears both stores and bumps a key to rebuild the data-reading children.
 
-**Notifications (Android).** `NotificationService` (`lib/util/notification_service.dart`, a singleton) wraps `flutter_local_notifications` for the opt-in daily reminder (off by default). It uses timezone-aware scheduling with a **hybrid exact/inexact** mode (`_scheduleMode()`): if exact alarms are permitted (`canScheduleExactNotifications`) it schedules to-the-minute (`exactAllowWhileIdle`), otherwise it falls back to `inexactAllowWhileIdle` so the reminder still works without the special permission. Enabling the reminder best-effort requests the exact-alarm permission (`requestExactAlarmPermission`, opens system settings on Android 12+). The reminder is an **OS-level daily repeat** (`matchDateTimeComponents: DateTimeComponents.time`): the plugin re-fires it at the next occurrence of the time every day, so it keeps nudging even if the app is never reopened (e.g. the player ignores a reminder and doesn't play — the next day still fires). It is (re)scheduled only when the reminder is enabled and when its time changes (`ReminderSetting`). Consequence of the OS repeat: it fires **every** day at the set time regardless of whether the player already played that day — the plugin cannot skip individual days, so there is intentionally no skip-played logic (`Grid.recordOutcome` no longer touches the reminder). The notification carries a monochrome white-owl status-bar icon (`ic_stat_reminder`, generated from the launcher foreground) and **no large icon**. Because that icon is referenced **only by name string at runtime** (never via `R.drawable`), Flutter's release build (R8 + `shrinkResources`) marks it unreachable and strips it — so `res/raw/keep.xml` (`tools:keep`) must retain it, otherwise `scheduleDailyReminder` throws `PlatformException(invalid_icon)` in **release only** and the reminder toggle silently fails (debug builds don't shrink, so this never reproduces there; guarded by `test/unit/android_manifest_test.dart`). As a backstop, `ReminderSetting._setEnabled` wraps scheduling in a try/catch and surfaces a snackbar (`reminderError`) instead of leaving the toggle stuck off. The underlying plugin is injectable via `pluginForTesting`. The `ReminderSetting` widget owns the toggle + time picker and localizes the notification text at schedule time; the chosen time is held in `ReminderTimeNotifier` (`lib/riverpod/reminder_time/reminder_time_notifier.dart`), persisted as an `HH:mm` string under `SharedPreferencesKeys.reminderTime` (default 8 PM), so the picker reflects a new time immediately instead of only after a restart. Native requirements: core library desugaring in `android/app/build.gradle`, `res/raw/keep.xml` to keep the notification icon through release resource shrinking, the `POST_NOTIFICATIONS`/`RECEIVE_BOOT_COMPLETED`/`SCHEDULE_EXACT_ALARM` manifest permissions, and the plugin's broadcast receivers (`ScheduledNotificationReceiver`, `ScheduledNotificationBootReceiver`, `ActionBroadcastReceiver`) declared in `AndroidManifest.xml` — the v19 plugin does **not** declare them itself, and without `ScheduledNotificationReceiver` the alarm fires but no notification is ever posted (`test/unit/android_manifest_test.dart` guards this).
+**Notifications (Android).** `NotificationService` (`lib/util/notification_service.dart`, a singleton) wraps `flutter_local_notifications` for the opt-in daily reminder (off by default). It uses timezone-aware scheduling with a **hybrid exact/inexact** mode (`_scheduleMode()`): if exact alarms are permitted (`canScheduleExactNotifications`) it schedules to-the-minute (`exactAllowWhileIdle`), otherwise it falls back to `inexactAllowWhileIdle` so the reminder still works without the special permission. Enabling the reminder best-effort requests the exact-alarm permission (`requestExactAlarmPermission`, opens system settings on Android 12+). The reminder is an **OS-level daily repeat** (`matchDateTimeComponents: DateTimeComponents.time`): the plugin re-fires it at the next occurrence of the time every day, so it keeps nudging even if the app is never reopened (e.g. the player ignores a reminder and doesn't play — the next day still fires). It is (re)scheduled only when the reminder is enabled and when its time changes (`ReminderSetting`). Consequence of the OS repeat: it fires **every** day at the set time regardless of whether the player already played that day — the plugin cannot skip individual days, so there is intentionally no skip-played logic (`Grid.recordOutcome` no longer touches the reminder). The notification carries a monochrome white-owl status-bar icon (`ic_stat_reminder`, generated from the launcher foreground) and **no large icon**. Because that icon is referenced **only by name string at runtime** (never via `R.drawable`), Flutter's release build (R8 + `shrinkResources`) marks it unreachable and strips it — so `res/raw/keep.xml` (`tools:keep`) must retain it, otherwise `scheduleDailyReminder` throws `PlatformException(invalid_icon)` in **release only** and the reminder toggle silently fails (debug builds don't shrink, so this never reproduces there; guarded by `test/unit/android_manifest_test.dart`). As a backstop, `ReminderSetting._setEnabled` wraps scheduling in a try/catch and surfaces a snackbar (`reminderError`) instead of leaving the toggle stuck off. The underlying plugin is injectable via `pluginForTesting`. The `ReminderSetting` widget owns the toggle + time picker and localizes the notification text at schedule time; the chosen time is held in `ReminderTimeNotifier` (`lib/riverpod/reminder_time/reminder_time_notifier.dart`), persisted as an `HH:mm` string under `SharedPreferencesKeys.reminderTime` (default 8 PM), so the picker reflects a new time immediately instead of only after a restart. Native requirements: core library desugaring in `android/app/build.gradle`, `res/raw/keep.xml` to keep the notification icon through release resource shrinking, the `POST_NOTIFICATIONS`/`RECEIVE_BOOT_COMPLETED`/`SCHEDULE_EXACT_ALARM` manifest permissions, and the plugin's broadcast receivers (`ScheduledNotificationReceiver`, `ScheduledNotificationBootReceiver`, `ActionBroadcastReceiver`) declared in `AndroidManifest.xml` — the plugin still does **not** declare them itself as of v22 (its manifest carries only the `VIBRATE` and `POST_NOTIFICATIONS` permissions), and without `ScheduledNotificationReceiver` the alarm fires but no notification is ever posted (`test/unit/android_manifest_test.dart` guards this).
+
+The plugin API is **all named parameters** since v22: `initialize(settings: ...)`, `cancel(id: ...)` and `zonedSchedule(id:, title:, body:, scheduledDate:, notificationDetails:, androidScheduleMode:, matchDateTimeComponents:)`. Mocktail stubs must therefore match with `any(named: 'id')` / `captureAny(named: 'scheduledDate')` — a bare `any()` in a named slot throws at runtime, not at analysis time.
+
+`timezone` 0.11 renamed the UTC database entry to `Etc/UTC`, so `getLocation('UTC')` throws `Location with the name "UTC" doesn't exist`. Use the built-in `tz.UTC` getter instead, which does not depend on the name.
 
 **Generic boolean settings.** Rather than a notifier per toggle, `BoolFamilyNotifier` (`lib/riverpod/bool_family_notifier/bool_family_notifier.dart`) is a Riverpod *family* keyed by `(BoolFamilyProviderIDs id, SharedPreferencesKeys sharedPrefsKey)`. Dark mode, custom-list toggle, etc. all reuse it. Per-key defaults (e.g. dark mode falling back to system brightness) live in its `build()` switch. To add a boolean setting, add an ID + a prefs key and read `boolFamilyProvider(id: ..., sharedPrefsKey: ...)`.
 
@@ -101,23 +105,81 @@ Gotchas worth knowing before you lose an hour to one:
 - Two singleton caches leak between tests in the same file: `rootBundle` memoises loaded assets and `WordleService` caches the parsed list. `setAssetBundleMock` clears the former; call `await WordleService().init()` after installing a new list to clear the latter. Without both, a group that installs its own word list silently keeps serving an earlier test's list.
 - Don't assert scoring by re-deriving it the way the implementation does (the old `expect(scoring['in_word'], answer.contains(guess[i]))` mirrored a real bug and could never fail). Use hand-derived expected values.
 
+### Integration tests and device verification
+
+`integration_test/app_test.dart` runs the real app on a device. Two rules keep it
+deterministic, both learned the hard way (the suite used to fail a different
+subset of tests on each run):
+
+- **`await app.main()`.** It is asynchronous — it awaits the prefs and word-list
+  services before `runApp` — so calling it bare lets `pumpAndSettle` run against a
+  tree where `runApp` has not happened yet.
+- **`SharedPreferences.setMockInitialValues` does nothing here.** It patches only
+  the legacy synchronous interface while the app reads through
+  `SharedPreferencesWithCache`. On a device, state leaks between tests and across
+  runs; clear the real store with `await SharedPreferencesAsync().clear()`
+  instead. Assertions that depend on a default (e.g. dark mode falling back to
+  system brightness) must compare against the rendered value, not a constant.
+
+For visual checks, **`adb exec-out screencap` cannot capture a debug build's
+Flutter content** — Flutter renders into an Impeller SurfaceView and the capture
+comes back showing only the launch background (the pink owl splash). Release
+builds capture fine. To screenshot reliably in any build, drive
+`IntegrationTestWidgetsFlutterBinding.takeScreenshot` through
+`flutter drive --driver=<driver> --target=<test>`, with an `integrationDriver(onScreenshot: ...)`
+driver that writes the bytes host-side; that renders through the engine. Writing
+them from the test to the app's external files dir does *not* work — Android 11+
+scoped storage blocks `adb pull` from `/Android/data/<pkg>/`.
+
+Also, Git Bash rewrites device paths: `adb shell ls /sdcard` becomes
+`/Files/Git/sdcard`. Export `MSYS_NO_PATHCONV=1` for any adb command taking an
+on-device path.
+
 **`dart run custom_lint` crashes if a stale `build/` directory is present**, with `PathNotFoundException: Directory listing failed` on some deep Gradle transform path — it walks `build/` looking for pubspecs. `flutter clean` fixes it; the failure says nothing about your code.
 
 ## Dependencies
 
 `^` constraints already let pub pick the newest compatible version, so raising a lower bound in `pubspec.yaml` unlocks nothing on its own — if `flutter pub outdated` shows *Resolvable* equal to *Current*, something is capping it. As of the 2026-08 maintenance pass the caps are:
 
-- **`custom_lint` 0.8.1** pins `analyzer ^8`, and no newer `custom_lint` exists. That caps `build_runner` (<2.15.2), `json_serializable` (<6.14.1), `freezed` (<3.2.5) and `drift_dev` (<2.34.1). Nothing moves here until custom_lint publishes an analyzer 10+ release.
-- **Dart 3.11.4** (Flutter 3.41.6, pinned in CI) caps the whole Riverpod 4.x toolchain: `flutter_riverpod` <3.4.1, `riverpod_annotation` <4.0.5, `riverpod_generator` <4.0.6, `riverpod_lint` <3.1.6 all require Dart ≥3.12. Bumping Flutter unlocks these.
-- **The Flutter SDK pins `meta` 1.17.0**, capping `flutter_native_splash` (<2.4.8).
-- **`flutter_local_notifications` 19.x pins `timezone ^0.10.0`**, so `timezone` 0.11 needs the (large) fln 22 migration first.
-- **`share_plus` 13, `package_info_plus` 10 and `file_picker` 12 all require `win32 ^6`** while the current versions pin `win32 ^5` — they move as one cluster or not at all. file_picker 12's only Dart-side break is `pickFiles` returning a non-nullable `List<PlatformFile>` (empty on cancel) instead of `FilePickerResult?`, but it also splits into federated platform packages, so the word-list and backup import flows need real device testing after that bump.
+- **`custom_lint` 0.8.1 is the single blocker for almost everything left.** It pins `analyzer ^8` and has no newer release. Directly that caps `build_runner` (<2.15.2), `json_serializable` (<6.14.1), `freezed` (<3.2.5) and `drift_dev` (<2.34.1). Less obviously it also caps the **entire Riverpod stack**, not just the lint: `riverpod_lint` >=3.1.1 needs analyzer ^9+, so it is stuck at 3.1.0 — and 3.1.0 pins `riverpod` to *exactly* 3.1.0, which in turn freezes `flutter_riverpod` and `riverpod_annotation`. Upgrading Flutter does **not** help here (that was tried); nothing moves until custom_lint ships an analyzer 10+ release, or the project drops custom_lint.
+
+The SDK floor is no longer a factor: the project runs Flutter 3.47.1 / Dart 3.13.1
+(pinned identically in CI), which released the old `meta` pin and let
+`flutter_native_splash` and `intl` move.
+
+`flutter_local_notifications` (now 22.x, which also unblocked `timezone` 0.11) and
+the `win32 ^6` cluster (`share_plus` 13, `package_info_plus` 10, `file_picker` 12)
+have already been taken — see their commits for the migration details. After
+changing the plugin set, **`flutter clean` before rebuilding Android**: a stale
+`GeneratedPluginRegistrant.java` otherwise fails the build with "cannot find
+symbol" for a plugin class that no longer exists.
+
+## Android toolchain
+
+`targetSdk` is pinned to **36** in `android/app/build.gradle` rather than tracking
+`flutter.targetSdkVersion`: the target level decides which platform behaviours
+apply, so it should move deliberately and be re-tested, not shift under a Flutter
+upgrade. `compileSdk` and `minSdk` do follow the Flutter defaults.
+
+Flutter enforces **minimum** Gradle / AGP / Kotlin versions and fails at plugin-apply
+time, one check at a time, so a Flutter bump can require three separate version
+bumps before a build will even configure. Current: Gradle 8.14.3, AGP 8.13.2,
+Kotlin 2.4.0 (`android/gradle/wrapper/gradle-wrapper.properties` and
+`android/settings.gradle`).
+
+**The project is deliberately still on AGP 8.x.** Flutter's template defaults to
+AGP 9, which reads only the new Gradle DSL and would require rewriting
+`android/app/build.gradle`; `android/gradle.properties` carries
+`android.newDsl=false` and `android.builtInKotlin=false` (added by Flutter's own
+migrator) to keep the current DSL working. Builds now warn that AGP <9.0.1 support
+will be dropped soon, so **migrating to AGP 9 + the new DSL is known outstanding
+work** — it is a breaking change, not a version bump.
 
 ## Releases & CI
 
 Releases are tag-driven via GitHub Actions (`.github/workflows/release.yml`). The single trigger is pushing a **semver tag** matching `*.*.*` (e.g. `2.1.0`, **no `v` prefix**). Two jobs run:
 
 - **`changelog`** — checks out `main` (full history), then a bash step reconstructs a new `CHANGELOG.md` section from `git log <prev-tag>..<new-tag>`, bucketing commit subjects by conventional-commit type (`feat`→Added, `fix`→Fixed, `perf`→Performance, `docs`→Documentation, `refactor`/`i18n`/`style`/`build`/unprefixed→Changed; `chore`/`ci`/`test` dropped). It inserts the section directly **below the `<!-- BEGIN_VERSIONS -->` marker** in `CHANGELOG.md` and commits it back to `main` with `[skip ci]`. The step is idempotent (greps for an existing `## <tag>` header first). **The CHANGELOG section header format is `## <version>` with no brackets — if you change that style, update both the marker-insertion code and the idempotency grep in the workflow to match, or auto-updates will duplicate or mis-detect entries.**
-- **`build`** — checks out the tag, sets up Java 17 + Flutter **pinned to `3.41.6`**, runs `build_runner`, reconstructs the release keystore from secrets, builds a single universal signed APK (`flutter build apk --release`), and publishes a GitHub Release (auto-generated notes) with `red_owl-<tag>.apk`.
+- **`build`** — checks out the tag, sets up Java 17 + Flutter **pinned to `3.47.1`**, runs `build_runner`, reconstructs the release keystore from secrets, builds a single universal signed APK (`flutter build apk --release`), and publishes a GitHub Release (auto-generated notes) with `red_owl-<tag>.apk`.
 
 Signing in CI needs four repo secrets: `KEYSTORE_BASE64` (base64 of `android/app/upload-keystore.jks`), `KEYSTORE_PASSWORD`, `KEY_PASSWORD`, `KEY_ALIAS`. The keystore and `android/key.properties` are gitignored (never in the repo); the `build` job writes `android/key.properties` from those secrets at build time. The tag is **not** validated against `pubspec.yaml`'s version — keep them in sync by hand. `CHANGELOG.md` is the user-facing history; the README's Changelog section is just a pointer to it.

@@ -73,7 +73,7 @@ Privacy Policy: <https://moofywoofy.github.io/red-owl/>
 | Immutable models | `freezed` 3.x + `json_serializable` |
 | Local persistence | `drift` (SQLite) for stats, `shared_preferences` for settings |
 | Charts | `fl_chart` 1.x |
-| File picking | `file_picker` 11.x |
+| File picking | `file_picker` 12.x |
 | Sharing / launching | `share_plus`, `url_launcher` |
 | Notifications | `flutter_local_notifications` + `timezone` / `flutter_timezone` (Android) |
 | Localization | `flutter_localizations` + ARB files |
@@ -120,7 +120,7 @@ AGENTS.md                      # Architecture notes and conventions for AI codin
 
 - **Flutter SDK** with Dart `^3.8.0` — install from <https://docs.flutter.dev/get-started/install>
 - **Android Studio** or **Xcode** for the corresponding platform toolchains
-- For Android release builds: **JDK 17+**, Android SDK with platform 35, NDK `28.2.13676358`
+- For Android release builds: **JDK 17+**, Android SDK with platform 36, NDK `28.2.13676358`
 
 Verify your environment:
 
@@ -238,11 +238,11 @@ Outputs land in `build/app/outputs/`.
 
 The Android module pins:
 
-- Kotlin `2.1.0`
-- Android Gradle Plugin `8.9.1`
-- Gradle wrapper `8.11.1`
+- Kotlin `2.4.0`
+- Android Gradle Plugin `8.13.2`
+- Gradle wrapper `8.14.3`
 - NDK `28.2.13676358`
-- `targetSdk` `35`, ABI filters `armeabi-v7a`, `arm64-v8a`, `x86_64`
+- `targetSdk` `36`, ABI filters `armeabi-v7a`, `arm64-v8a`, `x86_64`
 
 The daily reminder requires **core library desugaring** (enabled in `android/app/build.gradle`) for `flutter_local_notifications`. The Android manifest declares the `POST_NOTIFICATIONS`, `RECEIVE_BOOT_COMPLETED` and `SCHEDULE_EXACT_ALARM` permissions, plus the plugin's broadcast receivers (`ScheduledNotificationReceiver`, `ScheduledNotificationBootReceiver`, `ActionBroadcastReceiver`) — the plugin does not declare these itself, and without them a scheduled reminder never posts. The reminder's status-bar and large icons (`ic_stat_reminder`, `ic_notification_large`) live in `res/drawable-*` and are referenced only by name at runtime, so `res/raw/keep.xml` keeps them from being removed by release resource shrinking — without it, enabling the reminder fails in release builds. The reminder is scheduled one notification at a time and re-armed after each completed game so it can skip days you've already played.
 
