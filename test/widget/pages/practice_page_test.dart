@@ -91,9 +91,15 @@ void main() {
       return transform.transform;
     }
 
+    // The practice answer is random, so a guess may or may not win. Either way
+    // the flip runs; drain the snack-bar timers a win schedules so the test
+    // does not end with timers pending.
+    Future<void> drainSnackBars() => tester.pump(const Duration(seconds: 4));
+
     // Game 1 — play a full guess and let its flip finish.
     await submit('APPLE');
     await tester.pumpAndSettle();
+    await drainSnackBars();
 
     // Reset the board the way the "New word" action does.
     await tester.tap(find.byIcon(Icons.refresh));
@@ -110,5 +116,8 @@ void main() {
     expect(midFlip, isNot(equals(settled)),
         reason: 'the second game\'s tile jumped straight to its final '
             'transform, so the flip animation did not run');
+
+    await drainSnackBars();
+    await tester.pumpAndSettle();
   });
 }
