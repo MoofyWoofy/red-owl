@@ -73,7 +73,7 @@ final class GridProvider extends $NotifierProvider<Grid, models.Grid> {
   }
 }
 
-String _$gridHash() => r'b9d5e35b9ca7c936358c78864022d132898a54ef';
+String _$gridHash() => r'a65a1ba72ef825aa66199371e5b70700523c40d0';
 
 /// Riverpod notifier that owns and mutates the entire game board state.
 ///
