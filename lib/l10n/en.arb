@@ -91,6 +91,8 @@
   "import":"Import",
   "view":"View",
   "customList":"Custom list",
+  "wordListEmpty":"This word list is empty.",
+  "wordListLoadError":"The word list could not be loaded.",
   "importInvalidLine":"Line {line}: \"{word}\" is not a valid 5-letter word",
   "@importInvalidLine":{
     "placeholders":{

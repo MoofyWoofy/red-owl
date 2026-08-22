@@ -446,6 +446,18 @@ abstract class AppLocalizations {
   /// **'Custom list'**
   String get customList;
 
+  /// No description provided for @wordListEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'This word list is empty.'**
+  String get wordListEmpty;
+
+  /// No description provided for @wordListLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'The word list could not be loaded.'**
+  String get wordListLoadError;
+
   /// No description provided for @importInvalidLine.
   ///
   /// In en, this message translates to:

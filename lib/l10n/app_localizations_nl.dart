@@ -201,6 +201,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get customList => 'Aangepaste lijst';
 
   @override
+  String get wordListEmpty => 'Deze woordenlijst is leeg.';
+
+  @override
+  String get wordListLoadError => 'De woordenlijst kon niet worden geladen.';
+
+  @override
   String importInvalidLine(int line, String word) {
     return 'Regel $line: \"$word\" is geen geldig woord van 5 letters';
   }

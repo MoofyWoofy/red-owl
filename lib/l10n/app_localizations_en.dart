@@ -201,6 +201,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get customList => 'Custom list';
 
   @override
+  String get wordListEmpty => 'This word list is empty.';
+
+  @override
+  String get wordListLoadError => 'The word list could not be loaded.';
+
+  @override
   String importInvalidLine(int line, String word) {
     return 'Line $line: \"$word\" is not a valid 5-letter word';
   }

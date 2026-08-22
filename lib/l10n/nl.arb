@@ -91,6 +91,8 @@
   "import": "Importeren",
   "view": "Bekijken",
   "customList": "Aangepaste lijst",
+  "wordListEmpty": "Deze woordenlijst is leeg.",
+  "wordListLoadError": "De woordenlijst kon niet worden geladen.",
   "importInvalidLine": "Regel {line}: \"{word}\" is geen geldig woord van 5 letters",
   "@importInvalidLine": {
     "placeholders": {

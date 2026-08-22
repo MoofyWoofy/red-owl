@@ -36,14 +36,23 @@ class _ViewCustomListPageState extends State<ViewCustomListPage> {
         body: FutureBuilder(
           future: _words,
           builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              // Re-throw so the framework's error boundary can catch it.
-              throw snapshot.error!;
-            }
             if (snapshot.connectionState != ConnectionState.done) {
-              return const CircularProgressIndicator();
+              return const Center(child: CircularProgressIndicator());
             }
-            List<String> words = snapshot.data!;
+            if (snapshot.hasError) {
+              // Reading the list can fail (missing or unreadable file); show a
+              // message rather than re-throwing out of build, which replaces
+              // the whole page with a red error screen.
+              return Center(child: Text(context.l10n.wordListLoadError));
+            }
+
+            final words = snapshot.data ?? const <String>[];
+            if (words.isEmpty) {
+              // `prototypeItem` below reads `words.first`, so an empty list has
+              // to be handled before it — it used to throw
+              // `Bad state: No element`.
+              return Center(child: Text(context.l10n.wordListEmpty));
+            }
 
             // Use prototypeItem for O(1) layout — all list tiles are identical height.
             return ListView.builder(
