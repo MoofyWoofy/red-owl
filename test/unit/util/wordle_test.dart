@@ -6,6 +6,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
+import 'package:red_owl/config/shared.dart' show SharedPreferencesKeys;
 import 'package:red_owl/util/shared.dart' show SharedPreferenceService;
 import 'package:red_owl/util/wordle.dart';
 
@@ -318,6 +319,43 @@ void main() {
       expect(result.status, WordListImportStatus.invalidWord);
       expect(result.lineNumber, 2);
       expect(result.invalidWord, 'ch1ir');
+    });
+
+    // Regression: an empty file used to import "successfully" and be written as
+    // the active list. `getWordOfTheDay` then hit `nextInt(0)` -> RangeError,
+    // and because the list is persisted and read during `main()`'s awaited
+    // `WordleService().init()`, the app stopped starting entirely.
+    test('rejects a file with no words', () async {
+      final file = File(p.join(docsDir.path, 'empty.txt'))
+        ..writeAsStringSync('');
+      final result = await WordleService().importWordList(file);
+      expect(result.status, WordListImportStatus.empty);
+    });
+
+    test('rejects a file of only blank lines', () async {
+      final file = File(p.join(docsDir.path, 'blank.txt'))
+        ..writeAsStringSync('\n   \n\t\n\n');
+      final result = await WordleService().importWordList(file);
+      expect(result.status, WordListImportStatus.empty);
+    });
+
+    test('falls back to the bundled list when the custom list is empty',
+        () async {
+      // A backup whose `customWordList` is empty can still put a wordless file
+      // on disk, so reading must degrade to the bundled asset instead of
+      // throwing a RangeError from `nextInt(0)`.
+      setSharedPreferencesMock();
+      await SharedPreferenceService().init();
+      setAssetBundleMock(const ['apple', 'berry', 'chair']);
+      SharedPreferenceService()
+          .setBool(SharedPreferencesKeys.useCustomList, true);
+      File(p.join(docsDir.path, 'custom_list.txt')).writeAsStringSync('');
+
+      await WordleService().init();
+      expect(await WordleService().getWordList, isNotEmpty);
+      expect(WordleService().wordOfTheDay, isNotEmpty);
+
+      setAssetBundleMock(null);
     });
 
     test('rejects files larger than the size cap', () async {

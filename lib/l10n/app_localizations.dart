@@ -464,6 +464,12 @@ abstract class AppLocalizations {
   /// **'File is too large. The maximum size is 5 MB.'**
   String get importTooLarge;
 
+  /// No description provided for @importEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'File contains no words. Add at least one 5-letter word per line.'**
+  String get importEmpty;
+
   /// No description provided for @importFewWords.
   ///
   /// In en, this message translates to:

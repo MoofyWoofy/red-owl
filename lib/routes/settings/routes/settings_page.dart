@@ -475,6 +475,8 @@ class SettingsPage extends ConsumerWidget {
         showSnackBar(context, context.l10n.importReadError, 3);
       case WordListImportStatus.fileTooLarge:
         showSnackBar(context, context.l10n.importTooLarge, 3);
+      case WordListImportStatus.empty:
+        showSnackBar(context, context.l10n.importEmpty, 3);
     }
   }
 

@@ -214,6 +214,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Bestand is te groot. De maximale grootte is 5 MB.';
 
   @override
+  String get importEmpty =>
+      'Bestand bevat geen woorden. Voeg minstens één woord van 5 letters per regel toe.';
+
+  @override
   String importFewWords(int count) {
     return '$count woorden geïmporteerd. Minder dan 365 betekent dat dagelijkse woorden binnen een jaar herhalen.';
   }

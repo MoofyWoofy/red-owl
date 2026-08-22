@@ -117,7 +117,17 @@ class WordleService {
         words = await compute(_parseWordList, data);
 
         File file = File('${directory.path}/custom_list.txt');
-        file.writeAsString(words.join('\n'));
+        await file.writeAsString(words.join('\n'));
+      }
+
+      // A custom list with no usable words cannot answer `getWordOfTheDay`
+      // (`nextInt(0)` throws) and, since it is read on every launch, would stop
+      // the app from starting at all. `importWordList` rejects empty files, but
+      // one can still reach disk via a backup whose `customWordList` is empty,
+      // so fall back to the bundled list rather than failing.
+      if (words.isEmpty) {
+        final String data = await rootBundle.loadString('assets/word_list.txt');
+        words = await compute(_parseWordList, data);
       }
     } else {
       final String data = await rootBundle.loadString('assets/word_list.txt');
@@ -180,6 +190,14 @@ class WordleService {
         .map((e) => e.trim())
         .where((e) => e.isNotEmpty)
         .toList();
+
+    // An empty list would make the word of the day unresolvable
+    // (`nextInt(0)` throws), and because the list is persisted the failure
+    // repeats on every launch — `main()` awaits `WordleService().init()`, so
+    // the app would no longer start. Reject it here instead.
+    if (words.isEmpty) {
+      return const WordListImportResult.empty();
+    }
 
     for (var i = 0; i < words.length; i++) {
       if (!_wordPattern.hasMatch(words[i])) {
@@ -319,6 +337,9 @@ enum WordListImportStatus {
   /// The chosen file could not be read.
   readError,
 
+  /// The chosen file contained no words at all.
+  empty,
+
   /// The chosen file exceeds [WordleService.maxImportFileBytes].
   fileTooLarge,
 }
@@ -344,6 +365,14 @@ class WordListImportResult {
   const WordListImportResult.invalidWord(this.lineNumber, this.invalidWord)
       : status = WordListImportStatus.invalidWord,
         words = null,
+        belowRecommendedMinimum = false;
+
+  /// The file contained no words at all (blank, or only blank lines).
+  const WordListImportResult.empty()
+      : status = WordListImportStatus.empty,
+        words = null,
+        lineNumber = null,
+        invalidWord = null,
         belowRecommendedMinimum = false;
 
   /// The file could not be read.

@@ -213,6 +213,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importTooLarge => 'File is too large. The maximum size is 5 MB.';
 
   @override
+  String get importEmpty =>
+      'File contains no words. Add at least one 5-letter word per line.';
+
+  @override
   String importFewWords(int count) {
     return 'Imported $count words. Fewer than 365 means daily words repeat within a year.';
   }
