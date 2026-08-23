@@ -44,10 +44,15 @@ class Letter extends ConsumerWidget {
         textColor = Colors.white;
         break;
       case LetterStatus.notInWord:
-      case null:
-        // null can occur for ENTER/DELETE which are not in keyboardStatus.
         backgroundColor = Theme.of(context).extension<GameColors>()?.notInWord;
         textColor = Colors.white;
+        break;
+      case null:
+        // Defensive only: every key in `keyboardLayout`, ENTER and DELETE
+        // included, has an entry in the notifier's status map, so this is
+        // unreachable in practice. Render it like an untouched key rather than
+        // a greyed-out one, which is what the old comment wrongly implied.
+        backgroundColor = Theme.of(context).extension<GameColors>()?.initial;
         break;
     }
 

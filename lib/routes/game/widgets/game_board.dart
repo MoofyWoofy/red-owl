@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart'
     show KeyDownEvent, KeyEvent, LogicalKeyboardKey, ServicesBinding;
 import 'package:red_owl/config/shared.dart'
-    show LetterStatus, animationTiming, keyboardStatus;
+    show animationTiming;
 import 'package:red_owl/riverpod/shared.dart' show gridProvider;
 import 'package:red_owl/routes/game/widgets/shared.dart'
     show BounceAnimation, KeyboardRow, PopInAnimation, ShakeAnimation, Tile;
@@ -16,9 +16,10 @@ import 'package:red_owl/routes/game/widgets/shared.dart'
 /// latter overrides `gridProvider` with a [PracticeGrid] via a `ProviderScope`).
 ///
 /// Hardware keyboard input is captured via [ServicesBinding.keyboard] so that
-/// desktop and web users can type letters, ENTER, and BACKSPACE directly. The
-/// keyboard status map is reset on mount so stale colours from a previous
-/// session don't bleed through.
+/// desktop and web users can type letters, ENTER, and BACKSPACE directly. Key
+/// colours come from whichever notifier is bound to `gridProvider`, which
+/// starts from a fresh `initialKeyboardStatus()` map, so colours from another
+/// board can never bleed through.
 class GameBoard extends ConsumerStatefulWidget {
   const GameBoard({super.key});
 
@@ -78,8 +79,10 @@ class _GameBoardState extends ConsumerState<GameBoard> {
   void initState() {
     super.initState();
     ServicesBinding.instance.keyboard.addHandler(_onKey);
-    // Reset all key colors to their default state at the start of each session.
-    keyboardStatus.updateAll((key, val) => LetterStatus.initial);
+    // No keyboard-colour reset here any more. Each notifier now builds its own
+    // `initialKeyboardStatus()` map, so there is no shared global left to go
+    // stale — and mutating one from initState changed notifier state behind
+    // Riverpod's back.
   }
 
   @override

@@ -6,7 +6,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:red_owl/config/shared.dart' show LetterStatus, keyboardStatus;
+import 'package:red_owl/config/shared.dart' show LetterStatus, initialKeyboardStatus;
 import 'package:red_owl/models/shared.dart' show Grid, Tile;
 
 void main() {
@@ -16,7 +16,7 @@ void main() {
       column: 0,
       row: 0,
       tiles: const [],
-      keyboardStatus: keyboardStatus,
+      keyboardStatus: initialKeyboardStatus(),
       runFlipAnimation: false,
       isEnterOrDeletePressed: false,
       isGameWon: false,
@@ -37,7 +37,7 @@ void main() {
       expect(grid.notEnoughCharacters, false);
     });
 
-    test('keyboardStatus contains all 26 letters plus ENTER and DELETE', () {
+    test('initialKeyboardStatus() contains all 26 letters plus ENTER and DELETE', () {
       final grid = makeEmptyGrid();
       expect(grid.keyboardStatus.length, 28);
       expect(grid.keyboardStatus.containsKey('A'), true);
@@ -129,7 +129,7 @@ void main() {
             hasFlipAnimationPlayed: true,
           ),
         ],
-        keyboardStatus: keyboardStatus,
+        keyboardStatus: initialKeyboardStatus(),
         runFlipAnimation: false,
         isEnterOrDeletePressed: false,
         isGameWon: false,
@@ -183,7 +183,7 @@ void main() {
         column: 5,
         row: 6,
         tiles: tiles,
-        keyboardStatus: keyboardStatus,
+        keyboardStatus: initialKeyboardStatus(),
         runFlipAnimation: false,
         isEnterOrDeletePressed: false,
         isGameWon: false,

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:red_owl/routes/game/widgets/shared.dart' show Letter;
-import 'package:red_owl/config/shared.dart' show keyboardStatus;
+import 'package:red_owl/config/shared.dart' show keyboardLayout;
 
 /// Renders a single row of on-screen keyboard keys.
 ///
 /// The full keyboard is split into three rows by [minIndex] / [maxIndex]
-/// which slice the ordered [keyboardStatus] map:
+/// which slice the ordered [keyboardLayout] list:
 /// - Row 1 (Q–P):  minIndex=0,  maxIndex=10
 /// - Row 2 (A–L):  minIndex=11, maxIndex=19, addSpacer=true
 /// - Row 3 (ENTER, Z–M, DELETE): minIndex=20, maxIndex=29
 ///
 /// Keys outside the index range are emitted as zero-size [SizedBox] widgets
-/// so the map iteration stays in sync with the original insertion order.
+/// so the iteration stays in sync with the layout order.
 ///
 /// ENTER and DELETE keys are given a wider flex (8) so they stand out from
 /// letter keys (flex 4).
@@ -43,16 +43,16 @@ class KeyboardRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (addSpacer) const Spacer(),
-        ...keyboardStatus.entries.map((e) {
+        ...keyboardLayout.map((key) {
           index++;
           if (index >= minIndex && index <= maxIndex) {
-            switch (e.key) {
+            switch (key) {
               case 'ENTER':
               case 'DELETE':
                 // Action keys are twice as wide as letter keys.
-                return Expanded(flex: 8, child: Letter(letter: e.key));
+                return Expanded(flex: 8, child: Letter(letter: key));
               default:
-                return Expanded(flex: 4, child: Letter(letter: e.key));
+                return Expanded(flex: 4, child: Letter(letter: key));
             }
           }
           // Keys outside this row's range are invisible placeholders.

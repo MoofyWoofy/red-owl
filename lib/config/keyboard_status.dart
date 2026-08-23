@@ -1,43 +1,53 @@
 import 'package:red_owl/config/letter_status.dart';
 
-/// Default keyboard status map for a QWERTY layout.
+/// The on-screen keyboard layout, in render order.
 ///
-/// Each key maps to its current [LetterStatus] (initial, green, yellow, or
-/// notInWord). The order matches the three physical keyboard rows so that
-/// [KeyboardRow] can slice the map by index range to render each row.
+/// [KeyboardRow] slices this list by index to draw the three physical rows, so
+/// the order here is the source of truth for the layout:
+/// - Row 1 (Q–P), Row 2 (A–L), Row 3 (ENTER, Z–M, DELETE).
 ///
-/// This map is mutable so it can be reset at the start of each game via
-/// `updateAll` in [_WordlePageState.initState].
-Map<String, LetterStatus> keyboardStatus = {
-  // ── Row 1 ──
-  'Q': LetterStatus.initial,
-  'W': LetterStatus.initial,
-  'E': LetterStatus.initial,
-  'R': LetterStatus.initial,
-  'T': LetterStatus.initial,
-  'Y': LetterStatus.initial,
-  'U': LetterStatus.initial,
-  'I': LetterStatus.initial,
-  'O': LetterStatus.initial,
-  'P': LetterStatus.initial,
-  // ── Row 2 ──
-  'A': LetterStatus.initial,
-  'S': LetterStatus.initial,
-  'D': LetterStatus.initial,
-  'F': LetterStatus.initial,
-  'G': LetterStatus.initial,
-  'H': LetterStatus.initial,
-  'J': LetterStatus.initial,
-  'K': LetterStatus.initial,
-  'L': LetterStatus.initial,
-  // ── Row 3 (with ENTER and DELETE action keys) ──
-  'ENTER': LetterStatus.initial,
-  'Z': LetterStatus.initial,
-  'X': LetterStatus.initial,
-  'C': LetterStatus.initial,
-  'V': LetterStatus.initial,
-  'B': LetterStatus.initial,
-  'N': LetterStatus.initial,
-  'M': LetterStatus.initial,
-  'DELETE': LetterStatus.initial,
-};
+/// It is intentionally separate from game state: key *colours* live in the grid
+/// notifier's `keyboardStatus` map; this list only says which keys exist and in
+/// what order.
+const List<String> keyboardLayout = [
+  'Q',
+  'W',
+  'E',
+  'R',
+  'T',
+  'Y',
+  'U',
+  'I',
+  'O',
+  'P',
+  'A',
+  'S',
+  'D',
+  'F',
+  'G',
+  'H',
+  'J',
+  'K',
+  'L',
+  'ENTER',
+  'Z',
+  'X',
+  'C',
+  'V',
+  'B',
+  'N',
+  'M',
+  'DELETE',
+];
+
+/// A fresh, all-[LetterStatus.initial] keyboard status map.
+///
+/// Returns a **new** map on every call, and every board must start from one.
+/// This used to be a single mutable top-level map handed straight to the grid
+/// notifier as its initial state and then mutated in place (`updateAll`) when
+/// the board mounted — which changed notifier state without going through
+/// Riverpod (no rebuild) and shared one object between the daily and practice
+/// provider scopes.
+Map<String, LetterStatus> initialKeyboardStatus() => {
+      for (final key in keyboardLayout) key: LetterStatus.initial,
+    };

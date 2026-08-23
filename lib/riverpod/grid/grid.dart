@@ -17,7 +17,7 @@ import 'package:red_owl/util/shared.dart'
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:red_owl/models/shared.dart' as models;
 import 'package:red_owl/config/shared.dart'
-    show LetterStatus, SharedPreferencesKeys, keyboardStatus;
+    show LetterStatus, SharedPreferencesKeys, initialKeyboardStatus;
 
 part 'grid.g.dart';
 
@@ -88,7 +88,7 @@ class Grid extends _$Grid {
         column: 0,
         row: 0,
         tiles: [],
-        keyboardStatus: keyboardStatus,
+        keyboardStatus: initialKeyboardStatus(),
         runFlipAnimation: false,
         isEnterOrDeletePressed: false,
         isGameWon: false,
@@ -363,7 +363,7 @@ class Grid extends _$Grid {
       column: 0,
       row: 0,
       tiles: [],
-      keyboardStatus: keyboardStatus,
+      keyboardStatus: initialKeyboardStatus(),
       runFlipAnimation: false,
       isEnterOrDeletePressed: false,
       isGameWon: false,

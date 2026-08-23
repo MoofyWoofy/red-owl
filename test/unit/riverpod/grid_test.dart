@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:red_owl/config/shared.dart'
-    show LetterStatus, SharedPreferencesKeys, keyboardStatus;
+    show LetterStatus, SharedPreferencesKeys, initialKeyboardStatus;
 import 'package:red_owl/database/database.dart';
 import 'package:red_owl/models/shared.dart' as models;
 import 'package:red_owl/riverpod/shared.dart' show gridProvider;
@@ -381,7 +381,7 @@ void main() {
             hasFlipAnimationPlayed: false,
           ),
         ],
-        keyboardStatus: keyboardStatus,
+        keyboardStatus: initialKeyboardStatus(),
         runFlipAnimation: false,
         isEnterOrDeletePressed: false,
         isGameWon: false,
@@ -461,7 +461,7 @@ void main() {
         column: 5,
         row: 1,
         tiles: tiles,
-        keyboardStatus: keyboardStatus,
+        keyboardStatus: initialKeyboardStatus(),
         runFlipAnimation: false,
         isEnterOrDeletePressed: false,
         isGameWon: false,

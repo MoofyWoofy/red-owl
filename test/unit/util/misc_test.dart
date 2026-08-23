@@ -4,7 +4,7 @@
 // convertListStringToListDouble, isGameInProgress, and getWinRate.
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart' show Intl;
-import 'package:red_owl/config/shared.dart' show LetterStatus, keyboardStatus;
+import 'package:red_owl/config/shared.dart' show LetterStatus, initialKeyboardStatus;
 import 'package:red_owl/models/shared.dart' show Grid, Tile;
 import 'package:red_owl/util/misc.dart';
 
@@ -140,7 +140,7 @@ void main() {
             hasFlipAnimationPlayed: false,
           ),
         ],
-        keyboardStatus: keyboardStatus,
+        keyboardStatus: initialKeyboardStatus(),
         runFlipAnimation: false,
         isEnterOrDeletePressed: false,
         isGameWon: false,
@@ -155,7 +155,7 @@ void main() {
         column: 0,
         row: 0,
         tiles: const [],
-        keyboardStatus: keyboardStatus,
+        keyboardStatus: initialKeyboardStatus(),
         runFlipAnimation: false,
         isEnterOrDeletePressed: false,
         isGameWon: false,
@@ -176,7 +176,7 @@ void main() {
             hasFlipAnimationPlayed: true,
           ),
         ],
-        keyboardStatus: keyboardStatus,
+        keyboardStatus: initialKeyboardStatus(),
         runFlipAnimation: false,
         isEnterOrDeletePressed: false,
         isGameWon: true,

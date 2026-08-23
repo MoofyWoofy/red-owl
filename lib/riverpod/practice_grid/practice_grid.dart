@@ -1,5 +1,5 @@
 import 'dart:async' show unawaited;
-import 'package:red_owl/config/shared.dart' show keyboardStatus;
+import 'package:red_owl/config/shared.dart' show initialKeyboardStatus;
 import 'package:red_owl/models/shared.dart' as models;
 import 'package:red_owl/riverpod/grid/grid.dart' show Grid;
 import 'package:red_owl/util/shared.dart' show WordleService;
@@ -36,7 +36,7 @@ class PracticeGrid extends Grid {
         column: 0,
         row: 0,
         tiles: [],
-        keyboardStatus: keyboardStatus,
+        keyboardStatus: initialKeyboardStatus(),
         runFlipAnimation: false,
         isEnterOrDeletePressed: false,
         isGameWon: false,

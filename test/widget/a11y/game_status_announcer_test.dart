@@ -3,7 +3,7 @@ import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:red_owl/config/shared.dart' show keyboardStatus;
+import 'package:red_owl/config/shared.dart' show initialKeyboardStatus;
 import 'package:red_owl/database/database.dart';
 import 'package:red_owl/models/shared.dart' as models;
 import 'package:red_owl/riverpod/shared.dart' show gridProvider;
@@ -39,7 +39,7 @@ void main() {
         column: 0,
         row: row,
         tiles: const [],
-        keyboardStatus: keyboardStatus,
+        keyboardStatus: initialKeyboardStatus(),
         runFlipAnimation: false,
         isEnterOrDeletePressed: false,
         isGameWon: won,
