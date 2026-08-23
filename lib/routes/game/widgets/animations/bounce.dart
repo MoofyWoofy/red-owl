@@ -77,12 +77,20 @@ class _BounceAnimationState extends State<BounceAnimation>
   @override
   void didUpdateWidget(covariant BounceAnimation oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.runAnimation) {
+    // Only react to the trigger actually turning on. `didUpdateWidget` fires on
+    // every rebuild, so without this a rebuild during the win would queue
+    // another delayed start.
+    if (widget.runAnimation && !oldWidget.runAnimation) {
       Future.delayed(Duration(milliseconds: widget.delay), () {
         // The delay can outlive the widget (e.g. leaving the page right after a
         // win); don't drive a disposed controller.
         if (!mounted) return;
-        _animationController.forward();
+        // `forward(from: 0)`, matching PopInAnimation and ShakeAnimation: the
+        // controller finishes at 1.0 and keeps that value, so a plain
+        // `forward()` on a second win completes instantly and no bounce is
+        // seen. Practice mode wins repeatedly, so every win after the first
+        // was silent.
+        _animationController.forward(from: 0);
       });
     }
   }
