@@ -13,7 +13,6 @@ dart run build_runner watch --delete-conflicting-outputs   # regenerate continuo
 
 flutter run                          # run on default device (also -d chrome, -d <id>)
 flutter analyze                      # static analyzer
-dart run custom_lint                 # riverpod_lint + custom lints (NOT covered by flutter analyze)
 dart format lib test
 
 flutter test                                          # all unit + widget tests
@@ -22,7 +21,13 @@ flutter test --plain-name "name of test"              # single test by name
 flutter test integration_test/                        # integration tests (needs a device)
 ```
 
-`flutter analyze` does not run the Riverpod lints — run `dart run custom_lint` separately to catch provider misuse.
+**There is no `custom_lint` / `riverpod_lint` any more.** They were removed in the
+2026-08 pass because `custom_lint` 0.8.1 pins `analyzer ^8` and had frozen eleven
+direct dependencies — including, indirectly, the whole Riverpod runtime. `flutter
+analyze` is now the only static check, so Riverpod-specific mistakes (a provider
+read that should be a watch, a missing dependency) are no longer caught
+automatically. **Re-add both as soon as `custom_lint` ships a release supporting
+analyzer 10 or newer** — see *Dependencies* below.
 
 ## Code generation is mandatory
 
@@ -60,7 +65,29 @@ When adding a new file to a directory, add it to that directory's `shared.dart` 
 
 **Backup / restore.** `BackupService` (`lib/util/backup_service.dart`, also a singleton) serialises settings, stats and the full `History` table into one versioned JSON document (`backupVersion`), and optionally the custom word list. The Settings page's Export/Import buttons drive it via `share_plus` / `file_picker`. `importFromJson` validates the entire document **before** writing anything, so a malformed file leaves existing data untouched; after a successful import the caller re-inits `WordleService`, resets the board, and invalidates the dark-mode / custom-list `boolFamilyProvider`s so the UI reflects the restored values. The in-progress board (`gridState`) is intentionally **not** part of a backup.
 
+`backupVersion` is **2**. Version 1 carried only `isDarkMode` and
+`useCustomList`; version 2 carries *every* user preference, declared once in
+`_backedUpBoolSettings` / `_backedUpStringSettings` — add a new preference to
+those maps and both export and import pick it up. Version 1 files still import
+(absent keys are skipped). When you add a restorable preference, also invalidate
+its provider in `SettingsPage._importData`, or the UI keeps showing the
+pre-import value until restart.
+
 That up-front validation covers **both** the `history` rows and the `stats` counter arrays (`_parseCounters`, which requires exactly `statsDataLength` / `guessDistributionLength` non-negative integers). Validating stats is not optional politeness: they are consumed positionally and numerically (`Grid._updateStatsData` destructures `statsData` into four fields and `int.parse`s them; `guessDistribution` is indexed by row), so a wrong length or a non-numeric entry does not fail at import — it breaks the next finished game. Anything new added to a backup needs the same treatment: validate before the first write, or it becomes a delayed crash somewhere else.
+
+**Day-scoped state is resolved once, then refreshed on resume.** The word of the
+day, the rollover archive in `Grid.build` and the once-a-day hint are all decided
+from `DateTime.now()` when their provider is first built. Two consequences worth
+knowing:
+
+- The rollover archive is **lazy**: `Grid.build` runs on the first *read* of
+  `gridProvider`, which is when the board is opened — not at app launch, since
+  `HomePage` does not watch it. Yesterday's unfinished game is archived when the
+  player next opens Daily.
+- An app left open across midnight would otherwise keep yesterday's word and a
+  spent hint. `_AppState` (a `WidgetsBindingObserver` in `main.dart`) re-checks
+  on resume via `hasDayRolledOver(lastSeen, now)` and, on a new day, re-inits
+  `WordleService` and invalidates `gridProvider` + `hintProvider`.
 
 **Game state lives in one Riverpod notifier.** `Grid` (`lib/riverpod/grid/grid.dart`) owns the entire board. All input — letters, DELETE, ENTER — funnels through `onKeyboardPressed`. Its `build()` rehydrates an in-progress game from a base64-encoded JSON blob in SharedPreferences and handles **day rollover**: if the stored game is from a previous day and wasn't finished, it's archived to the database as `GameState.incomplete` and a fresh board is returned. On a submitted guess it also enforces **hard mode** (`_hardModeViolation`, gated by the `isHardMode` pref — green letters must stay put, yellow letters must reappear) and celebrates **streak milestones** (`isStreakMilestone`) by swapping the win snackbar for a share nudge. Outcome side effects go through two overridable hooks — `recordOutcome` (stats + history) and `getGuessResult` (answer lookup) — so practice mode can change them without duplicating `onKeyboardPressed`.
 
@@ -70,14 +97,32 @@ That up-front validation covers **both** the `history` rows and the `stats` coun
 
 **Reveal animation finalization & lifecycle.** The per-tile flip (`tile.dart`) and the staggered win-row bounce (`animations/bounce.dart`) start via `Future.delayed`, so their callbacks must guard `mounted` before driving the `AnimationController` — otherwise leaving the board mid-animation throws `AnimationController.forward() called after dispose()`. When the flip completes, `Tile` finalizes the board from the **current** `gridProvider` state (read fresh, not the value captured when the flip was scheduled), so letters typed during the animation survive; only already-revealed (non-`initial`) tiles are marked `hasFlipAnimationPlayed`.
 
+**Every tile animation must reset before it plays.** `PopInAnimation`,
+`ShakeAnimation` and `BounceAnimation` all replay on the same widget, and an
+`AnimationController` holds its value at 1.0 once finished — so a bare
+`forward()` on the second play completes instantly and nothing moves. Use
+`reset(); forward();` or `forward(from: 0)`. Practice mode is where this shows,
+since it wins repeatedly. Bounce also guards on
+`runAnimation && !oldWidget.runAnimation`, because `didUpdateWidget` fires on
+every rebuild.
+
 The flip is scheduled from `ref.listen(gridProvider, ...)` (`_maybeStartFlip`), **not** from `build`. Starting an animation, writing notifier state and persisting to SharedPreferences are side effects and must not run as part of rendering — from `build` every rebuild inside the flip window queued another callback, including rebuilds caused by unrelated things like a theme change. The controller is driven with `forward(from: 0)` and the callback bails out if `isAnimating` or if `runFlipAnimation` has already been cleared: the controller keeps its value between games, so a plain `forward()` after `resetGrid()` completes instantly and the tiles snap to their colour with no flip (most visible in practice mode, which resets on every "New word").
+
+**Keyboard layout and keyboard colours are separate things.** `keyboardLayout`
+(`config/keyboard_status.dart`) is a `const List<String>` giving the render order
+that `KeyboardRow` slices; `initialKeyboardStatus()` returns a **fresh** map for
+each board's initial state. They used to be one mutable top-level map that was
+handed straight to the notifier and then mutated in place by
+`GameBoard.initState`, which changed notifier state behind Riverpod's back and
+shared one object between the daily and practice scopes. Never reintroduce a
+shared mutable default — give each board its own map.
 
 **Practice mode reuses the daily UI via a provider override.** `PracticeGrid` (`lib/riverpod/practice_grid/practice_grid.dart`) **subclasses** `Grid`: it overrides `build()`/`resetGrid()` to use a fresh random word (`WordleService().randomWord()`), `getGuessResult` to score against that word, and `recordOutcome` to a no-op (no stats/history). Its board sets `persistState: false`, so the `Tile` widget skips writing `gridState` and the daily save is never clobbered. `PracticePage` (`lib/routes/game/practice_page.dart`) wraps its subtree in a `ProviderScope` that does `gridProvider.overrideWith(PracticeGrid.new)`, so the shared **`GameBoard`** widget (`lib/routes/game/widgets/game_board.dart`, the grid + keyboard + hardware-key handler, used by both `WordlePage` and `PracticePage`) and all tiles/keys read the practice notifier unchanged. The game board is pinned to LTR (5-letter Latin words / QWERTY) even when the rest of the UI is RTL.
 
 **Hints, sharing and accessibility.** `HintNotifier` (`lib/riverpod/hint/hint_notifier.dart`) gates the once-a-day hint by storing the usage date. `buildEmojiGrid` (`lib/util/share_grid.dart`) is a pure builder for the NYT-style emoji result (color-blind aware); the share/hint actions live in `lib/routes/game/widgets/`. Tiles and keys carry `Semantics` labels (`a11y_labels.dart`), a `GameStatusAnnouncer` live region announces win/loss, and on-screen keys expose an explicit `onTap` so assistive tech can activate them.
 
 **Stats are split across two stores, by design:**
-- Aggregate stats (games played/won, current/max streak, guess distribution) are plain string-list arrays in SharedPreferences, updated in `_updateStatsData`. The Stats page derives win rate and average guesses from these (`getWinRate`, `getAverageGuesses` in `lib/util/misc.dart`).
+- Aggregate stats (games played/won, current/max streak, guess distribution) are plain string-list arrays in SharedPreferences, updated in `_updateStatsData`. **Never index or destructure these arrays directly** — they are persisted data and an install that ran an older build can hold a short or non-numeric one. Read them through `normalizeCounters(stored, statsDataLength | guessDistributionLength)` (`util/misc.dart`), which pads, truncates and zeroes bad entries. Both Stats-page readers and the writer go through it; skipping it is what made the Stats page throw `RangeError` on a malformed array. The Stats page derives win rate and average guesses from these (`getWinRate`, `getAverageGuesses` in `lib/util/misc.dart`).
 - Per-game history is a Drift/SQLite `History` table (`lib/database/database.dart`), one row per day (`date` is the primary key), written in `_addToDatabase` with `InsertMode.insertOrReplace`. The replace matters: `resetGrid()` restarts the board (word-list toggle, word-list import, backup restore) without clearing that day's existing row, so a plain insert raises `UNIQUE constraint failed: history.date` when the replacement game finishes. Any new write to this table needs the same mode. The `History` widget reads it for the list and supports a date filter (all / rolling 30 days / custom range) by adding a `where` to the query. The Stats page's reset action clears both stores and bumps a key to rebuild the data-reading children.
 
 **Notifications (Android).** `NotificationService` (`lib/util/notification_service.dart`, a singleton) wraps `flutter_local_notifications` for the opt-in daily reminder (off by default). It uses timezone-aware scheduling with a **hybrid exact/inexact** mode (`_scheduleMode()`): if exact alarms are permitted (`canScheduleExactNotifications`) it schedules to-the-minute (`exactAllowWhileIdle`), otherwise it falls back to `inexactAllowWhileIdle` so the reminder still works without the special permission. Enabling the reminder best-effort requests the exact-alarm permission (`requestExactAlarmPermission`, opens system settings on Android 12+). The reminder is an **OS-level daily repeat** (`matchDateTimeComponents: DateTimeComponents.time`): the plugin re-fires it at the next occurrence of the time every day, so it keeps nudging even if the app is never reopened (e.g. the player ignores a reminder and doesn't play — the next day still fires). It is (re)scheduled only when the reminder is enabled and when its time changes (`ReminderSetting`). Consequence of the OS repeat: it fires **every** day at the set time regardless of whether the player already played that day — the plugin cannot skip individual days, so there is intentionally no skip-played logic (`Grid.recordOutcome` no longer touches the reminder). The notification carries a monochrome white-owl status-bar icon (`ic_stat_reminder`, generated from the launcher foreground) and **no large icon**. Because that icon is referenced **only by name string at runtime** (never via `R.drawable`), Flutter's release build (R8 + `shrinkResources`) marks it unreachable and strips it — so `res/raw/keep.xml` (`tools:keep`) must retain it, otherwise `scheduleDailyReminder` throws `PlatformException(invalid_icon)` in **release only** and the reminder toggle silently fails (debug builds don't shrink, so this never reproduces there; guarded by `test/unit/android_manifest_test.dart`). As a backstop, `ReminderSetting._setEnabled` wraps scheduling in a try/catch and surfaces a snackbar (`reminderError`) instead of leaving the toggle stuck off. The underlying plugin is injectable via `pluginForTesting`. The `ReminderSetting` widget owns the toggle + time picker and localizes the notification text at schedule time; the chosen time is held in `ReminderTimeNotifier` (`lib/riverpod/reminder_time/reminder_time_notifier.dart`), persisted as an `HH:mm` string under `SharedPreferencesKeys.reminderTime` (default 8 PM), so the picker reflects a new time immediately instead of only after a restart. Native requirements: core library desugaring in `android/app/build.gradle`, `res/raw/keep.xml` to keep the notification icon through release resource shrinking, the `POST_NOTIFICATIONS`/`RECEIVE_BOOT_COMPLETED`/`SCHEDULE_EXACT_ALARM` manifest permissions, and the plugin's broadcast receivers (`ScheduledNotificationReceiver`, `ScheduledNotificationBootReceiver`, `ActionBroadcastReceiver`) declared in `AndroidManifest.xml` — the plugin still does **not** declare them itself as of v22 (its manifest carries only the `VIBRATE` and `POST_NOTIFICATIONS` permissions), and without `ScheduledNotificationReceiver` the alarm fires but no notification is ever posted (`test/unit/android_manifest_test.dart` guards this).
@@ -135,13 +180,32 @@ Also, Git Bash rewrites device paths: `adb shell ls /sdcard` becomes
 `/Files/Git/sdcard`. Export `MSYS_NO_PATHCONV=1` for any adb command taking an
 on-device path.
 
-**`dart run custom_lint` crashes if a stale `build/` directory is present**, with `PathNotFoundException: Directory listing failed` on some deep Gradle transform path — it walks `build/` looking for pubspecs. `flutter clean` fixes it; the failure says nothing about your code.
+(The old "custom_lint crashes on a stale `build/` directory" gotcha is gone with
+custom_lint itself.)
 
 ## Dependencies
 
-`^` constraints already let pub pick the newest compatible version, so raising a lower bound in `pubspec.yaml` unlocks nothing on its own — if `flutter pub outdated` shows *Resolvable* equal to *Current*, something is capping it. As of the 2026-08 maintenance pass the caps are:
+`^` constraints already let pub pick the newest compatible version, so raising a
+lower bound in `pubspec.yaml` unlocks nothing on its own — if `flutter pub
+outdated` shows *Resolvable* equal to *Current*, some other package is capping it,
+and that is what has to move.
 
-- **`custom_lint` 0.8.1 is the single blocker for almost everything left.** It pins `analyzer ^8` and has no newer release. Directly that caps `build_runner` (<2.15.2), `json_serializable` (<6.14.1), `freezed` (<3.2.5) and `drift_dev` (<2.34.1). Less obviously it also caps the **entire Riverpod stack**, not just the lint: `riverpod_lint` >=3.1.1 needs analyzer ^9+, so it is stuck at 3.1.0 — and 3.1.0 pins `riverpod` to *exactly* 3.1.0, which in turn freezes `flutter_riverpod` and `riverpod_annotation`. Upgrading Flutter does **not** help here (that was tried); nothing moves until custom_lint ships an analyzer 10+ release, or the project drops custom_lint.
+**Everything is currently up to date** — `flutter pub outdated` reports no
+upgradable direct or dev dependency.
+
+That was only possible by **removing `custom_lint` and `riverpod_lint`**.
+`custom_lint` 0.8.1 pins `analyzer ^8` and has had no release since; that single
+constraint capped `build_runner`, `json_serializable`, `freezed` and `drift_dev`
+directly, and the entire Riverpod stack indirectly (`riverpod_lint` 3.1.0 pins
+`riverpod` to *exactly* 3.1.0, freezing `flutter_riverpod` and
+`riverpod_annotation` with it). Upgrading Flutter does not help — that was tried.
+Forcing a newer analyzer through `dependency_overrides` resolves but does not
+work: `custom_lint_visitor` then fails to compile (`'NormalFormalParameter' isn't
+a type`).
+
+**Watch for a `custom_lint` release supporting analyzer 10+ and re-add both
+packages** (plus the `plugins: - custom_lint` entry under `analyzer:` in
+`analysis_options.yaml`). Until then the Riverpod lints are simply not running.
 
 The SDK floor is no longer a factor: the project runs Flutter 3.47.1 / Dart 3.13.1
 (pinned identically in CI), which released the old `meta` pin and let

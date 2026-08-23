@@ -48,6 +48,7 @@ Privacy Policy: <https://moofywoofy.github.io/red-owl/>
 - **Once-a-day hint** — reveal a single correct letter when you're stuck.
 - **Custom word lists** — import any `.txt` file (one word per line) and play against your own dictionary.
 - **Stats tracking** — local Drift database records every game, surfacing games played/won, win rate, current/max streak, average guesses, guess distribution and a filterable history (all / last 30 days / custom range), with a reset option.
+- **Backup & restore** — export every setting, your stats and your full game history (and optionally your custom word list) to a single JSON file, and import it on another device.
 - **Sharing** — copy a spoiler-free NYT-style emoji result grid, plus celebratory streak-milestone prompts.
 - **Daily reminder** — optional local notification at a time you choose that repeats every day (Android, off by default).
 - **Theming & readability** — light/dark mode, a color-blind / high-contrast palette, adjustable text size, and an animation-speed control.
@@ -70,14 +71,14 @@ Privacy Policy: <https://moofywoofy.github.io/red-owl/>
 | --- | --- |
 | Framework | Flutter (Dart SDK `^3.8.0`) |
 | State management | `flutter_riverpod` 3.x with `riverpod_generator` 4.x |
-| Immutable models | `freezed` 3.x + `json_serializable` |
+| Immutable models | `freezed` 4.x + `json_serializable` |
 | Local persistence | `drift` (SQLite) for stats, `shared_preferences` for settings |
 | Charts | `fl_chart` 1.x |
 | File picking | `file_picker` 12.x |
 | Sharing / launching | `share_plus`, `url_launcher` |
 | Notifications | `flutter_local_notifications` + `timezone` / `flutter_timezone` (Android) |
 | Localization | `flutter_localizations` + ARB files |
-| Linting | `flutter_lints`, `custom_lint`, `riverpod_lint` |
+| Linting | `flutter_lints` (via `flutter analyze`) |
 | Icons / splash | `flutter_launcher_icons`, `flutter_native_splash` |
 
 ## Project Structure
@@ -194,13 +195,13 @@ To add a new language, drop a `xx.arb` file alongside the existing ones and rebu
 ### Linting and Analysis
 
 ```bash
-flutter analyze                              # standard analyzer
-dart run custom_lint                         # riverpod_lint and other custom lints
+flutter analyze                              # static analyzer
 dart format lib test                         # format
 flutter test                                 # widget/unit tests
+flutter test integration_test/               # end-to-end tests (needs a device)
 ```
 
-`flutter analyze` does not run the Riverpod lints, so run `custom_lint` separately. If `custom_lint` fails with `PathNotFoundException: Directory listing failed` on a path under `build/`, run `flutter clean` first — it scans `build/` for pubspecs and trips over stale Gradle artifacts.
+`custom_lint` / `riverpod_lint` are not currently used: `custom_lint` 0.8.1 pins an old `analyzer` and was holding back eleven dependencies, so it was removed. They should be reinstated once it supports `analyzer` 10+ — see the Dependencies section of [AGENTS.md](AGENTS.md).
 
 ## Custom Word Lists
 
@@ -244,7 +245,7 @@ The Android module pins:
 - NDK `28.2.13676358`
 - `targetSdk` `36`, ABI filters `armeabi-v7a`, `arm64-v8a`, `x86_64`
 
-The daily reminder requires **core library desugaring** (enabled in `android/app/build.gradle`) for `flutter_local_notifications`. The Android manifest declares the `POST_NOTIFICATIONS`, `RECEIVE_BOOT_COMPLETED` and `SCHEDULE_EXACT_ALARM` permissions, plus the plugin's broadcast receivers (`ScheduledNotificationReceiver`, `ScheduledNotificationBootReceiver`, `ActionBroadcastReceiver`) — the plugin does not declare these itself, and without them a scheduled reminder never posts. The reminder's status-bar and large icons (`ic_stat_reminder`, `ic_notification_large`) live in `res/drawable-*` and are referenced only by name at runtime, so `res/raw/keep.xml` keeps them from being removed by release resource shrinking — without it, enabling the reminder fails in release builds. The reminder is scheduled one notification at a time and re-armed after each completed game so it can skip days you've already played.
+The daily reminder requires **core library desugaring** (enabled in `android/app/build.gradle`) for `flutter_local_notifications`. The Android manifest declares the `POST_NOTIFICATIONS`, `RECEIVE_BOOT_COMPLETED` and `SCHEDULE_EXACT_ALARM` permissions, plus the plugin's broadcast receivers (`ScheduledNotificationReceiver`, `ScheduledNotificationBootReceiver`, `ActionBroadcastReceiver`) — the plugin does not declare these itself, and without them a scheduled reminder never posts. The reminder's monochrome status-bar icon (`ic_stat_reminder`) lives in `res/drawable-*` and is referenced only by name at runtime, so `res/raw/keep.xml` keeps it from being removed by release resource shrinking — without it, enabling the reminder fails in release builds. The reminder is an **OS-level daily repeat** (`matchDateTimeComponents: time`), so it keeps firing every day at the chosen time even if the app is never reopened; it is (re)scheduled only when the toggle is switched on or the time is changed. Because the plugin cannot skip individual days, it fires whether or not you have already played.
 
 ### iOS
 
