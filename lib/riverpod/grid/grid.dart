@@ -392,19 +392,15 @@ class Grid extends _$Grid {
   /// Called from the Settings page when the user switches word lists while
   /// a game is in progress (after confirming the confirmation dialog).
   void resetGrid() {
-    SharedPreferenceService().remove(SharedPreferencesKeys.gridState);
+    // Observed rather than dropped: `remove` is async, and an unobserved
+    // rejection surfaces as an unhandled error in the zone rather than at the
+    // call site. Clearing the saved board is best-effort -- the fresh state
+    // below is what the player sees either way.
+    unawaited(SharedPreferenceService()
+        .remove(SharedPreferencesKeys.gridState)
+        .catchError((Object _) {}));
 
-    state = models.Grid(
-      column: 0,
-      row: 0,
-      tiles: [],
-      keyboardStatus: initialKeyboardStatus(),
-      runFlipAnimation: false,
-      isEnterOrDeletePressed: false,
-      isGameWon: false,
-      isGameOver: false,
-      notEnoughCharacters: false,
-    );
+    state = _emptyBoard();
   }
 
   /// Replaces the keyboard status map in the current state.

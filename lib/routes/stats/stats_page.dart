@@ -77,7 +77,11 @@ class _StatsPageState extends State<StatsPage> {
           // ── Reset statistics button ──────────────────────────────────────
           IconButton(
             tooltip: context.l10n.resetStats,
-            onPressed: () => _resetStats(context),
+            // Observed rather than dropped: `_resetStats` awaits preference
+            // and database writes, and an unobserved rejection surfaces as an
+            // unhandled error in the zone instead of at the call site.
+            onPressed: () => unawaited(
+                _resetStats(context).catchError((Object _) {})),
             icon: const Icon(Icons.delete_outline),
           ),
           // ── Share button ─────────────────────────────────────────────────
