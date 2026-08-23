@@ -34,57 +34,42 @@ part 'grid.g.dart';
 ///   checks win/loss conditions, persists stats, and writes the history record.
 @riverpod
 class Grid extends _$Grid {
-  /// Rehydrates the game board from SharedPreferences on app startup.
+  /// Decodes a board persisted by the [Tile] widget, or returns `null` when the
+  /// stored value cannot be read.
   ///
-  /// Handles the day-rollover scenario: if the stored [gameDate] is before
-  /// today and the game was not yet over, the partial game is written to the
-  /// database as [GameState.incomplete] before a fresh grid is returned.
-  @override
-  models.Grid build() {
-    String? gridBase64 =
-        SharedPreferenceService().getString(SharedPreferencesKeys.gridState);
-
-    // Determine which day the saved grid belongs to.
-    String? gameDateString =
-        SharedPreferenceService().getString(SharedPreferencesKeys.gameDate);
-    DateTime gameDate = gameDateString == null
-        ? getDateOnly(DateTime.now())
-        : getDateOnly(stringToDate(gameDateString));
-
-    DateTime today = getDateOnly(DateTime.now());
-
-    if (gameDate != today) {
-      // Day has rolled over — archive the incomplete game if any data exists.
-      if (gridBase64 != null) {
-        String gridJsonString = utf8.decode(base64.decode(gridBase64));
-        final grid = models.Grid.fromJson(jsonDecode(gridJsonString));
-        if (!grid.isGameOver) {
-          // Only save to history if the game was not already finished.
-          // `build` is synchronous, so this write cannot be awaited; make that
-          // explicit and swallow failures rather than letting them surface as
-          // an unhandled async error that takes down the zone. Losing one
-          // archived row is not worth crashing the app on startup.
-          unawaited(
-            _addToDatabase(gameState: GameState.incomplete, date: gameDate)
-                .catchError((Object _) {}),
-          );
-        }
-      }
-
-      // Advance gameDate to today and clear the stale grid.
-      SharedPreferenceService().setString(
-          SharedPreferencesKeys.gameDate, dateToString(DateTime.now()));
-      gameDate = getDateOnly(DateTime.now());
-
-      gridBase64 = null;
-      unawaited(SharedPreferenceService()
-          .remove(SharedPreferencesKeys.gridState)
-          .catchError((Object _) {}));
+  /// The value is base64-wrapped JSON, and every layer of that can fail on a
+  /// value that is already on disk: a partial write leaves invalid base64, a
+  /// downgrade to a build with a different model shape leaves JSON that
+  /// `fromJson` rejects, and a hand-edited backup can leave anything at all.
+  /// Letting any of those throw out of [build] puts `gridProvider` into an
+  /// error state, and because the bad value stays persisted it does so again on
+  /// every launch — leaving no way out but clearing the app's data (and with it
+  /// the player's stats). Treat an unreadable board as no saved game instead.
+  static models.Grid? _decodeGrid(String encoded) {
+    try {
+      return models.Grid.fromJson(
+          jsonDecode(utf8.decode(base64.decode(encoded))));
+    } catch (_) {
+      // Deliberately broad: base64, utf8 and jsonDecode each throw
+      // FormatException, while `fromJson` throws a TypeError on a shape it does
+      // not recognise. They are all the same problem here.
+      return null;
     }
+  }
 
-    if (gridBase64 == null) {
-      // No saved game — start with a blank board.
-      return models.Grid(
+  /// Parses a persisted `yyyy-MM-dd` stamp, or returns `null` when it is not a
+  /// readable date. Corrupt just like [_decodeGrid]'s input, and just as fatal
+  /// to [build] if it were allowed to throw.
+  static DateTime? _decodeDate(String raw) {
+    try {
+      return getDateOnly(stringToDate(raw));
+    } on FormatException {
+      return null;
+    }
+  }
+
+  /// A blank board.
+  models.Grid _emptyBoard() => models.Grid(
         column: 0,
         row: 0,
         tiles: [],
@@ -95,11 +80,61 @@ class Grid extends _$Grid {
         isGameOver: false,
         notEnoughCharacters: false,
       );
-    } else {
-      // Decode and deserialize the persisted grid.
-      String gridJsonString = utf8.decode(base64.decode(gridBase64));
-      return models.Grid.fromJson(jsonDecode(gridJsonString));
+
+  /// Rehydrates the game board from SharedPreferences on app startup.
+  ///
+  /// Handles the day-rollover scenario: if the stored [gameDate] is before
+  /// today and the game was not yet over, the partial game is written to the
+  /// database as [GameState.incomplete] before a fresh grid is returned.
+  ///
+  /// Both persisted values are decoded defensively — see [_decodeGrid].
+  @override
+  models.Grid build() {
+    final prefs = SharedPreferenceService();
+    final today = getDateOnly(DateTime.now());
+
+    final storedGridRaw = prefs.getString(SharedPreferencesKeys.gridState);
+    final storedGrid =
+        storedGridRaw == null ? null : _decodeGrid(storedGridRaw);
+    final storedDateRaw = prefs.getString(SharedPreferencesKeys.gameDate);
+    final storedDate =
+        storedDateRaw == null ? null : _decodeDate(storedDateRaw);
+
+    // Present but unreadable, as opposed to simply absent.
+    final gridUnreadable = storedGridRaw != null && storedGrid == null;
+    final dateUnreadable = storedDateRaw != null && storedDate == null;
+
+    // A *missing* date means a board saved before any stamp was written; keep
+    // treating that as today's board. An *unreadable* one is different: there
+    // is no way to tell which day the board belongs to, so it can neither be
+    // trusted as today's nor archived under a known date.
+    final gameDate = storedDate ?? today;
+    final rolledOver = gameDate != today;
+
+    if (rolledOver || dateUnreadable || gridUnreadable) {
+      // Archive an unfinished board only when the day it belongs to is known.
+      if (rolledOver && storedGrid != null && !storedGrid.isGameOver) {
+        // `build` is synchronous, so this write cannot be awaited; make that
+        // explicit and swallow failures rather than letting them surface as
+        // an unhandled async error that takes down the zone. Losing one
+        // archived row is not worth crashing the app on startup.
+        unawaited(
+          _addToDatabase(gameState: GameState.incomplete, date: gameDate)
+              .catchError((Object _) {}),
+        );
+      }
+
+      // Stamp today and drop the stale or unreadable board, so a poisoned value
+      // is cleared instead of being re-read on every launch.
+      prefs.setString(
+          SharedPreferencesKeys.gameDate, dateToString(DateTime.now()));
+      unawaited(prefs
+          .remove(SharedPreferencesKeys.gridState)
+          .catchError((Object _) {}));
+      return _emptyBoard();
     }
+
+    return storedGrid ?? _emptyBoard();
   }
 
   /// Set while an ENTER press is being evaluated.
