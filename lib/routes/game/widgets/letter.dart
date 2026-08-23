@@ -5,7 +5,7 @@ import 'package:red_owl/config/shared.dart' show GameColors, LetterStatus;
 import 'package:red_owl/riverpod/shared.dart';
 import 'package:red_owl/routes/game/widgets/a11y_labels.dart'
     show letterStatusLabel;
-import 'package:red_owl/util/shared.dart' show Localization;
+import 'package:red_owl/util/shared.dart' show Localization, showSnackBar;
 
 /// A single key on the on-screen keyboard.
 ///
@@ -76,7 +76,14 @@ class Letter extends ConsumerWidget {
       unawaited(
         ref
             .read(gridProvider.notifier)
-            .onKeyboardPressed(key: letter, context: context)
+            .onKeyboardPressed(
+              key: letter,
+              messenger: GameMessenger(
+                l10n: context.l10n,
+                show: (message, seconds) =>
+                    showSnackBar(context, message, seconds),
+              ),
+            )
             .catchError((Object _) {}),
       );
     }

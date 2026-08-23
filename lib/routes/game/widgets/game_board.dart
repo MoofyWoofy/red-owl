@@ -5,9 +5,11 @@ import 'package:flutter/services.dart'
     show KeyDownEvent, KeyEvent, LogicalKeyboardKey, ServicesBinding;
 import 'package:red_owl/config/shared.dart'
     show animationTiming;
-import 'package:red_owl/riverpod/shared.dart' show gridProvider;
+import 'package:red_owl/riverpod/shared.dart'
+    show GameMessenger, gridProvider;
 import 'package:red_owl/routes/game/widgets/shared.dart'
     show BounceAnimation, KeyboardRow, PopInAnimation, ShakeAnimation, Tile;
+import 'package:red_owl/util/shared.dart' show Localization, showSnackBar;
 
 /// The interactive game surface: the 5×6 tile grid and the on-screen keyboard.
 ///
@@ -40,6 +42,12 @@ class _GameBoardState extends ConsumerState<GameBoard> {
     if (ref.read(gridProvider).isGameOver) return false;
 
     final notifier = ref.read(gridProvider.notifier);
+    // Built here rather than passing `context` into the notifier: the widget
+    // owns the tree, so it owns whether a message can still be shown.
+    final messenger = GameMessenger(
+      l10n: context.l10n,
+      show: (message, seconds) => showSnackBar(context, message, seconds),
+    );
     final key = event.logicalKey;
 
     if (key == LogicalKeyboardKey.enter ||
@@ -48,13 +56,13 @@ class _GameBoardState extends ConsumerState<GameBoard> {
       // synchronously to claim the event. Observe the future so a failure
       // cannot escape as an unhandled async error.
       unawaited(notifier
-          .onKeyboardPressed(key: 'ENTER', context: context)
+          .onKeyboardPressed(key: 'ENTER', messenger: messenger)
           .catchError((Object _) {}));
       return true;
     }
     if (key == LogicalKeyboardKey.backspace) {
       unawaited(notifier
-          .onKeyboardPressed(key: 'DELETE', context: context)
+          .onKeyboardPressed(key: 'DELETE', messenger: messenger)
           .catchError((Object _) {}));
       return true;
     }
@@ -66,7 +74,7 @@ class _GameBoardState extends ConsumerState<GameBoard> {
       final code = upper.codeUnitAt(0);
       if (code >= 0x41 && code <= 0x5A) {
         unawaited(notifier
-            .onKeyboardPressed(key: upper, context: context)
+            .onKeyboardPressed(key: upper, messenger: messenger)
             .catchError((Object _) {}));
         return true;
       }

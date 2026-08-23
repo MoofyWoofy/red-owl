@@ -1,4 +1,6 @@
 import 'dart:async' show unawaited;
+
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:red_owl/config/shared.dart' show initialKeyboardStatus;
 import 'package:red_owl/models/shared.dart' as models;
 import 'package:red_owl/riverpod/grid/grid.dart' show Grid;
@@ -68,6 +70,17 @@ class PracticeGrid extends Grid {
     state = _emptyBoard();
   }
 
-  /// The current answer (uppercase), exposed for the practice UI/tests.
+  /// The current answer (uppercase).
+  ///
+  /// Test-only: no UI reads this, and none should -- showing the answer would
+  /// give the puzzle away. The tests need it to type a deliberately winning
+  /// guess against a word that is random by design.
+  ///
+  /// `avoid_public_notifier_properties` wants all public API to go through
+  /// `state`, but the answer is deliberately *not* part of the board state:
+  /// putting it there would persist it and hand it to every widget that watches
+  /// the grid.
+  // ignore: avoid_public_notifier_properties
+  @visibleForTesting
   String get answer => _answer;
 }

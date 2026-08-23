@@ -9,9 +9,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:red_owl/config/shared.dart' show SharedPreferencesKeys;
 import 'package:red_owl/database/database.dart';
-import 'package:red_owl/riverpod/shared.dart' show gridProvider, PracticeGrid;
+import 'package:red_owl/l10n/app_localizations.dart';
+import 'package:red_owl/riverpod/shared.dart'
+    show GameMessenger, gridProvider, PracticeGrid;
 import 'package:red_owl/util/shared.dart'
-    show SharedPreferenceService, WordleService;
+    show SharedPreferenceService, WordleService, showSnackBar;
 
 import '../../helpers/test_helpers.dart';
 
@@ -57,16 +59,23 @@ void main() {
   PracticeGrid notifier() =>
       capturedRef.read(gridProvider.notifier) as PracticeGrid;
 
+  /// Feedback sink for the notifier, wired to the captured context.
+  GameMessenger messenger() => GameMessenger(
+        l10n: AppLocalizations.of(capturedContext)!,
+        show: (message, seconds) =>
+            showSnackBar(capturedContext, message, seconds),
+      );
+
   Future<void> type(String word) async {
     final n = capturedRef.read(gridProvider.notifier);
     for (final ch in word.toUpperCase().split('')) {
-      await n.onKeyboardPressed(key: ch, context: capturedContext);
+      await n.onKeyboardPressed(key: ch, messenger: messenger());
     }
   }
 
   Future<void> enter() => capturedRef
       .read(gridProvider.notifier)
-      .onKeyboardPressed(key: 'ENTER', context: capturedContext);
+      .onKeyboardPressed(key: 'ENTER', messenger: messenger());
 
   Future<void> drainSnackBars(WidgetTester tester) =>
       tester.pumpAndSettle(const Duration(seconds: 4));

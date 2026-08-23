@@ -19,6 +19,18 @@ class PracticePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ProviderScope(
       // Swap the daily notifier for the practice one within this page only.
+      //
+      // This trips riverpod_lint's scoped_providers_should_specify_dependencies,
+      // knowingly and permanently. The lint wants `dependencies` declared on
+      // the provider, but that marker means "this provider requires a scope to
+      // supply it", which is false here: the root scope always provides the
+      // daily notifier and this override merely replaces it for one page.
+      // Declaring it would also oblige every widget that reads gridProvider --
+      // most of the game UI -- to claim a dependency on a scope none of them
+      // require. The warning cannot currently be silenced either: plugin
+      // diagnostics ignore `// ignore:` comments, and the analyzer rejects
+      // their codes in analysis_options' `errors:` map as unrecognised. So it
+      // stands as the one expected warning from `dart analyze`.
       overrides: [gridProvider.overrideWith(PracticeGrid.new)],
       child: const _PracticeView(),
     );

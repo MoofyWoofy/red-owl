@@ -2,17 +2,15 @@ import 'dart:async' show unawaited;
 import 'dart:convert';
 
 import 'package:drift/drift.dart' show InsertMode;
-import 'package:flutter/widgets.dart' show BuildContext;
+import 'package:red_owl/l10n/app_localizations.dart' show AppLocalizations;
 import 'package:red_owl/database/database.dart';
 import 'package:red_owl/util/misc.dart';
 import 'package:red_owl/util/shared.dart'
     show
-        Localization,
         SharedPreferenceService,
         WordleService,
         getDateOnly,
         isStreakMilestone,
-        showSnackBar,
         stringToDate;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:red_owl/models/shared.dart' as models;
@@ -20,6 +18,29 @@ import 'package:red_owl/config/shared.dart'
     show LetterStatus, SharedPreferencesKeys, initialKeyboardStatus;
 
 part 'grid.g.dart';
+
+/// How the board reports user-facing feedback without reaching into the widget
+/// tree.
+///
+/// The board's messages are localised, and several are parameterised (the
+/// rejected word, the hard-mode constraint that was broken, the streak that was
+/// reached), so the notifier needs [AppLocalizations] to build them. It does
+/// **not** need a [BuildContext]: taking one mixed the UI into the business
+/// logic and tied a notifier that outlives any single page to a context that
+/// can be popped mid-guess, which is why every call site had to be paired with
+/// a `context.mounted` check.
+///
+/// The widget supplies [show], so deciding whether a message can still be
+/// displayed stays where the widget tree is.
+class GameMessenger {
+  const GameMessenger({required this.l10n, required this.show});
+
+  /// Localised strings for the active locale.
+  final AppLocalizations l10n;
+
+  /// Displays [message] for [seconds].
+  final void Function(String message, int seconds) show;
+}
 
 /// Riverpod notifier that owns and mutates the entire game board state.
 ///
@@ -156,7 +177,7 @@ class Grid extends _$Grid {
   ///   history database. Shows a snack bar feedback message.
   Future<void> onKeyboardPressed({
     required String key,
-    required BuildContext context,
+    required GameMessenger messenger,
   }) async {
     if (_isEvaluatingGuess) return;
 
@@ -172,13 +193,11 @@ class Grid extends _$Grid {
       case 'ENTER':
         if (state.column == 5) {
           // Hard mode: enforce that previously revealed hints are reused.
-          final hardModeError = _hardModeViolation(context, guessWord);
+          final hardModeError = _hardModeViolation(messenger.l10n, guessWord);
           if (hardModeError != null) {
             // Reuse the shake animation to signal the invalid guess.
             state = state.copyWith(notEnoughCharacters: true);
-            if (context.mounted) {
-              showSnackBar(context, hardModeError, 3);
-            }
+            messenger.show(hardModeError, 3);
             break;
           }
 
@@ -225,20 +244,16 @@ class Grid extends _$Grid {
                     statsDataLength,
                   )[2])
                 : 0;
-            if (context.mounted) {
-              if (isStreakMilestone(streak)) {
-                showSnackBar(context, context.l10n.streakMilestone(streak), 3);
-              } else {
-                showSnackBar(context, context.l10n.youGotIt);
-              }
+            if (isStreakMilestone(streak)) {
+              messenger.show(messenger.l10n.streakMilestone(streak), 3);
+            } else {
+              messenger.show(messenger.l10n.youGotIt, 2);
             }
           } else if (!result.isWordInList) {
             // ── Word not in list ───────────────────────────────────────────
             // Reuse the notEnoughCharacters flag to trigger the shake animation.
             state = state.copyWith(notEnoughCharacters: true);
-            if (context.mounted) {
-              showSnackBar(context, context.l10n.notInWordList(guessWord));
-            }
+            messenger.show(messenger.l10n.notInWordList(guessWord), 2);
           } else {
             // ── Valid word, evaluate each character ────────────────────────
             for (var i = row * 5; i < row * 5 + 5; i++) {
@@ -261,9 +276,7 @@ class Grid extends _$Grid {
             }
             if (row + 1 == 6) {
               // Player used all 6 rows without winning — game over.
-              if (context.mounted) {
-                showSnackBar(context, context.l10n.betterLuckNextTime);
-              }
+              messenger.show(messenger.l10n.betterLuckNextTime, 2);
               state = state.copyWith(
                 isGameWon: false,
                 isGameOver: true,
@@ -283,9 +296,7 @@ class Grid extends _$Grid {
         } else {
           // Row does not have 5 letters — trigger shake animation.
           state = state.copyWith(notEnoughCharacters: true);
-          if (context.mounted) {
-            showSnackBar(context, context.l10n.notEnoughLetters);
-          }
+          messenger.show(messenger.l10n.notEnoughLetters, 2);
         }
         break;
 
@@ -327,7 +338,7 @@ class Grid extends _$Grid {
   /// - a letter previously marked green must stay in the same position;
   /// - a letter previously marked yellow (present) must appear somewhere.
   /// Grey letters are not restricted, matching the NYT ruleset.
-  String? _hardModeViolation(BuildContext context, String guessWord) {
+  String? _hardModeViolation(AppLocalizations l10n, String guessWord) {
     final hardMode =
         SharedPreferenceService().getBool(SharedPreferencesKeys.isHardMode) ??
             false;
@@ -351,13 +362,13 @@ class Grid extends _$Grid {
     for (var position = 0; position < 5; position++) {
       final expected = requiredGreens[position];
       if (expected != null && guessWord[position] != expected) {
-        return context.l10n.hardModeLetterMustBe(position + 1, expected);
+        return l10n.hardModeLetterMustBe(position + 1, expected);
       }
     }
     // Then presence constraints.
     for (final letter in requiredPresent) {
       if (!guessWord.contains(letter)) {
-        return context.l10n.hardModeMustContain(letter);
+        return l10n.hardModeMustContain(letter);
       }
     }
     return null;

@@ -3,8 +3,8 @@
 // These drive the notifier through `onKeyboardPressed` and assert on the
 // resulting board state, the keyboard colours, the persisted aggregate stats,
 // and the History database rows. A `testWidgets` host is used (rather than a
-// bare ProviderContainer) so that `onKeyboardPressed` has a real BuildContext
-// with a ScaffoldMessenger ancestor for its snack-bar feedback.
+// bare ProviderContainer) so that the notifier's GameMessenger has a real
+// ScaffoldMessenger ancestor to show its snack-bar feedback through.
 //
 // The word of the day is deterministic for a given list + date, so each test
 // reads `WordleService().wordOfTheDay` and types that exact word to force a
@@ -19,10 +19,11 @@ import 'package:red_owl/config/shared.dart'
     show LetterStatus, SharedPreferencesKeys, initialKeyboardStatus;
 import 'package:red_owl/database/database.dart';
 import 'package:red_owl/models/shared.dart' as models;
-import 'package:red_owl/riverpod/shared.dart' show gridProvider;
+import 'package:red_owl/l10n/app_localizations.dart';
+import 'package:red_owl/riverpod/shared.dart' show GameMessenger, gridProvider;
 import 'package:red_owl/util/misc.dart' show dateToString;
 import 'package:red_owl/util/shared.dart'
-    show SharedPreferenceService, WordleService;
+    show SharedPreferenceService, WordleService, showSnackBar;
 
 import '../../helpers/test_helpers.dart';
 
@@ -41,7 +42,7 @@ const _testWords = [
 
 void main() {
   /// Captured on first build of the host widget so tests can drive the notifier
-  /// and supply a BuildContext to `onKeyboardPressed`.
+  /// and build the GameMessenger handed to `onKeyboardPressed`.
   late WidgetRef capturedRef;
   late BuildContext capturedContext;
 
@@ -78,18 +79,26 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  /// Feedback sink for the notifier, wired to the captured context so the
+  /// snack-bar assertions below still see real snack bars.
+  GameMessenger messenger() => GameMessenger(
+        l10n: AppLocalizations.of(capturedContext)!,
+        show: (message, seconds) =>
+            showSnackBar(capturedContext, message, seconds),
+      );
+
   /// Types [word] one letter at a time through the notifier.
   Future<void> type(String word) async {
     final notifier = capturedRef.read(gridProvider.notifier);
     for (final ch in word.toUpperCase().split('')) {
-      await notifier.onKeyboardPressed(key: ch, context: capturedContext);
+      await notifier.onKeyboardPressed(key: ch, messenger: messenger());
     }
   }
 
   /// Submits the current row.
   Future<void> enter() => capturedRef
       .read(gridProvider.notifier)
-      .onKeyboardPressed(key: 'ENTER', context: capturedContext);
+      .onKeyboardPressed(key: 'ENTER', messenger: messenger());
 
   /// Drains the snack-bar timers scheduled by `showSnackBar` so the test does
   /// not end with a pending [Timer].
@@ -116,7 +125,7 @@ void main() {
 
       await capturedRef
           .read(gridProvider.notifier)
-          .onKeyboardPressed(key: 'DELETE', context: capturedContext);
+          .onKeyboardPressed(key: 'DELETE', messenger: messenger());
       grid = capturedRef.read(gridProvider);
       expect(grid.tiles.map((t) => t.letter).join(), 'AB');
       expect(grid.column, 2);
@@ -272,9 +281,9 @@ void main() {
       // full, but DELETE removes a tile, leaving the row short when the
       // post-await code indexes it.
       final submit =
-          notifier.onKeyboardPressed(key: 'ENTER', context: capturedContext);
+          notifier.onKeyboardPressed(key: 'ENTER', messenger: messenger());
       final interleaved =
-          notifier.onKeyboardPressed(key: 'DELETE', context: capturedContext);
+          notifier.onKeyboardPressed(key: 'DELETE', messenger: messenger());
       await Future.wait([submit, interleaved]);
 
       final grid = capturedRef.read(gridProvider);
