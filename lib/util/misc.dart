@@ -119,3 +119,14 @@ List<String> normalizeCounters(List<String>? stored, int length) => [
           return value.toString();
         }(),
     ];
+
+/// Whether day-scoped state must be rebuilt because the calendar date has
+/// changed since [lastSeen].
+///
+/// The word of the day, the day-rollover archive in `Grid.build` and the
+/// once-a-day hint are all decided from `DateTime.now()` at the moment their
+/// provider is built. Nothing re-evaluates them afterwards, so an app left open
+/// across midnight keeps yesterday's word and a spent hint until it is
+/// restarted. The app re-checks this on resume.
+bool hasDayRolledOver(DateTime lastSeen, DateTime now) =>
+    getDateOnly(lastSeen) != getDateOnly(now);

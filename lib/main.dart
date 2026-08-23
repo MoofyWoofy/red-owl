@@ -10,7 +10,9 @@ import 'package:red_owl/riverpod/shared.dart'
         fontScaleValueOf,
         motionSpeedProvider,
         motionSpeedReduced,
-        motionDilationOf;
+        motionDilationOf,
+        gridProvider,
+        hintProvider;
 import 'package:red_owl/l10n/app_localizations.dart';
 import 'package:red_owl/routes/shared.dart';
 import 'package:red_owl/config/shared.dart'
@@ -26,7 +28,8 @@ import 'package:red_owl/util/shared.dart'
         Localization,
         NotificationService,
         SharedPreferenceService,
-        WordleService;
+        WordleService,
+        hasDayRolledOver;
 import 'package:red_owl/widgets/shared.dart' show Logo, appBar;
 
 /// Application entry point.
@@ -61,11 +64,67 @@ Future<void> main() async {
 ///
 /// Watches the [boolFamilyProvider] for dark-mode so the whole app
 /// re-themes reactively whenever the user toggles the setting in [SettingsPage].
-class App extends ConsumerWidget {
+///
+/// Also refreshes day-scoped state when the app is resumed on a new calendar
+/// day — see [_refreshIfDayRolledOver].
+class App extends ConsumerStatefulWidget {
   const App({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<App> createState() => _AppState();
+}
+
+class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
+  /// The day the day-scoped providers were last built for.
+  DateTime _lastSeenDate = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      unawaited(_refreshIfDayRolledOver());
+    }
+  }
+
+  /// Rebuilds the day-scoped state when the app resumes on a new day.
+  ///
+  /// The word of the day, the rollover archive in `Grid.build` and the
+  /// once-a-day hint are all resolved once, when their provider is first built.
+  /// Left open across midnight the app would otherwise keep serving yesterday's
+  /// word and treat the hint as still spent until it was restarted.
+  Future<void> _refreshIfDayRolledOver() async {
+    final now = DateTime.now();
+    if (!hasDayRolledOver(_lastSeenDate, now)) return;
+    _lastSeenDate = now;
+
+    // Re-resolve the word of the day before the board rebuilds against it.
+    try {
+      await WordleService().init();
+    } catch (_) {
+      // Keep the previous word rather than tearing the board down.
+      return;
+    }
+    if (!mounted) return;
+    // Invalidating the grid re-runs `Grid.build`, which archives yesterday's
+    // unfinished game and returns a fresh board.
+    ref.invalidate(gridProvider);
+    ref.invalidate(hintProvider);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     bool isDarkMode = ref.watch(
       boolFamilyProvider(
       id: BoolFamilyProviderIDs.isDarkMode,

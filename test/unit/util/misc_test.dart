@@ -269,4 +269,32 @@ void main() {
       expect(isStreakMilestone(99), isFalse);
     });
   });
+
+  group('hasDayRolledOver', () {
+    test('is false within the same day', () {
+      expect(
+        hasDayRolledOver(DateTime(2026, 8, 23, 0, 0), DateTime(2026, 8, 23, 23, 59)),
+        isFalse,
+      );
+    });
+
+    test('is true once the calendar date changes', () {
+      expect(
+        hasDayRolledOver(DateTime(2026, 8, 23, 23, 59), DateTime(2026, 8, 24, 0, 1)),
+        isTrue,
+      );
+    });
+
+    test('is true across a month and a year boundary', () {
+      expect(hasDayRolledOver(DateTime(2026, 8, 31), DateTime(2026, 9, 1)),
+          isTrue);
+      expect(hasDayRolledOver(DateTime(2026, 12, 31), DateTime(2027, 1, 1)),
+          isTrue);
+    });
+
+    test('ignores the time component entirely', () {
+      expect(hasDayRolledOver(DateTime(2026, 8, 23, 9), DateTime(2026, 8, 23)),
+          isFalse);
+    });
+  });
 }
