@@ -150,9 +150,10 @@ class WordleService {
 
       // A custom list with no usable words cannot answer `getWordOfTheDay`
       // (`nextInt(0)` throws) and, since it is read on every launch, would stop
-      // the app from starting at all. `importWordList` rejects empty files, but
-      // one can still reach disk via a backup whose `customWordList` is empty,
-      // so fall back to the bundled list rather than failing.
+      // the app from starting at all. Both write paths now reject an empty list
+      // (`importWordList` and `BackupService.importFromJson`), but a file
+      // written by an older build can still be on disk, so fall back to the
+      // bundled list rather than failing.
       if (words.isEmpty) {
         final String data = await rootBundle.loadString('assets/word_list.txt');
         words = await compute(_parseWordList, data);
@@ -167,6 +168,13 @@ class WordleService {
 
   /// Matches a single valid word: exactly five ASCII letters.
   static final RegExp _wordPattern = RegExp(r'^[a-zA-Z]{5}$');
+
+  /// Whether [word] is a usable word-list entry: exactly five ASCII letters.
+  ///
+  /// Exposed so [BackupService] can hold a word list restored from a backup to
+  /// the same rule [importWordList] applies to one picked from a file, rather
+  /// than keeping a second copy of the pattern that could drift from this one.
+  static bool isValidWord(String word) => _wordPattern.hasMatch(word);
 
   /// A custom list with fewer than this many unique words won't last a full
   /// year of daily play before words repeat. Imports below it still succeed but

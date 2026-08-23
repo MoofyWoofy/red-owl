@@ -9,6 +9,7 @@ import 'package:red_owl/config/shared.dart' show SharedPreferencesKeys;
 import 'package:red_owl/database/database.dart';
 import 'package:red_owl/util/misc.dart' show dateToString, getDateOnly;
 import 'package:red_owl/util/shared_preference_service.dart';
+import 'package:red_owl/util/wordle.dart' show WordleService;
 
 /// Serialises the user's data to a single JSON document and restores it again.
 ///
@@ -108,6 +109,45 @@ class BackupService {
     ];
   }
 
+  /// Validates the optional `customWordList` section, returning the words to
+  /// write, or `null` when the section is absent.
+  ///
+  /// Held to the same rule as [WordleService.importWordList]: every entry must
+  /// be exactly five ASCII letters ([WordleService.isValidWord]), blanks are
+  /// dropped, and duplicates are removed case-insensitively (repeats would bias
+  /// the deterministic word-of-the-day seeding). A section that is present but
+  /// yields no usable words is rejected.
+  ///
+  /// Without this the section went to disk unchecked, while a list picked from
+  /// a file did not. The word of the day is drawn from whatever is on disk on
+  /// every launch, and the board is built for five-letter answers -- the fixed
+  /// five columns and the `i % 5` scoring in `Grid.onKeyboardPressed` both
+  /// assume it -- so an unchecked list breaks the game rather than the import.
+  static List<String>? _parseCustomWordList(Object? raw) {
+    if (raw == null) return null;
+    if (raw is! List) {
+      throw const FormatException('"customWordList" must be a list');
+    }
+    final seen = <String>{};
+    final words = <String>[];
+    for (final entry in raw) {
+      if (entry is! String) {
+        throw FormatException('Invalid word-list entry: $entry');
+      }
+      final word = entry.trim();
+      // Blank lines (e.g. a trailing newline in the exported file) are noise.
+      if (word.isEmpty) continue;
+      if (!WordleService.isValidWord(word)) {
+        throw FormatException('Invalid word-list entry: $entry');
+      }
+      if (seen.add(word.toLowerCase())) words.add(word);
+    }
+    if (words.isEmpty) {
+      throw const FormatException('"customWordList" has no usable words');
+    }
+    return words;
+  }
+
   static final BackupService _instance = BackupService._internal();
 
   /// Returns the singleton [BackupService] instance.
@@ -192,11 +232,14 @@ class BackupService {
   /// Parses [jsonString] and applies it, replacing the current settings, stats,
   /// history and (when present) custom word list.
   ///
-  /// Validation of both the `history` rows and the `stats` counter arrays runs
-  /// to completion **before** anything is written, so an invalid file throws a
-  /// [FormatException] and leaves all existing data untouched. Unknown or
-  /// missing sections are skipped rather than treated as errors, so partial
-  /// backups still import cleanly.
+  /// Validation of the `history` rows, the `stats` counter arrays and the
+  /// `customWordList` entries all runs to completion **before** anything is
+  /// written, so an invalid file throws a [FormatException] and leaves all
+  /// existing data untouched. Unknown or missing sections are skipped rather
+  /// than treated as errors, so partial backups still import cleanly.
+  ///
+  /// The history replacement runs in a single transaction, so a write that
+  /// fails midway cannot leave the table half-restored either.
   Future<void> importFromJson(String jsonString) async {
     final Object? decoded;
     try {
@@ -266,6 +309,9 @@ class BackupService {
           guessDistributionLength, 'stats.guessDistribution');
     }
 
+    // ── And the custom word list, before it can reach disk ───────────────────
+    final customWordList = _parseCustomWordList(decoded['customWordList']);
+
     // ── All validation passed — apply the backup ─────────────────────────────
     final prefs = SharedPreferenceService();
 
@@ -292,18 +338,26 @@ class BackupService {
     }
 
     // Replace the history table with the imported rows (shared singleton).
+    //
+    // One transaction, because the delete would otherwise commit before the
+    // inserts: a failure (or the app being killed) partway through the loop
+    // left history permanently truncated, with the original rows already gone
+    // and the replacements never written. The batch also collapses what were
+    // per-row round trips into a single set of statements.
     final db = AppDatabase();
-    await db.delete(db.history).go();
-    for (final entry in historyEntries) {
-      await db.into(db.history).insert(entry, mode: InsertMode.insertOrReplace);
-    }
+    await db.transaction(() async {
+      await db.delete(db.history).go();
+      await db.batch((batch) => batch.insertAll(
+            db.history,
+            historyEntries,
+            mode: InsertMode.insertOrReplace,
+          ));
+    });
 
-    // Restore the custom word list when present.
-    final customWordList = decoded['customWordList'];
-    if (customWordList is List) {
+    // Restore the custom word list when present (validated above).
+    if (customWordList != null) {
       final file = await _customListFile();
-      await file
-          .writeAsString(customWordList.map((e) => e.toString()).join('\n'));
+      await file.writeAsString(customWordList.join('\n'));
     }
   }
 }

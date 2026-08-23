@@ -4,6 +4,7 @@
 // *before* anything is written, so a bad file can never leave the app in a
 // state that breaks the next finished game.
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -34,8 +35,13 @@ void main() {
     });
   }
 
+  /// The temp directory `path_provider` resolves to for this test. Captured
+  /// here because `installFakePathProvider` creates a *fresh* directory on each
+  /// call, so re-invoking it would point away from the file just written.
+  late Directory tempDir;
+
   setUp(() async {
-    await installFakePathProvider();
+    tempDir = await installFakePathProvider();
     setSharedPreferencesMock();
     await SharedPreferenceService().init();
     AppDatabase.setSingleton(AppDatabase.forTesting(NativeDatabase.memory()));
@@ -230,6 +236,138 @@ void main() {
         SharedPreferenceService().getStringList(SharedPreferencesKeys.statsData),
         isNull,
       );
+    });
+
+    group('custom word list', () {
+      /// Reads back whatever the import wrote to custom_list.txt.
+      Future<List<String>> savedWordList() async {
+        final file = File('${tempDir.path}/custom_list.txt');
+        if (!file.existsSync()) return [];
+        return file.readAsLinesSync();
+      }
+
+      test('a valid list is written to disk', () async {
+        await BackupService().importFromJson(backupJson(overrides: {
+          'customWordList': ['crane', 'slate', 'PIANO'],
+        }));
+        expect(await savedWordList(), ['crane', 'slate', 'PIANO']);
+      });
+
+      test('blank entries are dropped', () async {
+        await BackupService().importFromJson(backupJson(overrides: {
+          'customWordList': ['crane', '', '   ', 'slate'],
+        }));
+        expect(await savedWordList(), ['crane', 'slate']);
+      });
+
+      test('duplicates are removed case-insensitively', () async {
+        await BackupService().importFromJson(backupJson(overrides: {
+          'customWordList': ['crane', 'CRANE', 'Crane', 'slate'],
+        }));
+        expect(await savedWordList(), ['crane', 'slate']);
+      });
+
+      // The word of the day is drawn from this file on every launch and the
+      // board is built for five-letter answers, so a bad entry has to be
+      // rejected at the import rather than surfacing as a broken game.
+      for (final (name, entry) in [
+        ('a word that is too short', 'cat'),
+        ('a word that is too long', 'crustacean'),
+        ('a word with digits', 'cr4ne'),
+        ('a word with punctuation', "cran'"),
+        ('a non-string entry', 42),
+      ]) {
+        test('rejects $name without writing it', () async {
+          await expectLater(
+            BackupService().importFromJson(backupJson(overrides: {
+              'customWordList': ['crane', entry],
+            })),
+            throwsFormatException,
+          );
+          expect(await savedWordList(), isEmpty);
+        });
+      }
+
+      test('rejects a list with no usable words', () async {
+        await expectLater(
+          BackupService().importFromJson(backupJson(overrides: {
+            'customWordList': ['', '  '],
+          })),
+          throwsFormatException,
+        );
+      });
+
+      test('rejects a customWordList that is not a list', () async {
+        await expectLater(
+          BackupService().importFromJson(
+              backupJson(overrides: {'customWordList': 'crane'})),
+          throwsFormatException,
+        );
+      });
+
+      // The word list is written last, so a bad entry must abort before the
+      // history and stats writes rather than after them.
+      test('an invalid word leaves existing data untouched', () async {
+        await BackupService().importFromJson(backupJson());
+        final before =
+            await AppDatabase().select(AppDatabase().history).get();
+        expect(before, hasLength(1));
+
+        await expectLater(
+          BackupService().importFromJson(backupJson(overrides: {
+            'history': [
+              {'word': 'SLATE', 'gameState': 'lost', 'date': '2026-08-20'},
+            ],
+            'customWordList': ['nope!'],
+          })),
+          throwsFormatException,
+        );
+
+        final after = await AppDatabase().select(AppDatabase().history).get();
+        expect(after, hasLength(1));
+        expect(after.single.word, 'CRANE');
+      });
+    });
+
+    group('history replacement', () {
+      test('replaces the table wholesale', () async {
+        await BackupService().importFromJson(backupJson());
+        await BackupService().importFromJson(backupJson(overrides: {
+          'history': [
+            {'word': 'SLATE', 'gameState': 'lost', 'date': '2026-08-20'},
+            {'word': 'PIANO', 'gameState': 'won', 'date': '2026-08-19'},
+          ],
+        }));
+
+        final rows = await AppDatabase().select(AppDatabase().history).get();
+        expect(rows, hasLength(2));
+        expect(rows.map((r) => r.word), containsAll(['SLATE', 'PIANO']));
+        expect(rows.map((r) => r.word), isNot(contains('CRANE')));
+      });
+
+      // The delete and the inserts run in one transaction, so the table is
+      // never observable as emptied-but-not-yet-refilled.
+      test('an empty history section clears the table', () async {
+        await BackupService().importFromJson(backupJson());
+        await BackupService()
+            .importFromJson(backupJson(overrides: {'history': <dynamic>[]}));
+        expect(
+          await AppDatabase().select(AppDatabase().history).get(),
+          isEmpty,
+        );
+      });
+
+      test('duplicate dates collapse to the last entry', () async {
+        await BackupService().importFromJson(backupJson(overrides: {
+          'history': [
+            {'word': 'SLATE', 'gameState': 'lost', 'date': '2026-08-20'},
+            {'word': 'PIANO', 'gameState': 'won', 'date': '2026-08-20'},
+          ],
+        }));
+        final rows = await AppDatabase().select(AppDatabase().history).get();
+        expect(rows, hasLength(1));
+        expect(rows.single.word, 'PIANO');
+      });
     });
   });
 }
