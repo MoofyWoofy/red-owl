@@ -4,7 +4,12 @@ import 'package:red_owl/config/shared.dart'
 import 'package:red_owl/database/database.dart' show AppDatabase;
 import 'package:red_owl/routes/stats/widgets/shared.dart';
 import 'package:red_owl/util/shared.dart'
-    show Localization, SharedPreferenceService, getWinRate;
+    show
+        Localization,
+        SharedPreferenceService,
+        getWinRate,
+        normalizeCounters,
+        statsDataLength;
 import 'package:red_owl/widgets/shared.dart' show HelpIconButton, appBar;
 import 'package:share_plus/share_plus.dart' show SharePlus, ShareParams;
 
@@ -79,10 +84,16 @@ class _StatsPageState extends State<StatsPage> {
             tooltip: context.l10n.share,
             onPressed: () {
               // Build a short shareable text from the stored stats.
-              final [gamesPlayed, gamesWon, _, maxStreak] =
-                  SharedPreferenceService()
-                          .getStringList(SharedPreferencesKeys.statsData) ??
-                      ['0', '0', '0', '0'];
+              // Normalised, not destructured: a stored array of the wrong
+              // length would make positional matching throw.
+              final stats = normalizeCounters(
+                SharedPreferenceService()
+                    .getStringList(SharedPreferencesKeys.statsData),
+                statsDataLength,
+              );
+              final gamesPlayed = stats[0];
+              final gamesWon = stats[1];
+              final maxStreak = stats[3];
 
               final winRate = getWinRate(gamesWon, gamesPlayed);
 

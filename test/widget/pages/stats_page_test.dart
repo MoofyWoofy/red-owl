@@ -162,4 +162,43 @@ void main() {
       expect(rows, isEmpty);
     });
   });
+
+  // Regression: the Stats page read `statsData` by direct index (StatsInfo) and
+  // by positional destructuring (the share action). An install that ran an
+  // older build can hold a shorter array, which threw
+  // `RangeError (length): Invalid value: Not in inclusive range 0..1: 2` on
+  // open and a pattern-matching error on share.
+  group('with a malformed statsData array', () {
+    for (final stored in <List<String>>[
+      <String>[],
+      ['3'],
+      ['3', '2'],
+      ['3', '2', 'abc'],
+    ]) {
+      testWidgets('renders with statsData=$stored', (tester) async {
+        tester.view.physicalSize = const Size(1080, 1920);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+        setSharedPreferencesMock({'isDarkMode': false});
+        await SharedPreferenceService().init();
+        SharedPreferenceService()
+            .setStringList(SharedPreferencesKeys.statsData, stored);
+        // The History child opens AppDatabase(); give it the in-memory one.
+        AppDatabase.setSingleton(AppDatabase.forTesting(NativeDatabase.memory()));
+        addTearDown(() async {
+          await AppDatabase().close();
+          AppDatabase.resetSingleton();
+        });
+
+        await tester.pumpWidget(makeTestAppRaw(child: const StatsPage()));
+        await tester.pump(const Duration(seconds: 1));
+
+        expect(tester.takeException(), isNull);
+        expect(find.byType(StatsPage), findsOneWidget);
+      });
+    }
+  });
 }

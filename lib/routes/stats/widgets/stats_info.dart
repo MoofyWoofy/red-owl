@@ -6,6 +6,9 @@ import 'package:red_owl/util/shared.dart'
         Localization,
         SharedPreferenceService,
         getAverageGuesses,
+        guessDistributionLength,
+        normalizeCounters,
+        statsDataLength,
         getWinRate;
 
 /// Displays the four top-level statistics in a two-row grid:
@@ -35,14 +38,19 @@ class _StatsInfoState extends State<StatsInfo> {
   @override
   void initState() {
     super.initState();
-    // Fall back to all-zeros if no stats have been recorded yet.
-    arr = SharedPreferenceService()
-            .getStringList(SharedPreferencesKeys.statsData) ??
-        ['0', '0', '0', '0'];
+    // Normalise rather than defaulting only on null: the stored array can also
+    // be the wrong length (an install that ran an older build, or a partial
+    // write), and the `arr[3]` reads below would then throw a RangeError.
+    arr = normalizeCounters(
+      SharedPreferenceService().getStringList(SharedPreferencesKeys.statsData),
+      statsDataLength,
+    );
     avgGuesses = getAverageGuesses(
-      SharedPreferenceService()
-              .getStringList(SharedPreferencesKeys.guessDistribution) ??
-          ['0', '0', '0', '0', '0', '0'],
+      normalizeCounters(
+        SharedPreferenceService()
+            .getStringList(SharedPreferencesKeys.guessDistribution),
+        guessDistributionLength,
+      ),
     );
   }
 

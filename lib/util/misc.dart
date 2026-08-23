@@ -92,3 +92,30 @@ String getWinRate(String wins, String games) {
   if (gamesPlayed <= 0) return '0';
   return (gamesWon / gamesPlayed * 100).round().toString();
 }
+
+/// Number of entries in the persisted `statsData` array:
+/// `[gamesPlayed, gamesWon, currentStreak, maxStreak]`.
+const int statsDataLength = 4;
+
+/// Number of entries in the persisted `guessDistribution` array — one counter
+/// per possible winning row (1–6).
+const int guessDistributionLength = 6;
+
+/// Normalises a persisted counter array to exactly [length] non-negative
+/// integer strings.
+///
+/// Missing, surplus, unparseable and negative entries all become `'0'`. Every
+/// reader of `statsData` / `guessDistribution` should go through this instead
+/// of indexing or destructuring the stored list directly: the arrays come from
+/// SharedPreferences, so an install that ran an older build (or a partial
+/// write) can hold a short array, and a bare `arr[3]` throws a RangeError
+/// while `var [a, b, c, d] = arr` throws a pattern-matching error.
+List<String> normalizeCounters(List<String>? stored, int length) => [
+      for (var i = 0; i < length; i++)
+        () {
+          if (stored == null || i >= stored.length) return '0';
+          final value = int.tryParse(stored[i]);
+          if (value == null || value < 0) return '0';
+          return value.toString();
+        }(),
+    ];

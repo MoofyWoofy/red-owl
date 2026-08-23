@@ -181,11 +181,14 @@ class Grid extends _$Grid {
             await recordOutcome(gameWon: true);
             // The (daily-only) updated current streak; a milestone replaces the
             // generic win message with a celebration.
+            // Normalised: indexing the stored list directly would throw a
+            // RangeError if it were shorter than four entries.
             final streak = state.persistState
-                ? int.tryParse(SharedPreferenceService()
-                            .getStringList(SharedPreferencesKeys.statsData)?[2] ??
-                        '0') ??
-                    0
+                ? int.parse(normalizeCounters(
+                    SharedPreferenceService()
+                        .getStringList(SharedPreferencesKeys.statsData),
+                    statsDataLength,
+                  )[2])
                 : 0;
             if (context.mounted) {
               if (isStreakMilestone(streak)) {
@@ -389,23 +392,24 @@ class Grid extends _$Grid {
     // stats on import, but an install that ran an older build may already hold
     // a short or non-numeric array, and this runs on every finished game —
     // rebuilding from zero beats throwing and breaking the board.
-    final storedStats = SharedPreferenceService()
-        .getStringList(SharedPreferencesKeys.statsData);
-    final storedDistribution = SharedPreferenceService()
-        .getStringList(SharedPreferencesKeys.guessDistribution);
+    // `normalizeCounters` is shared with the Stats page readers so the writer
+    // and the readers cannot drift apart on the expected shape.
+    final storedStats = normalizeCounters(
+      SharedPreferenceService().getStringList(SharedPreferencesKeys.statsData),
+      statsDataLength,
+    );
+    final storedDistribution = normalizeCounters(
+      SharedPreferenceService()
+          .getStringList(SharedPreferencesKeys.guessDistribution),
+      guessDistributionLength,
+    );
 
-    int counterAt(List<String>? source, int index) =>
-        (source != null && index < source.length)
-            ? (int.tryParse(source[index]) ?? 0)
-            : 0;
-
-    var gamesPlayed = counterAt(storedStats, 0);
-    var gamesWon = counterAt(storedStats, 1);
-    var currentStreak = counterAt(storedStats, 2);
-    var maxStreak = counterAt(storedStats, 3);
-    final guessDistribution = [
-      for (var i = 0; i < 6; i++) counterAt(storedDistribution, i),
-    ];
+    var gamesPlayed = int.parse(storedStats[0]);
+    var gamesWon = int.parse(storedStats[1]);
+    var currentStreak = int.parse(storedStats[2]);
+    var maxStreak = int.parse(storedStats[3]);
+    final guessDistribution =
+        storedDistribution.map(int.parse).toList();
 
     gamesPlayed += 1;
 
