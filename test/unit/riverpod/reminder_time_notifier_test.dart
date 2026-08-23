@@ -108,4 +108,22 @@ void main() {
       expect(parseReminderTime('aa:bb'), isNull);
     });
   });
+
+  group('parseReminderTime range checking', () {
+    // Regression: TimeOfDay does not validate its arguments, so a corrupt
+    // stored value produced an out-of-range time that TZDateTime normalises
+    // into a different day — scheduling the reminder at a time never chosen.
+    for (final raw in ['24:00', '99:77', '-1:30', '12:60', '12:-5']) {
+      test('rejects out-of-range "$raw"', () {
+        expect(parseReminderTime(raw), isNull);
+      });
+    }
+
+    test('accepts the boundary values', () {
+      expect(parseReminderTime('00:00'),
+          const TimeOfDay(hour: 0, minute: 0));
+      expect(parseReminderTime('23:59'),
+          const TimeOfDay(hour: 23, minute: 59));
+    });
+  });
 }

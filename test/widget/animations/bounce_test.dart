@@ -13,6 +13,10 @@ class _Host extends StatefulWidget {
 
 class _HostState extends State<_Host> {
   bool run = false;
+
+  /// Flips the trigger from outside the widget (calling `setState` directly
+  /// from a test would be reaching into a protected member).
+  void setRun(bool value) => setState(() => run = value);
   @override
   Widget build(BuildContext context) => Directionality(
         textDirection: TextDirection.ltr,
@@ -34,7 +38,7 @@ void main() {
   /// Triggers a win and samples the offset partway through the bounce.
   Future<Offset> playAndSampleMidBounce(
       WidgetTester tester, _HostState state) async {
-    state.setState(() => state.run = true);
+    state.setRun(true);
     await tester.pump();
     // Fire the (zero-length) stagger delay, then advance into the bounce.
     await tester.pump(const Duration(milliseconds: 1));
@@ -62,7 +66,7 @@ void main() {
     final first = await playAndSampleMidBounce(tester, state);
 
     // Board reset, then a second win.
-    state.setState(() => state.run = false);
+    state.setRun(false);
     await tester.pump();
     final second = await playAndSampleMidBounce(tester, state);
 

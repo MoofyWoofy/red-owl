@@ -42,5 +42,10 @@ TimeOfDay? parseReminderTime(String? raw) {
   final hour = int.tryParse(parts.first);
   final minute = parts.length > 1 ? int.tryParse(parts[1]) : null;
   if (hour == null || minute == null) return null;
+  // Range-check before constructing: `TimeOfDay` does not validate, so a
+  // corrupt value like "99:77" would otherwise produce an out-of-range time
+  // that `TZDateTime` silently normalises into a different day, scheduling the
+  // reminder at a time the user never chose.
+  if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
   return TimeOfDay(hour: hour, minute: minute);
 }

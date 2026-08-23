@@ -56,7 +56,14 @@ class ReminderSetting extends ConsumerWidget {
     ).notifier);
 
     if (!value) {
-      await NotificationService().cancelReminder();
+      // Turn the toggle off even if cancelling fails: the user asked for it
+      // off, and leaving the switch stuck on would be worse than a stale
+      // schedule (which the next enable/reschedule cancels anyway).
+      try {
+        await NotificationService().cancelReminder();
+      } catch (_) {
+        // Intentionally ignored — see above.
+      }
       notifier.updateBoolean(SharedPreferencesKeys.reminderEnabled, false);
       return;
     }
@@ -97,15 +104,25 @@ class ReminderSetting extends ConsumerWidget {
         await showTimePicker(context: context, initialTime: current);
     if (picked == null) return;
 
+    if (!context.mounted) return;
+    // Schedule *before* persisting. Rescheduling can fail at the platform layer
+    // exactly as it can when enabling, and storing the new time first would
+    // leave the displayed time claiming a reminder that was never scheduled.
+    try {
+      await NotificationService().scheduleDailyReminder(
+        hour: picked.hour,
+        minute: picked.minute,
+        title: context.l10n.appName,
+        body: context.l10n.reminderBody,
+      );
+    } catch (_) {
+      if (context.mounted) {
+        showSnackBar(context, context.l10n.reminderError, 3);
+      }
+      return;
+    }
+
     // Persist + update the notifier so the time row rebuilds immediately.
     ref.read(reminderTimeProvider.notifier).setTime(picked);
-
-    if (!context.mounted) return;
-    await NotificationService().scheduleDailyReminder(
-      hour: picked.hour,
-      minute: picked.minute,
-      title: context.l10n.appName,
-      body: context.l10n.reminderBody,
-    );
   }
 }
