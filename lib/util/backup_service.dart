@@ -14,7 +14,9 @@ import 'package:red_owl/util/shared_preference_service.dart';
 ///
 /// The backup covers three categories of data, mirroring how the app stores
 /// them:
-/// - **settings** — `isDarkMode` and `useCustomList` from SharedPreferences.
+/// - **settings** — every user preference from SharedPreferences: the dark
+///   mode, color-blind, hard mode, custom-list and reminder toggles, plus the
+///   language, text-size, animation-speed and reminder-time values.
 /// - **stats** — the `statsData` and `guessDistribution` arrays from
 ///   SharedPreferences.
 /// - **history** — every row of the Drift [History] table.
@@ -22,9 +24,10 @@ import 'package:red_owl/util/shared_preference_service.dart';
 /// The custom word list (`custom_list.txt`) is *optionally* included; the
 /// caller decides at export time (see [hasCustomWordList]).
 ///
-/// The in-progress game board ([SharedPreferencesKeys.gridState]) is
-/// deliberately **not** part of a backup — it is transient daily state, not
-/// something worth transferring between devices.
+/// The in-progress game board ([SharedPreferencesKeys.gridState]), the game
+/// date and the hint-used date are deliberately **not** part of a backup —
+/// they are transient daily state, not something worth transferring between
+/// devices.
 ///
 /// Implemented as a singleton so it can be swapped/mocked consistently with the
 /// other services ([SharedPreferenceService], [WordleService]).
@@ -32,7 +35,39 @@ class BackupService {
   /// Schema version written into every backup. Bump when the format changes in
   /// a way [importFromJson] needs to branch on; imports with a higher version
   /// than this are rejected.
-  static const int backupVersion = 1;
+  ///
+  /// - **1** — `settings` carried only `isDarkMode` and `useCustomList`.
+  /// - **2** — `settings` carries every user preference (see
+  ///   [_backedUpBoolSettings] / [_backedUpStringSettings]). Version 1 files
+  ///   still import: the extra keys are simply absent and those preferences are
+  ///   left at their current values.
+  static const int backupVersion = 2;
+
+  /// Boolean preferences included in a backup, keyed by their JSON field name.
+  ///
+  /// Everything the user can toggle in Settings belongs here. Transient daily
+  /// state (`gridState`, `gameDate`, `hintUsedDate`) is deliberately excluded.
+  static const Map<String, SharedPreferencesKeys> _backedUpBoolSettings = {
+    'isDarkMode': SharedPreferencesKeys.isDarkMode,
+    'useCustomList': SharedPreferencesKeys.useCustomList,
+    'isColorBlindMode': SharedPreferencesKeys.isColorBlindMode,
+    'isHardMode': SharedPreferencesKeys.isHardMode,
+    'reminderEnabled': SharedPreferencesKeys.reminderEnabled,
+  };
+
+  /// String preferences included in a backup, keyed by their JSON field name.
+  ///
+  /// The values are opaque codes (`localeCode`, `fontScale`, `motionSpeed`) and
+  /// an `HH:mm` reminder time. They are type-checked on import but not matched
+  /// against a known-code list: each notifier already falls back to its default
+  /// for a value it does not recognise, so a stale code degrades rather than
+  /// failing the whole import.
+  static const Map<String, SharedPreferencesKeys> _backedUpStringSettings = {
+    'localeCode': SharedPreferencesKeys.localeCode,
+    'fontScale': SharedPreferencesKeys.fontScale,
+    'motionSpeed': SharedPreferencesKeys.motionSpeed,
+    'reminderTime': SharedPreferencesKeys.reminderTime,
+  };
 
   static const String _customListFileName = 'custom_list.txt';
 
@@ -119,8 +154,10 @@ class BackupService {
       'version': backupVersion,
       'exportedAt': DateTime.now().toIso8601String(),
       'settings': {
-        'isDarkMode': prefs.getBool(SharedPreferencesKeys.isDarkMode),
-        'useCustomList': prefs.getBool(SharedPreferencesKeys.useCustomList),
+        for (final entry in _backedUpBoolSettings.entries)
+          entry.key: prefs.getBool(entry.value),
+        for (final entry in _backedUpStringSettings.entries)
+          entry.key: prefs.getString(entry.value),
       },
       'stats': {
         'statsData': prefs.getStringList(SharedPreferencesKeys.statsData),
@@ -234,13 +271,16 @@ class BackupService {
 
     final settings = decoded['settings'];
     if (settings is Map) {
-      if (settings['isDarkMode'] is bool) {
-        prefs.setBool(SharedPreferencesKeys.isDarkMode, settings['isDarkMode']);
-      }
-      if (settings['useCustomList'] is bool) {
-        prefs.setBool(
-            SharedPreferencesKeys.useCustomList, settings['useCustomList']);
-      }
+      // Absent keys are skipped, so a version 1 backup (which carried only
+      // isDarkMode and useCustomList) still imports cleanly.
+      _backedUpBoolSettings.forEach((field, key) {
+        final value = settings[field];
+        if (value is bool) prefs.setBool(key, value);
+      });
+      _backedUpStringSettings.forEach((field, key) {
+        final value = settings[field];
+        if (value is String) prefs.setString(key, value);
+      });
     }
 
     if (statsData != null) {

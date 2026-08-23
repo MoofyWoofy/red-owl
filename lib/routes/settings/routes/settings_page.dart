@@ -571,17 +571,32 @@ class SettingsPage extends ConsumerWidget {
       // settings/word list may differ from the active game.
       await WordleService().init();
       ref.read(gridProvider.notifier).resetGrid();
-      // Force the theme and custom-list toggle to re-read the imported values.
-      ref.invalidate(boolFamilyProvider(
-        id: BoolFamilyProviderIDs.isDarkMode,
-        sharedPrefsKey: SharedPreferencesKeys.isDarkMode,
-      ));
-      ref.invalidate(boolFamilyProvider(
-        id: BoolFamilyProviderIDs.useCustomList,
-        sharedPrefsKey: SharedPreferencesKeys.useCustomList,
-      ));
-      // The reminder time is provider-cached, so re-read the imported value.
+      // Every restored preference is provider-cached, so invalidate each one to
+      // re-read the imported value. Missing any here would leave the UI showing
+      // the pre-import setting until the next restart.
+      const restoredToggles = <(BoolFamilyProviderIDs, SharedPreferencesKeys)>[
+        (BoolFamilyProviderIDs.isDarkMode, SharedPreferencesKeys.isDarkMode),
+        (
+          BoolFamilyProviderIDs.useCustomList,
+          SharedPreferencesKeys.useCustomList
+        ),
+        (
+          BoolFamilyProviderIDs.isColorBlindMode,
+          SharedPreferencesKeys.isColorBlindMode
+        ),
+        (BoolFamilyProviderIDs.isHardMode, SharedPreferencesKeys.isHardMode),
+        (
+          BoolFamilyProviderIDs.reminderEnabled,
+          SharedPreferencesKeys.reminderEnabled
+        ),
+      ];
+      for (final (id, key) in restoredToggles) {
+        ref.invalidate(boolFamilyProvider(id: id, sharedPrefsKey: key));
+      }
       ref.invalidate(reminderTimeProvider);
+      ref.invalidate(localeProvider);
+      ref.invalidate(fontScaleProvider);
+      ref.invalidate(motionSpeedProvider);
 
       if (context.mounted) {
         showSnackBar(context, context.l10n.success);

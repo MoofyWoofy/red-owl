@@ -66,6 +66,67 @@ void main() {
       expect(rows.first.word, 'CRANE');
     });
 
+    // Regression: the backup used to carry only isDarkMode and useCustomList,
+    // so hard mode, colour-blind mode, the language, text size, animation
+    // speed and the whole reminder configuration were silently lost when a
+    // user restored onto a new device.
+    test('round-trips every user setting', () async {
+      final prefs = SharedPreferenceService();
+      prefs.setBool(SharedPreferencesKeys.isDarkMode, true);
+      prefs.setBool(SharedPreferencesKeys.useCustomList, true);
+      prefs.setBool(SharedPreferencesKeys.isColorBlindMode, true);
+      prefs.setBool(SharedPreferencesKeys.isHardMode, true);
+      prefs.setBool(SharedPreferencesKeys.reminderEnabled, true);
+      prefs.setString(SharedPreferencesKeys.localeCode, 'nl');
+      prefs.setString(SharedPreferencesKeys.fontScale, 'large');
+      prefs.setString(SharedPreferencesKeys.motionSpeed, 'slow');
+      prefs.setString(SharedPreferencesKeys.reminderTime, '07:45');
+
+      final exported = await BackupService().buildBackup(includeWordList: false);
+      expect(exported['version'], 2);
+
+      // Wipe everything, then restore from the exported document.
+      setSharedPreferencesMock();
+      await SharedPreferenceService().init();
+      await BackupService().importFromJson(jsonEncode(exported));
+
+      expect(prefs.getBool(SharedPreferencesKeys.isDarkMode), isTrue);
+      expect(prefs.getBool(SharedPreferencesKeys.useCustomList), isTrue);
+      expect(prefs.getBool(SharedPreferencesKeys.isColorBlindMode), isTrue);
+      expect(prefs.getBool(SharedPreferencesKeys.isHardMode), isTrue);
+      expect(prefs.getBool(SharedPreferencesKeys.reminderEnabled), isTrue);
+      expect(prefs.getString(SharedPreferencesKeys.localeCode), 'nl');
+      expect(prefs.getString(SharedPreferencesKeys.fontScale), 'large');
+      expect(prefs.getString(SharedPreferencesKeys.motionSpeed), 'slow');
+      expect(prefs.getString(SharedPreferencesKeys.reminderTime), '07:45');
+    });
+
+    test('a version 1 backup still imports', () async {
+      // Older files carry only the two original settings; the rest are absent
+      // and must simply be left alone rather than failing the import.
+      final json = jsonEncode({
+        'version': 1,
+        'settings': {'isDarkMode': true, 'useCustomList': false},
+        'history': const [],
+      });
+      await BackupService().importFromJson(json);
+      expect(SharedPreferenceService().getBool(SharedPreferencesKeys.isDarkMode),
+          isTrue);
+    });
+
+    test('ignores settings of the wrong type', () async {
+      final json = jsonEncode({
+        'version': BackupService.backupVersion,
+        'settings': {'isHardMode': 'yes', 'fontScale': 42},
+        'history': const [],
+      });
+      await BackupService().importFromJson(json);
+      expect(SharedPreferenceService().getBool(SharedPreferencesKeys.isHardMode),
+          isNull);
+      expect(SharedPreferenceService().getString(SharedPreferencesKeys.fontScale),
+          isNull);
+    });
+
     test('rejects a document that is not valid JSON', () {
       expect(() => BackupService().importFromJson('{not json'),
           throwsFormatException);
