@@ -9,6 +9,12 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
+# riverpod_lint runs through Dart's native analysis_server_plugin system (it
+# dropped its custom_lint dependency in 3.1.x), so it is declared here rather
+# than as a dev_dependency. `flutter analyze` picks it up automatically.
+plugins:
+  riverpod_lint: ^3.1.8
+
 linter:
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`
