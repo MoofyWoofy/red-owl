@@ -12,7 +12,8 @@ dart run build_runner build --delete-conflicting-outputs   # regenerate code (se
 dart run build_runner watch --delete-conflicting-outputs   # regenerate continuously
 
 flutter run                          # run on default device (also -d chrome, -d <id>)
-flutter analyze                      # static analyzer
+dart analyze                         # static analyzer -- use this one
+flutter analyze                      # NOTE: silently skips riverpod_lint
 dart format lib test
 
 flutter test                                          # all unit + widget tests
@@ -21,13 +22,29 @@ flutter test --plain-name "name of test"              # single test by name
 flutter test integration_test/                        # integration tests (needs a device)
 ```
 
-**There is no `custom_lint` / `riverpod_lint` any more.** They were removed in the
-2026-08 pass because `custom_lint` 0.8.1 pins `analyzer ^8` and had frozen eleven
-direct dependencies — including, indirectly, the whole Riverpod runtime. `flutter
-analyze` is now the only static check, so Riverpod-specific mistakes (a provider
-read that should be a watch, a missing dependency) are no longer caught
-automatically. **Re-add both as soon as `custom_lint` ships a release supporting
-analyzer 10 or newer** — see *Dependencies* below.
+**`riverpod_lint` is back, and only `dart analyze` runs it.** riverpod_lint 3.1.x
+dropped its `custom_lint` dependency for Dart's native `analysis_server_plugin`,
+so it no longer drags in the `analyzer ^8` pin that forced its removal. It is
+declared in `analysis_options.yaml` under the top-level `plugins:` key — **not**
+as a dev_dependency, and nothing in `pubspec.yaml` changed.
+
+**`flutter analyze` silently ignores that `plugins:` key.** It reports a clean
+tree while the Riverpod lints never run; only `dart analyze` loads the plugin.
+Verified with a deliberate `avoid_public_notifier_properties` violation, which
+`flutter analyze` did not report and `dart analyze` did. Use `dart analyze`.
+
+`custom_lint` itself is still stuck (0.8.1, `analyzer ^8`, no release since
+2025-09) but is no longer needed for the Riverpod lints — see *Dependencies*.
+
+**One warning is expected and must not be "fixed":**
+`scoped_providers_should_specify_dependencies` on `PracticePage`'s
+`gridProvider` override. Declaring `dependencies` would assert that gridProvider
+requires a scope to supply it, which is false — the root scope always provides
+the daily notifier, and the override merely replaces it for one page — and it
+would oblige ~22 dependency annotations across most of the game UI. It cannot be
+suppressed either: plugin diagnostics do not honour `// ignore:` comments, and
+the analyzer rejects their codes in `errors:` as `unrecognized_error_code`. The
+reasoning is recorded at the call site.
 
 ## Code generation is mandatory
 
@@ -63,7 +80,13 @@ When adding a new file to a directory, add it to that directory's `shared.dart` 
 
   An **empty word list is rejected at import** (`WordListImportStatus.empty`) and `getWordList` falls back to the bundled asset if the custom list reads back empty. An empty list makes `getWordOfTheDay` throw on `nextInt(0)`, and since `main()` awaits `WordleService().init()`, persisting one stops the app from starting at all.
 
-**Backup / restore.** `BackupService` (`lib/util/backup_service.dart`, also a singleton) serialises settings, stats and the full `History` table into one versioned JSON document (`backupVersion`), and optionally the custom word list. The Settings page's Export/Import buttons drive it via `share_plus` / `file_picker`. `importFromJson` validates the entire document **before** writing anything, so a malformed file leaves existing data untouched; after a successful import the caller re-inits `WordleService`, resets the board, and invalidates the dark-mode / custom-list `boolFamilyProvider`s so the UI reflects the restored values. The in-progress board (`gridState`) is intentionally **not** part of a backup.
+**Backup / restore.** `BackupService` (`lib/util/backup_service.dart`, also a singleton) serialises settings, stats and the full `History` table into one versioned JSON document (`backupVersion`), and optionally the custom word list. The Settings page's Export/Import buttons drive it via `share_plus` / `file_picker`. `importFromJson` validates the entire document **before** writing anything — history rows, stats counters *and* `customWordList` — so a malformed file leaves existing data untouched; after a successful import the caller re-inits `WordleService`, resets the board, and invalidates the dark-mode / custom-list `boolFamilyProvider`s so the UI reflects the restored values. The in-progress board (`gridState`) is intentionally **not** part of a backup.
+
+Three details on the import worth not undoing:
+
+- **The history replacement is one transaction.** The delete used to commit before the row-by-row inserts, so a failure (or the app being killed) partway through left history permanently truncated — originals gone, replacements never written. It is now `db.transaction` + `batch.insertAll`.
+- **`customWordList` is held to `importWordList`'s rules** (exactly five ASCII letters via `WordleService.isValidWord`, blanks dropped, duplicates removed case-insensitively, empty rejected). It used to go to disk unchecked while a list picked from a file did not — and since the word of the day is drawn from that file on every launch and the board assumes five-letter answers (fixed five columns, `i % 5` scoring), a junk entry broke the game rather than the import.
+- **Restoring re-applies the reminder to the OS.** The toggle and time are app data but the schedule lives with the platform, so `NotificationService.applyReminder` is called after the provider invalidations. It never throws — the data import has already succeeded by then — and returns whether a reminder is actually scheduled; when it returns false for an enabled reminder the page turns the toggle back off, so the switch cannot claim a reminder that does not exist.
 
 `backupVersion` is **2**. Version 1 carried only `isDarkMode` and
 `useCustomList`; version 2 carries *every* user preference, declared once in
@@ -90,6 +113,10 @@ knowing:
   `WordleService` and invalidates `gridProvider` + `hintProvider`.
 
 **Game state lives in one Riverpod notifier.** `Grid` (`lib/riverpod/grid/grid.dart`) owns the entire board. All input — letters, DELETE, ENTER — funnels through `onKeyboardPressed`. Its `build()` rehydrates an in-progress game from a base64-encoded JSON blob in SharedPreferences and handles **day rollover**: if the stored game is from a previous day and wasn't finished, it's archived to the database as `GameState.incomplete` and a fresh board is returned. On a submitted guess it also enforces **hard mode** (`_hardModeViolation`, gated by the `isHardMode` pref — green letters must stay put, yellow letters must reappear) and celebrates **streak milestones** (`isStreakMilestone`) by swapping the win snackbar for a share nudge. Outcome side effects go through two overridable hooks — `recordOutcome` (stats + history) and `getGuessResult` (answer lookup) — so practice mode can change them without duplicating `onKeyboardPressed`.
+
+**`build()` never throws on unreadable persisted state.** `_decodeGrid` and `_decodeDate` return `null` rather than propagating, because both values live on disk: a partial write leaves invalid base64, a downgrade to a build with a different model shape leaves JSON `fromJson` rejects, and a hand-edited backup can leave anything. A throw here put `gridProvider` into an error state on *every* launch, recoverable only by clearing app data (and with it the player's stats). An unreadable board is treated as no saved game; an unreadable date is treated as neither today's nor archivable (there is no way to tell which day the board belongs to, so no history row is written under a guessed date). Either way the poisoned key is cleared and the date re-stamped. Covered by `test/unit/riverpod/grid_corrupt_state_test.dart` and, against the real platform store, by `integration_test/app_test.dart`.
+
+**The notifier does not take a `BuildContext`.** `onKeyboardPressed` takes a `GameMessenger` — the `AppLocalizations` plus a `show(message, seconds)` callback — so it states what it wants said while the calling widget decides whether it can still be displayed. That keeps the widget tree out of the business logic (`avoid_build_context_in_providers`) and removes the `context.mounted` checks the notifier had to make about a tree it does not own. When adding a message, add it to the messenger call, not a `showSnackBar` import.
 
 `onKeyboardPressed` awaits `getGuessResult` mid-way, so it guards re-entrancy with `_isEvaluatingGuess` and pins the row to a local before the await. Both matter: the writes after the await index the tile list by row, and a DELETE handled during the await shortens the row, which used to throw `RangeError (length): Invalid value: Not in inclusive range 0..3: 4`. Anything new added after that await must use the pinned `row`, not `state.row`.
 
@@ -180,6 +207,17 @@ Also, Git Bash rewrites device paths: `adb shell ls /sdcard` becomes
 `/Files/Git/sdcard`. Export `MSYS_NO_PATHCONV=1` for any adb command taking an
 on-device path.
 
+Two things to know before extending `integration_test/app_test.dart`:
+
+- **The home page does not build `gridProvider`.** Only opening *Daily* does, so
+  launching the app alone never runs `Grid.build` — and therefore never runs its
+  corrupt-state recovery. Tests asserting on that recovery have to navigate to
+  the game page first.
+- **`Grid.build`'s cleanup writes are unawaited** (it is synchronous, so they
+  cannot be awaited). They clear the in-memory cache immediately but reach the
+  platform store a moment later, so an assertion that reads the store straight
+  after the first frame races them and sees the old value. Poll instead.
+
 (The old "custom_lint crashes on a stale `build/` directory" gotcha is gone with
 custom_lint itself.)
 
@@ -203,9 +241,21 @@ Forcing a newer analyzer through `dependency_overrides` resolves but does not
 work: `custom_lint_visitor` then fails to compile (`'NormalFormalParameter' isn't
 a type`).
 
-**Watch for a `custom_lint` release supporting analyzer 10+ and re-add both
-packages** (plus the `plugins: - custom_lint` entry under `analyzer:` in
-`analysis_options.yaml`). Until then the Riverpod lints are simply not running.
+**`riverpod_lint` no longer needs any of that.** From 3.1.x it is built on Dart's
+native `analysis_server_plugin` instead of `custom_lint`, so it was re-added in
+the 2026-08-23 pass with **no pubspec change at all** — it is declared in
+`analysis_options.yaml`:
+
+```yaml
+plugins:
+  riverpod_lint: ^3.1.8
+```
+
+3.1.8 wants `riverpod` 3.4.2 and `analyzer ^13`, both of which the project
+already resolves. Remember that only `dart analyze` runs it (see *Commands*).
+
+`custom_lint` remains unusable and is now simply unused. Nothing is waiting on
+it; drop it from consideration unless some other package needs it.
 
 The SDK floor is no longer a factor: the project runs Flutter 3.47.1 / Dart 3.13.1
 (pinned identically in CI), which released the old `meta` pin and let
@@ -227,9 +277,11 @@ upgrade. `compileSdk` and `minSdk` do follow the Flutter defaults.
 
 Flutter enforces **minimum** Gradle / AGP / Kotlin versions and fails at plugin-apply
 time, one check at a time, so a Flutter bump can require three separate version
-bumps before a build will even configure. Current: Gradle 8.14.3, AGP 8.13.2,
-Kotlin 2.4.0 (`android/gradle/wrapper/gradle-wrapper.properties` and
-`android/settings.gradle`).
+bumps before a build will even configure. Current: Gradle 8.14.5, AGP 8.13.2,
+Kotlin 2.4.10 (`android/gradle/wrapper/gradle-wrapper.properties` and
+`android/settings.gradle`), and `desugar_jdk_libs` 2.1.5 in
+`android/app/build.gradle`. AGP 8.13.2 is the newest 8.x — there is no 8.x bump
+left to take.
 
 **The project is deliberately still on AGP 8.x.** Flutter's template defaults to
 AGP 9, which reads only the new Gradle DSL and would require rewriting

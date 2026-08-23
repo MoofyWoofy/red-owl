@@ -48,7 +48,7 @@ Privacy Policy: <https://moofywoofy.github.io/red-owl/>
 - **Once-a-day hint** — reveal a single correct letter when you're stuck.
 - **Custom word lists** — import any `.txt` file (one word per line) and play against your own dictionary.
 - **Stats tracking** — local Drift database records every game, surfacing games played/won, win rate, current/max streak, average guesses, guess distribution and a filterable history (all / last 30 days / custom range), with a reset option.
-- **Backup & restore** — export every setting, your stats and your full game history (and optionally your custom word list) to a single JSON file, and import it on another device.
+- **Backup & restore** — export every setting, your stats and your full game history (and optionally your custom word list) to a single JSON file, and import it on another device. Restoring also re-applies your daily reminder on the new device (asking for the notification permission if it has not been granted there), so the toggle and the reminder you actually get agree.
 - **Sharing** — copy a spoiler-free NYT-style emoji result grid, plus celebratory streak-milestone prompts.
 - **Daily reminder** — optional local notification at a time you choose that repeats every day (Android, off by default).
 - **Theming & readability** — light/dark mode, a color-blind / high-contrast palette, adjustable text size, and an animation-speed control.
@@ -78,7 +78,7 @@ Privacy Policy: <https://moofywoofy.github.io/red-owl/>
 | Sharing / launching | `share_plus`, `url_launcher` |
 | Notifications | `flutter_local_notifications` + `timezone` / `flutter_timezone` (Android) |
 | Localization | `flutter_localizations` + ARB files |
-| Linting | `flutter_lints` (via `flutter analyze`) |
+| Linting | `flutter_lints` + `riverpod_lint` (via `dart analyze`) |
 | Icons / splash | `flutter_launcher_icons`, `flutter_native_splash` |
 
 ## Project Structure
@@ -195,13 +195,24 @@ To add a new language, drop a `xx.arb` file alongside the existing ones and rebu
 ### Linting and Analysis
 
 ```bash
-flutter analyze                              # static analyzer
+dart analyze                                 # static analyzer -- use this one
 dart format lib test                         # format
 flutter test                                 # widget/unit tests
 flutter test integration_test/               # end-to-end tests (needs a device)
 ```
 
-`custom_lint` / `riverpod_lint` are not currently used: `custom_lint` 0.8.1 pins an old `analyzer` and was holding back eleven dependencies, so it was removed. They should be reinstated once it supports `analyzer` 10+ — see the Dependencies section of [AGENTS.md](AGENTS.md).
+**Use `dart analyze`, not `flutter analyze`.** `riverpod_lint` runs through Dart's
+native `analysis_server_plugin` and is declared under the top-level `plugins:` key
+in [analysis_options.yaml](analysis_options.yaml) rather than as a dev_dependency.
+`flutter analyze` silently ignores that key, reporting a clean tree while the
+Riverpod lints never run.
+
+One warning is expected: `scoped_providers_should_specify_dependencies` on the
+practice page's provider override. It is deliberate and cannot currently be
+suppressed — see the Commands section of [AGENTS.md](AGENTS.md).
+
+`custom_lint` is unused: 0.8.1 pins an old `analyzer` and was holding back eleven
+dependencies. `riverpod_lint` no longer needs it.
 
 ## Custom Word Lists
 
@@ -239,9 +250,10 @@ Outputs land in `build/app/outputs/`.
 
 The Android module pins:
 
-- Kotlin `2.4.0`
-- Android Gradle Plugin `8.13.2`
-- Gradle wrapper `8.14.3`
+- Kotlin `2.4.10`
+- Android Gradle Plugin `8.13.2` (the newest 8.x; AGP 9 needs the new Gradle DSL)
+- Gradle wrapper `8.14.5`
+- `desugar_jdk_libs` `2.1.5`
 - NDK `28.2.13676358`
 - `targetSdk` `36`, ABI filters `armeabi-v7a`, `arm64-v8a`, `x86_64`
 
