@@ -162,7 +162,7 @@ abstract class _$BoolFamilyNotifier extends $Notifier<bool> {
   });
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<bool, bool>;
     final element =
         ref.element
@@ -172,7 +172,7 @@ abstract class _$BoolFamilyNotifier extends $Notifier<bool> {
               Object?,
               Object?
             >;
-    element.handleCreate(
+    return element.handleCreate(
       ref,
       () => build(id: _$args.id, sharedPrefsKey: _$args.sharedPrefsKey),
     );

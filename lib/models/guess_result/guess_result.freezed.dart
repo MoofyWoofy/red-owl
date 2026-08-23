@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'guess_result.dart';
@@ -9,6 +9,7 @@ part of 'guess_result.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -73,7 +74,7 @@ class _$GuessResultCopyWithImpl<$Res>
 /// Create a copy of GuessResult
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? guess = null,Object? isCorrect = null,Object? isWordInList = null,Object? characterInfo = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(GuessResult(
 guess: null == guess ? _self.guess : guess // ignore: cast_nullable_to_non_nullable
 as String,isCorrect: null == isCorrect ? _self.isCorrect : isCorrect // ignore: cast_nullable_to_non_nullable
 as bool,isWordInList: null == isWordInList ? _self.isWordInList : isWordInList // ignore: cast_nullable_to_non_nullable
@@ -219,7 +220,7 @@ return $default(_that.guess,_that.isCorrect,_that.isWordInList,_that.characterIn
 @JsonSerializable()
 
 class _GuessResult implements GuessResult {
-  const _GuessResult({required this.guess, @JsonKey(name: "is_correct") required this.isCorrect, @JsonKey(name: "is_word_in_list") required this.isWordInList, @JsonKey(name: "character_info") required final  List<CharacterInfo>? characterInfo}): _characterInfo = characterInfo;
+  const _GuessResult({required this.guess, @JsonKey(name: "is_correct") required this.isCorrect, @JsonKey(name: "is_word_in_list") required this.isWordInList, @JsonKey(name: "character_info") required  List<CharacterInfo>? characterInfo}): _characterInfo = characterInfo;
   factory _GuessResult.fromJson(Map<String, dynamic> json) => _$GuessResultFromJson(json);
 
 /// The word the player submitted (uppercase).
@@ -365,7 +366,7 @@ class _$CharacterInfoCopyWithImpl<$Res>
 /// Create a copy of CharacterInfo
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? char = null,Object? scoring = null,}) {
-  return _then(_self.copyWith(
+  return _then(CharacterInfo(
 char: null == char ? _self.char : char // ignore: cast_nullable_to_non_nullable
 as String,scoring: null == scoring ? _self.scoring : scoring // ignore: cast_nullable_to_non_nullable
 as CharacterScoring,
@@ -655,7 +656,7 @@ class _$CharacterScoringCopyWithImpl<$Res>
 /// Create a copy of CharacterScoring
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? inWord = null,Object? correctIndex = null,}) {
-  return _then(_self.copyWith(
+  return _then(CharacterScoring(
 inWord: null == inWord ? _self.inWord : inWord // ignore: cast_nullable_to_non_nullable
 as bool,correctIndex: null == correctIndex ? _self.correctIndex : correctIndex // ignore: cast_nullable_to_non_nullable
 as bool,

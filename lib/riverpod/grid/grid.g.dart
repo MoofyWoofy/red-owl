@@ -91,7 +91,7 @@ abstract class _$Grid extends $Notifier<models.Grid> {
   models.Grid build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<models.Grid, models.Grid>;
     final element =
         ref.element
@@ -101,6 +101,6 @@ abstract class _$Grid extends $Notifier<models.Grid> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }

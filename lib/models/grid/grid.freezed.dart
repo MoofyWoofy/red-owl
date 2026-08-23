@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'grid.dart';
@@ -9,6 +9,7 @@ part of 'grid.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -87,7 +88,7 @@ class _$GridCopyWithImpl<$Res>
 /// Create a copy of Grid
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? column = null,Object? row = null,Object? tiles = null,Object? keyboardStatus = null,Object? runFlipAnimation = null,Object? isEnterOrDeletePressed = null,Object? isGameWon = null,Object? isGameOver = null,Object? notEnoughCharacters = null,Object? persistState = null,}) {
-  return _then(_self.copyWith(
+  return _then(Grid(
 column: null == column ? _self.column : column // ignore: cast_nullable_to_non_nullable
 as int,row: null == row ? _self.row : row // ignore: cast_nullable_to_non_nullable
 as int,tiles: null == tiles ? _self.tiles : tiles // ignore: cast_nullable_to_non_nullable
@@ -239,7 +240,7 @@ return $default(_that.column,_that.row,_that.tiles,_that.keyboardStatus,_that.ru
 @JsonSerializable()
 
 class _Grid implements Grid {
-  const _Grid({required this.column, required this.row, required final  List<Tile> tiles, required final  Map<String, LetterStatus> keyboardStatus, required this.runFlipAnimation, required this.isEnterOrDeletePressed, required this.isGameWon, required this.isGameOver, required this.notEnoughCharacters, this.persistState = true}): _tiles = tiles,_keyboardStatus = keyboardStatus;
+  const _Grid({required this.column, required this.row, required  List<Tile> tiles, required  Map<String, LetterStatus> keyboardStatus, required this.runFlipAnimation, required this.isEnterOrDeletePressed, required this.isGameWon, required this.isGameOver, required this.notEnoughCharacters, this.persistState = true}): _tiles = tiles,_keyboardStatus = keyboardStatus;
   factory _Grid.fromJson(Map<String, dynamic> json) => _$GridFromJson(json);
 
 /// Zero-based column index of the tile that will receive the next key press.

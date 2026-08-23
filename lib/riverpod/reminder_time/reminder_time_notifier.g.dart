@@ -73,7 +73,7 @@ abstract class _$ReminderTimeNotifier extends $Notifier<TimeOfDay> {
   TimeOfDay build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<TimeOfDay, TimeOfDay>;
     final element =
         ref.element
@@ -83,6 +83,6 @@ abstract class _$ReminderTimeNotifier extends $Notifier<TimeOfDay> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }
