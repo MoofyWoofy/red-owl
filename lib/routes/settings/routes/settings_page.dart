@@ -27,6 +27,7 @@ import 'package:red_owl/util/shared.dart'
     show
         BackupService,
         Localization,
+        NotificationService,
         WordleService,
         WordListImportStatus,
         showSnackBar;
@@ -540,6 +541,47 @@ class SettingsPage extends ConsumerWidget {
     }
   }
 
+  /// Brings the OS-level daily reminder into line with freshly restored
+  /// preferences.
+  ///
+  /// A backup carries the reminder toggle and time, but the schedule lives with
+  /// the platform, not in the app's own storage. Restoring one therefore used
+  /// to change what the switch displayed without changing what was scheduled:
+  /// a backup with the reminder on left the switch on with nothing scheduled on
+  /// this device, and one with it off left an existing reminder firing while
+  /// the switch read off.
+  ///
+  /// Takes [l10n] rather than a [BuildContext] because the notification text
+  /// has to survive the awaits below, which can outlive the page.
+  Future<void> _applyRestoredReminder(
+      AppLocalizations l10n, WidgetRef ref) async {
+    final provider = boolFamilyProvider(
+      id: BoolFamilyProviderIDs.reminderEnabled,
+      sharedPrefsKey: SharedPreferencesKeys.reminderEnabled,
+    );
+    final enabled = ref.read(provider);
+    final time = ref.read(reminderTimeProvider);
+
+    // Cannot throw, so the already-successful data import is never reported as
+    // a failure because of a notification problem.
+    final scheduled = await NotificationService().applyReminder(
+      enabled: enabled,
+      hour: time.hour,
+      minute: time.minute,
+      title: l10n.appName,
+      body: l10n.reminderBody,
+    );
+
+    // Keep the switch honest when the platform refused -- a denied permission
+    // or a rejected schedule must not leave it claiming a reminder that does
+    // not exist.
+    if (enabled && !scheduled) {
+      ref
+          .read(provider.notifier)
+          .updateBoolean(SharedPreferencesKeys.reminderEnabled, false);
+    }
+  }
+
   /// Imports a previously exported JSON backup, replacing the current data.
   ///
   /// Warns the user that existing data will be overwritten, picks a `.json`
@@ -547,6 +589,10 @@ class SettingsPage extends ConsumerWidget {
   /// in-memory providers (theme, custom-list toggle) and resets the board so
   /// the active game stays consistent with the (possibly changed) word list.
   Future<void> _importData(BuildContext context, WidgetRef ref) async {
+    // Captured before the first await: the reminder text is needed long after
+    // the dialogs and file picker have had a chance to outlive this page.
+    final l10n = context.l10n;
+
     final confirmed = await showDialog<bool>(
           context: context,
           builder: (_) => AlertDialog(
@@ -610,6 +656,12 @@ class SettingsPage extends ConsumerWidget {
       ref.invalidate(localeProvider);
       ref.invalidate(fontScaleProvider);
       ref.invalidate(motionSpeedProvider);
+
+      // The restored preferences now describe a reminder, but the schedule
+      // itself lives with the OS rather than in the app's data, so it has to be
+      // re-applied explicitly. Runs after the invalidations above so it reads
+      // the imported values, not the pre-import ones.
+      await _applyRestoredReminder(l10n, ref);
 
       if (context.mounted) {
         showSnackBar(context, context.l10n.success);

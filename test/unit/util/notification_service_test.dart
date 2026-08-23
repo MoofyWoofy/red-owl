@@ -200,4 +200,109 @@ void main() {
 
     verifyNever(() => android.requestExactAlarmsPermission());
   });
+
+  group('applyReminder', () {
+    /// Stubs the schedule path so a reminder can actually be written.
+    void allowScheduling() {
+      when(() => plugin.cancel(id: any(named: 'id'))).thenAnswer((_) async {});
+      when(() => plugin.zonedSchedule(
+            id: any(named: 'id'),
+            title: any(named: 'title'),
+            body: any(named: 'body'),
+            scheduledDate: any(named: 'scheduledDate'),
+            notificationDetails: any(named: 'notificationDetails'),
+            androidScheduleMode: any(named: 'androidScheduleMode'),
+            matchDateTimeComponents: any(named: 'matchDateTimeComponents'),
+          )).thenAnswer((_) async {});
+    }
+
+    Future<bool> apply({required bool enabled}) =>
+        NotificationService().applyReminder(
+          enabled: enabled,
+          hour: 7,
+          minute: 30,
+          title: 'Red Owl',
+          body: 'Play!',
+        );
+
+    test('schedules at the given time when enabled', () async {
+      allowScheduling();
+
+      expect(await apply(enabled: true), isTrue);
+
+      verify(() => plugin.zonedSchedule(
+            id: NotificationService.reminderId,
+            title: 'Red Owl',
+            body: 'Play!',
+            scheduledDate: any(named: 'scheduledDate'),
+            notificationDetails: any(named: 'notificationDetails'),
+            androidScheduleMode: any(named: 'androidScheduleMode'),
+            matchDateTimeComponents: any(named: 'matchDateTimeComponents'),
+          )).called(1);
+    });
+
+    test('cancels instead of scheduling when disabled', () async {
+      allowScheduling();
+
+      expect(await apply(enabled: false), isFalse);
+
+      verify(() => plugin.cancel(id: NotificationService.reminderId)).called(1);
+      verifyNever(() => plugin.zonedSchedule(
+            id: any(named: 'id'),
+            title: any(named: 'title'),
+            body: any(named: 'body'),
+            scheduledDate: any(named: 'scheduledDate'),
+            notificationDetails: any(named: 'notificationDetails'),
+            androidScheduleMode: any(named: 'androidScheduleMode'),
+            matchDateTimeComponents: any(named: 'matchDateTimeComponents'),
+          ));
+    });
+
+    // The caller uses a false return to correct the stored toggle, so these
+    // paths must report failure rather than throwing out of the import that
+    // triggered them.
+    test('reports failure instead of throwing when scheduling fails', () async {
+      when(() => plugin.cancel(id: any(named: 'id'))).thenAnswer((_) async {});
+      when(() => plugin.zonedSchedule(
+            id: any(named: 'id'),
+            title: any(named: 'title'),
+            body: any(named: 'body'),
+            scheduledDate: any(named: 'scheduledDate'),
+            notificationDetails: any(named: 'notificationDetails'),
+            androidScheduleMode: any(named: 'androidScheduleMode'),
+            matchDateTimeComponents: any(named: 'matchDateTimeComponents'),
+          )).thenThrow(Exception('platform refused'));
+
+      expect(await apply(enabled: true), isFalse);
+    });
+
+    test('reports failure instead of throwing when cancelling fails', () async {
+      when(() => plugin.cancel(id: any(named: 'id')))
+          .thenThrow(Exception('platform refused'));
+
+      expect(await apply(enabled: false), isFalse);
+    });
+
+    test('does not schedule when the permission is refused', () async {
+      allowScheduling();
+      final android = MockAndroidPlugin();
+      when(() => android.requestNotificationsPermission())
+          .thenAnswer((_) async => false);
+      when(() => plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()).thenReturn(android);
+
+      expect(await apply(enabled: true), isFalse);
+
+      verifyNever(() => plugin.zonedSchedule(
+            id: any(named: 'id'),
+            title: any(named: 'title'),
+            body: any(named: 'body'),
+            scheduledDate: any(named: 'scheduledDate'),
+            notificationDetails: any(named: 'notificationDetails'),
+            androidScheduleMode: any(named: 'androidScheduleMode'),
+            matchDateTimeComponents: any(named: 'matchDateTimeComponents'),
+          ));
+    });
+  });
+
 }

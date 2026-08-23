@@ -136,6 +136,48 @@ class NotificationService {
   /// Cancels the daily reminder, if any.
   Future<void> cancelReminder() => _plugin.cancel(id: reminderId);
 
+  /// Brings the OS schedule in line with the given reminder preferences,
+  /// returning whether a reminder is actually scheduled afterwards.
+  ///
+  /// The toggle and the time are stored by the app, but the schedule itself
+  /// lives with the platform. Anything that changes those preferences behind
+  /// the settings UI's back -- restoring a backup -- leaves the two
+  /// disagreeing, with the switch reading on while nothing is scheduled on this
+  /// device, or reading off while an old reminder keeps firing.
+  ///
+  /// **Never throws**, so a caller mid-way through a larger operation cannot
+  /// have that operation fail on a notification problem. A `false` return means
+  /// no reminder is scheduled -- the permission was refused, or the platform
+  /// rejected the schedule -- and the caller should correct the stored toggle
+  /// so it does not claim a reminder that does not exist.
+  Future<bool> applyReminder({
+    required bool enabled,
+    required int hour,
+    required int minute,
+    required String title,
+    required String body,
+  }) async {
+    try {
+      if (!enabled) {
+        await cancelReminder();
+        return false;
+      }
+      // Preferences cannot carry an OS permission grant, so this device may
+      // still have to ask.
+      if (!await requestPermission()) return false;
+      await requestExactAlarmPermission();
+      await scheduleDailyReminder(
+        hour: hour,
+        minute: minute,
+        title: title,
+        body: body,
+      );
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// The next [tz.TZDateTime] matching [hour]:[minute] in local time (today if
   /// still in the future, otherwise tomorrow).
   tz.TZDateTime _nextInstanceOf(int hour, int minute) {
