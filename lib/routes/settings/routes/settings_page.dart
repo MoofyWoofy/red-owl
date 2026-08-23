@@ -266,15 +266,28 @@ class SettingsPage extends ConsumerWidget {
                               context.l10n.yetAnotherWordApp,
                               textAlign: TextAlign.center,
                             ),
-                            TextButton(
-                              onPressed: () async {
-                                final uri = Uri.parse(
-                                    'https://moofywoofy.github.io/red-owl/');
-                                if (!await launchUrl(uri)) {
-                                  throw Exception('Could not launch $uri');
-                                }
-                              },
-                              child: Text(context.l10n.privacyPolicy),
+                            Builder(
+                              builder: (dialogContext) => TextButton(
+                                onPressed: () async {
+                                  final uri = Uri.parse(
+                                      'https://moofywoofy.github.io/red-owl/');
+                                  // Report a failure to the user instead of
+                                  // throwing out of an async button handler,
+                                  // where it would surface only as an
+                                  // unhandled exception in the logs.
+                                  var opened = false;
+                                  try {
+                                    opened = await launchUrl(uri);
+                                  } catch (_) {
+                                    opened = false;
+                                  }
+                                  if (!opened && dialogContext.mounted) {
+                                    showSnackBar(dialogContext,
+                                        dialogContext.l10n.linkOpenFailed, 3);
+                                  }
+                                },
+                                child: Text(context.l10n.privacyPolicy),
+                              ),
                             )
                           ],
                         );

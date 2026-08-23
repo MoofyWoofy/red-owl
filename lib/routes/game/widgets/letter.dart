@@ -1,3 +1,4 @@
+import 'dart:async' show unawaited;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:red_owl/config/shared.dart' show GameColors, LetterStatus;
@@ -65,10 +66,14 @@ class Letter extends ConsumerWidget {
     // Forwards the key press to the grid notifier. Shared by pointer taps and
     // accessibility / keyboard activation.
     void press() {
-      ref.read(gridProvider.notifier).onKeyboardPressed(
-            key: letter,
-            context: context,
-          );
+      // Tap handlers are synchronous; observe the future so a failure cannot
+      // escape as an unhandled async error.
+      unawaited(
+        ref
+            .read(gridProvider.notifier)
+            .onKeyboardPressed(key: letter, context: context)
+            .catchError((Object _) {}),
+      );
     }
 
     return IgnorePointer(

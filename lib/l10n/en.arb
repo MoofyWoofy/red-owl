@@ -111,6 +111,7 @@
   },
   "yetAnotherWordApp":"Yet another wordle app",
   "privacyPolicy":"Privacy Policy",
+  "linkOpenFailed":"Could not open the link.",
   "about":"About",
   "checkOutWordleStats":"Check out my Wordle! stats",
   "wordsGuessed":"Words Guessed",

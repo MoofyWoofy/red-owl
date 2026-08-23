@@ -1,3 +1,4 @@
+import 'dart:async' show unawaited;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:red_owl/config/shared.dart'
@@ -42,6 +43,14 @@ class ShareResultButton extends ConsumerWidget {
       colorBlind: colorBlind,
       titlePrefix: '${context.l10n.appName} $date',
     );
-    SharePlus.instance.share(ShareParams(text: text));
+    // Opens a system sheet; nothing depends on the result, but observe it so a
+    // platform failure does not escape as an unhandled async error.
+    unawaited(() async {
+      try {
+        await SharePlus.instance.share(ShareParams(text: text));
+      } catch (_) {
+        // Nothing actionable; just don't let it escape.
+      }
+    }());
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:async' show unawaited;
 import 'package:flutter/material.dart';
 import 'package:red_owl/config/shared.dart'
     show HistoryColors, SharedPreferencesKeys;
@@ -104,7 +105,16 @@ ${context.l10n.checkOutWordleStats}!
 🔥 $maxStreak ${context.l10n.maxStreak}
 """;
 
-              SharePlus.instance.share(ShareParams(text: shareText));
+              // Sharing opens a system sheet; nothing depends on the
+              // result, but observe it so a platform failure does not
+              // escape as an unhandled async error.
+              unawaited(() async {
+                try {
+                  await SharePlus.instance.share(ShareParams(text: shareText));
+                } catch (_) {
+                  // Nothing actionable; just don't let it escape.
+                }
+              }());
             },
             icon: const Icon(Icons.share),
           ),

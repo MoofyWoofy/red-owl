@@ -111,6 +111,7 @@
   },
   "yetAnotherWordApp": "Nog een Wordle-app",
   "privacyPolicy": "Privacybeleid",
+  "linkOpenFailed": "Kon de link niet openen.",
   "about": "Over",
   "checkOutWordleStats": "Bekijk mijn Wordle! statistieken",
   "wordsGuessed": "Woorden Geraden",

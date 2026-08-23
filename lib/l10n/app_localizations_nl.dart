@@ -235,6 +235,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get privacyPolicy => 'Privacybeleid';
 
   @override
+  String get linkOpenFailed => 'Kon de link niet openen.';
+
+  @override
   String get about => 'Over';
 
   @override

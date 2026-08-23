@@ -1,3 +1,4 @@
+import 'dart:async' show unawaited;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart'
@@ -42,11 +43,18 @@ class _GameBoardState extends ConsumerState<GameBoard> {
 
     if (key == LogicalKeyboardKey.enter ||
         key == LogicalKeyboardKey.numpadEnter) {
-      notifier.onKeyboardPressed(key: 'ENTER', context: context);
+      // Deliberately not awaited: the keyboard handler must return
+      // synchronously to claim the event. Observe the future so a failure
+      // cannot escape as an unhandled async error.
+      unawaited(notifier
+          .onKeyboardPressed(key: 'ENTER', context: context)
+          .catchError((Object _) {}));
       return true;
     }
     if (key == LogicalKeyboardKey.backspace) {
-      notifier.onKeyboardPressed(key: 'DELETE', context: context);
+      unawaited(notifier
+          .onKeyboardPressed(key: 'DELETE', context: context)
+          .catchError((Object _) {}));
       return true;
     }
 
@@ -56,7 +64,9 @@ class _GameBoardState extends ConsumerState<GameBoard> {
       final upper = character.toUpperCase();
       final code = upper.codeUnitAt(0);
       if (code >= 0x41 && code <= 0x5A) {
-        notifier.onKeyboardPressed(key: upper, context: context);
+        unawaited(notifier
+            .onKeyboardPressed(key: upper, context: context)
+            .catchError((Object _) {}));
         return true;
       }
     }

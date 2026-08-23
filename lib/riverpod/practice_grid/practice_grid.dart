@@ -1,3 +1,4 @@
+import 'dart:async' show unawaited;
 import 'package:red_owl/config/shared.dart' show keyboardStatus;
 import 'package:red_owl/models/shared.dart' as models;
 import 'package:red_owl/riverpod/grid/grid.dart' show Grid;
@@ -19,8 +20,9 @@ class PracticeGrid extends Grid {
   @override
   models.Grid build() {
     // Kick off the async answer load. The guard in [getGuessResult] ensures a
-    // valid answer even if the player somehow submits before it resolves.
-    _loadAnswer();
+    // valid answer even if the player somehow submits before it resolves, so a
+    // failure here is recoverable and must not escape as an unhandled error.
+    unawaited(_loadAnswer().catchError((Object _) {}));
     return _emptyBoard();
   }
 
@@ -62,7 +64,7 @@ class PracticeGrid extends Grid {
   @override
   void resetGrid() {
     _answer = '';
-    _loadAnswer();
+    unawaited(_loadAnswer().catchError((Object _) {}));
     state = _emptyBoard();
   }
 

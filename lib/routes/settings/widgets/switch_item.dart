@@ -1,3 +1,5 @@
+import 'dart:async' show FutureOr, unawaited;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:red_owl/riverpod/shared.dart' show boolFamilyProvider;
@@ -45,7 +47,14 @@ class SwitchItem extends ConsumerStatefulWidget {
   final SharedPreferencesKeys sharedPrefsKey;
 
   /// Custom toggle callback (e.g. to show a confirmation dialog first).
-  final ValueChanged<bool>? callback;
+  ///
+  /// May be asynchronous. It is invoked through [Future.sync] so that a
+  /// returned future is actually observed — passing an `async` closure to a
+  /// plain `ValueChanged<bool>` used to discard it, turning any failure into an
+  /// unhandled async error. Callbacks remain responsible for reporting their
+  /// own failures to the user; anything that escapes is swallowed here rather
+  /// than taking down the zone.
+  final FutureOr<void> Function(bool)? callback;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _SwitchItemState();
@@ -67,16 +76,22 @@ class _SwitchItemState extends ConsumerState<SwitchItem> {
       secondary: Icon(widget.icon),
       // Place the switch on the platform-default side (right on most platforms).
       controlAffinity: ListTileControlAffinity.platform,
-      onChanged: widget.callback ??
-          (value) {
-            // Default: immediately persist and update state through the notifier.
-            ref
-                .read(boolFamilyProvider(
-                  id: widget.boolProviderId,
-                  sharedPrefsKey: widget.sharedPrefsKey,
-                ).notifier)
-                .updateBoolean(widget.sharedPrefsKey, value);
-          },
+      onChanged: (value) {
+        final callback = widget.callback;
+        if (callback == null) {
+          // Default: immediately persist and update state through the notifier.
+          ref
+              .read(boolFamilyProvider(
+                id: widget.boolProviderId,
+                sharedPrefsKey: widget.sharedPrefsKey,
+              ).notifier)
+              .updateBoolean(widget.sharedPrefsKey, value);
+          return;
+        }
+        unawaited(
+          Future<void>.sync(() => callback(value)).catchError((Object _) {}),
+        );
+      },
     );
   }
 }

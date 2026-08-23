@@ -234,6 +234,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get privacyPolicy => 'Privacy Policy';
 
   @override
+  String get linkOpenFailed => 'Could not open the link.';
+
+  @override
   String get about => 'About';
 
   @override
