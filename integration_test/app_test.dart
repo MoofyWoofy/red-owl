@@ -47,6 +47,79 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  /// Regression cover for unreadable persisted state, run against the real
+  /// platform preference store rather than the in-memory fake the unit tests
+  /// use.
+  ///
+  /// `Grid.build` decodes the saved board (base64-wrapped JSON) and parses the
+  /// saved date. Both used to be unguarded, so a value that could not be read
+  /// threw straight out of the provider build -- and because the value stayed
+  /// on disk, every subsequent launch failed the same way, recoverable only by
+  /// clearing the app's data.
+  ///
+  /// Note that opening the Daily page is what builds the grid: the home page
+  /// does not watch the provider, so the recovery does not run on launch alone.
+  group('unreadable saved state', () {
+    /// Polls [read] until [isDone] accepts the value, giving up after ~2s.
+    ///
+    /// `Grid.build` is synchronous, so its cleanup writes are deliberately
+    /// issued unawaited: they clear the in-memory cache at once but reach the
+    /// platform store a moment later.
+    Future<String?> settled(
+      WidgetTester tester,
+      String key,
+      bool Function(String?) isDone,
+    ) async {
+      String? value;
+      await tester.runAsync(() async {
+        value = await SharedPreferencesAsync().getString(key);
+        for (var i = 0; i < 40 && !isDone(value); i++) {
+          await Future<void>.delayed(const Duration(milliseconds: 50));
+          value = await SharedPreferencesAsync().getString(key);
+        }
+      });
+      return value;
+    }
+
+    /// Launches and opens the Daily page, which is what builds the grid.
+    Future<void> openDaily(WidgetTester tester) async {
+      await launchApp(tester);
+      await tester.tap(find.text('Daily'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('an undecodable board yields a playable blank grid',
+        (tester) async {
+      await SharedPreferencesAsync().setString('gridState', 'not-base64!!!');
+
+      await openDaily(tester);
+
+      // A board rendered, rather than the provider erroring out.
+      expect(find.byType(GridView), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      // And the poisoned value is gone, so the next launch does not re-read it.
+      expect(
+        await settled(tester, 'gridState', (value) => value == null),
+        isNull,
+      );
+    });
+
+    testWidgets('an unparseable game date is repaired', (tester) async {
+      await SharedPreferencesAsync().setString('gameDate', 'garbage');
+
+      await openDaily(tester);
+
+      expect(find.byType(GridView), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      final stamped = await settled(
+        tester,
+        'gameDate',
+        (value) => value != null && value != 'garbage',
+      );
+      expect(DateTime.tryParse(stamped ?? ''), isNotNull);
+    });
+  });
+
   group('Full App E2E', () {
     /// Verifies that the app boots without error and the home page is visible.
     testWidgets('app launches and shows home page', (tester) async {
