@@ -8,6 +8,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- New release sections are inserted directly below this marker by the release workflow. Do not remove it. -->
 <!-- BEGIN_VERSIONS -->
 
+## 2.3.0
+
+### Added
+- Include every user setting, bump backupVersion to 2
+- Let the About button scroll with the content
+- Drop the large icon from the daily reminder
+
+### Changed
+- Updated app version in pubspec
+- Take the widget tree out of the Grid notifier
+- Bump Gradle, Kotlin and desugar_jdk_libs patch versions
+- Stop sharing one mutable keyboard map across boards
+- Upgrade Flutter to 3.47.1 and the Android toolchain to match
+- Raise targetSdk from 35 to 36
+- Start the tile flip from a listener, not from build()
+
+### Fixed
+- Observe two more fire-and-forget futures
+- Apply the restored reminder to the OS schedule
+- Restore history atomically and validate the imported word list
+- Stop unreadable saved state bricking the daily game
+- Refresh day-scoped state when resuming on a new day
+- Observe fire-and-forget futures and report link failures
+- Handle scheduling failures when the time changes
+- Replay the winning-row bounce on every win
+- Stop the Stats page crashing on a malformed stats array
+- Make date handling locale- and DST-independent
+- Tolerate corrupted persisted counters instead of throwing
+- Localize the history load-failure message
+- Handle the futures that are deliberately not awaited
+- Ignore input while a guess is being evaluated
+- Replay the tile flip after the board is reset
+- Handle empty and failed word-list loads in the viewer
+- Reject empty word-list imports and survive an empty list
+- Validate stats arrays before importing them
+- Don't crash when a day's game is recorded twice
+- Score repeated letters with the standard two-pass algorithm
+- Make the daily reminder an OS daily repeat
+
+### Performance
+- Collapse concurrent word-list loads into one
+
+### Documentation
+- Record this pass's changes and fix stale claims
+- Record this pass's changes and fix stale claims
+- Record the toolchain upgrade and correct the dependency ceilings
+- Rename CLAUDE.md to AGENTS.md and record this pass's findings
+- Add 2.1.0 [skip ci]
+- Add 2.0.1 [skip ci]
+
 ## 2.1.0
 
 ### Added
