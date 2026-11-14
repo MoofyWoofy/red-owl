@@ -8,6 +8,8 @@ A clean, offline-first Wordle clone built with Flutter. Bring your own word list
 
 Privacy Policy: <https://moofywoofy.github.io/red-owl/>
 
+Having trouble — "Can't install Red Owl", a missing reminder, moving your stats to a new phone, or a build error? See the **[FAQ](FAQ.md)**.
+
 > **AI-assisted development** — This codebase is developed and maintained with the help of AI coding assistants. Changes are human-reviewed before release. See [AGENTS.md](AGENTS.md) for the guidance those agents follow.
 
 ---
@@ -35,6 +37,7 @@ Privacy Policy: <https://moofywoofy.github.io/red-owl/>
 - [Versioning](#versioning)
 - [Releases](#releases)
 - [Changelog](#changelog)
+- [FAQ](FAQ.md)
 - [Inspiration](#inspiration)
 - [License](#license)
 
@@ -121,7 +124,7 @@ AGENTS.md                      # Architecture notes and conventions for AI codin
 
 - **Flutter SDK** with Dart `^3.8.0` — install from <https://docs.flutter.dev/get-started/install>
 - **Android Studio** or **Xcode** for the corresponding platform toolchains
-- For Android release builds: **JDK 17+**, Android SDK with platform 36, NDK `28.2.13676358`
+- For Android release builds: **JDK 17+** (the JDK bundled with current Android Studio, Java 25, works), Android SDK with platform 36, NDK `28.2.13676358`
 
 Verify your environment:
 
@@ -220,10 +223,10 @@ The default dictionary is bundled at [assets/word_list.txt](assets/word_list.txt
 
 1. Open **Settings**.
 2. Toggle **Use custom word list**.
-3. Tap **Import** and pick a `.txt` file containing one 5-letter word per line.
-4. Words are stored locally in shared preferences and used for the next game.
+3. Tap **Import** and pick a `.txt` file containing one 5-letter word per line (A–Z only, at most 5 MB; blank lines and duplicates are dropped).
+4. The list is saved as `custom_list.txt` in the app's documents directory and a fresh board starts with a word from it. It is used both for answers and for the guesses the game accepts.
 
-You can preview, replace or clear the imported list from the settings sub-routes.
+**View** previews the active list, and **Import** again replaces it. Turning the toggle off returns to the bundled list without deleting yours. See the [FAQ](FAQ.md#custom-word-lists) for what each import error means.
 
 ## Building for Release
 
@@ -252,7 +255,7 @@ The Android module pins:
 
 - Kotlin `2.4.10`
 - Android Gradle Plugin `8.13.2` (the newest 8.x; AGP 9 needs the new Gradle DSL)
-- Gradle wrapper `8.14.5`
+- Gradle wrapper `9.3.1` (Gradle runs on Java 25 only from 9.1)
 - `desugar_jdk_libs` `2.1.5`
 - NDK `28.2.13676358`
 - `targetSdk` `36`, ABI filters `armeabi-v7a`, `arm64-v8a`, `x86_64`
