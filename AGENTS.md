@@ -14,13 +14,19 @@ dart run build_runner watch --delete-conflicting-outputs   # regenerate continuo
 flutter run                          # run on default device (also -d chrome, -d <id>)
 dart analyze                         # static analyzer -- use this one
 flutter analyze                      # NOTE: silently skips riverpod_lint
-dart format lib test
+dart format <new files>              # NOT whole dirs -- see below
 
 flutter test                                          # all unit + widget tests
 flutter test test/unit/models/grid_test.dart          # single file
 flutter test --plain-name "name of test"              # single test by name
 flutter test integration_test/                        # integration tests (needs a device)
 ```
+
+**Don't run `dart format` over existing files.** The codebase predates the
+formatter's current ("tall") style, so formatting an existing file rewrites far
+more than the lines you changed — one three-line fix became a ~900-line diff.
+Format files you create; keep edits to existing files in their surrounding
+style.
 
 **`riverpod_lint` is back, and only `dart analyze` runs it.** riverpod_lint 3.1.x
 dropped its `custom_lint` dependency for Dart's native `analysis_server_plugin`,
@@ -237,10 +243,13 @@ lower bound in `pubspec.yaml` unlocks nothing on its own — if `flutter pub
 outdated` shows *Resolvable* equal to *Current*, some other package is capping it,
 and that is what has to move.
 
-**Everything is currently up to date** — `flutter pub outdated` reports no
-upgradable direct or dev dependency.
+**State as of the 2026-11-14 pass:** every minor/patch update is taken
+(`flutter pub upgrade`, 95 packages). Three **major** upgrades are deliberately
+deferred by the maintainer — `file_picker` 13, `flutter_local_notifications` 23
+and `cupertino_icons` 2 — as is Flutter 3.50 (the project stays on 3.47.1 for
+now). Do not take them as part of unrelated work.
 
-That was only possible by **removing `custom_lint` and `riverpod_lint`**.
+Getting to "nothing capped" was only possible by **removing `custom_lint` and `riverpod_lint`**.
 `custom_lint` 0.8.1 pins `analyzer ^8` and has had no release since; that single
 constraint capped `build_runner`, `json_serializable`, `freezed` and `drift_dev`
 directly, and the entire Riverpod stack indirectly (`riverpod_lint` 3.1.0 pins
@@ -286,11 +295,19 @@ upgrade. `compileSdk` and `minSdk` do follow the Flutter defaults.
 
 Flutter enforces **minimum** Gradle / AGP / Kotlin versions and fails at plugin-apply
 time, one check at a time, so a Flutter bump can require three separate version
-bumps before a build will even configure. Current: Gradle 8.14.5, AGP 8.13.2,
+bumps before a build will even configure. Current: Gradle 9.3.1, AGP 8.13.2,
 Kotlin 2.4.10 (`android/gradle/wrapper/gradle-wrapper.properties` and
 `android/settings.gradle`), and `desugar_jdk_libs` 2.1.5 in
 `android/app/build.gradle`. AGP 8.13.2 is the newest 8.x — there is no 8.x bump
 left to take.
+
+**Gradle is on 9.x because of the JDK, not AGP.** Flutter builds Android with
+the JDK bundled in the newest Android Studio, which is now **Java 25**, and
+Gradle only runs on Java 25 from 9.1.0 — on 8.14.5 every build failed with
+`Error resolving plugin [id: 'dev.flutter.flutter-plugin-loader'] > 25.0.3`.
+9.3.1 is the version Flutter 3.47.1's own template ships and is inside Flutter's
+supported range for AGP 8.13. CI still runs it on Java 17, which Gradle 9
+accepts.
 
 **The project is deliberately still on AGP 8.x.** Flutter's template defaults to
 AGP 9, which reads only the new Gradle DSL and would require rewriting
@@ -306,5 +323,15 @@ Releases are tag-driven via GitHub Actions (`.github/workflows/release.yml`). Th
 
 - **`changelog`** — checks out `main` (full history), then a bash step reconstructs a new `CHANGELOG.md` section from `git log <prev-tag>..<new-tag>`, bucketing commit subjects by conventional-commit type (`feat`→Added, `fix`→Fixed, `perf`→Performance, `docs`→Documentation, `refactor`/`i18n`/`style`/`build`/unprefixed→Changed; `chore`/`ci`/`test` dropped). It inserts the section directly **below the `<!-- BEGIN_VERSIONS -->` marker** in `CHANGELOG.md` and commits it back to `main` with `[skip ci]`. The step is idempotent (greps for an existing `## <tag>` header first). **The CHANGELOG section header format is `## <version>` with no brackets — if you change that style, update both the marker-insertion code and the idempotency grep in the workflow to match, or auto-updates will duplicate or mis-detect entries.**
 - **`build`** — checks out the tag, sets up Java 17 + Flutter **pinned to `3.47.1`**, runs `build_runner`, reconstructs the release keystore from secrets, builds a single universal signed APK (`flutter build apk --release`), and publishes a GitHub Release (auto-generated notes) with `red_owl-<tag>.apk`.
+
+**GitHub APKs and Play installs cannot update each other.** The listing uses
+Play App Signing, so Play re-signs every uploaded AAB with Google's app-signing
+key, while the GitHub APK (and any local release build) carries the **upload
+key**. Android rejects an update across keys
+(`INSTALL_FAILED_UPDATE_INCOMPATIBLE`; Play shows "Can't install Red Owl"), so a
+player who installed from GitHub cannot take a Play update without
+export → uninstall → install → import. The same applies when testing: a locally
+built APK will not install over a Play copy — test through Play's internal
+track. Players' and maintainers' versions of this are in [FAQ.md](FAQ.md).
 
 Signing in CI needs four repo secrets: `KEYSTORE_BASE64` (base64 of `android/app/upload-keystore.jks`), `KEYSTORE_PASSWORD`, `KEY_PASSWORD`, `KEY_ALIAS`. The keystore and `android/key.properties` are gitignored (never in the repo); the `build` job writes `android/key.properties` from those secrets at build time. The tag is **not** validated against `pubspec.yaml`'s version — keep them in sync by hand. `CHANGELOG.md` is the user-facing history; the README's Changelog section is just a pointer to it.

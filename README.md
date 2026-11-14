@@ -199,7 +199,7 @@ To add a new language, drop a `xx.arb` file alongside the existing ones and rebu
 
 ```bash
 dart analyze                                 # static analyzer -- use this one
-dart format lib test                         # format
+dart format <new files>                      # format (not whole dirs -- see FAQ)
 flutter test                                 # widget/unit tests
 flutter test integration_test/               # end-to-end tests (needs a device)
 ```
