@@ -147,15 +147,40 @@ class Grid extends _$Grid {
 
       // Stamp today and drop the stale or unreadable board, so a poisoned value
       // is cleared instead of being re-read on every launch.
-      prefs.setString(
-          SharedPreferencesKeys.gameDate, dateToString(DateTime.now()));
+      _stampBoardDate(today);
       unawaited(prefs
           .remove(SharedPreferencesKeys.gridState)
           .catchError((Object _) {}));
       return _emptyBoard();
     }
 
+    // No stamp yet (first launch, or a board saved by a build that predates
+    // the stamp): claim the board for today now, so the stamp always names the
+    // board's day from the moment the board exists.
+    if (storedDateRaw == null) _stampBoardDate(today);
+
     return storedGrid ?? _emptyBoard();
+  }
+
+  /// Records [day] as the day the daily board belongs to.
+  ///
+  /// The stamp is written when a board is *created* — here and in [resetGrid]
+  /// — and never on a later save. It used to be rewritten with
+  /// `DateTime.now()` every time the [Tile] widget persisted a flip, so a game
+  /// begun before midnight and continued after it was re-stamped with the new
+  /// day. The next launch then treated yesterday's board as today's: a
+  /// finished game locked the player out of the new word, and an unfinished one
+  /// carried rows scored against yesterday's answer into today's game.
+  void _stampBoardDate(DateTime day) => SharedPreferenceService()
+      .setString(SharedPreferencesKeys.gameDate, dateToString(day));
+
+  /// The day the daily board belongs to, from the stamp written by
+  /// [_stampBoardDate]; today when there is no readable stamp.
+  DateTime _boardDate() {
+    final raw =
+        SharedPreferenceService().getString(SharedPreferencesKeys.gameDate);
+    return (raw == null ? null : _decodeDate(raw)) ??
+        getDateOnly(DateTime.now());
   }
 
   /// Set while an ENTER press is being evaluated.
@@ -388,10 +413,17 @@ class Grid extends _$Grid {
   /// Records the finished game's outcome: updates the aggregate stats and
   /// writes a history row. The practice notifier overrides this to a no-op so
   /// unlimited play never affects stats or history.
+  ///
+  /// The row is filed under the board's own day ([_boardDate]), not the
+  /// current one. A game left open across midnight is still yesterday's game,
+  /// scored against yesterday's word; recording it under today wrote *today's*
+  /// answer into History before the player had even started today's puzzle.
   Future<void> recordOutcome({required bool gameWon}) async {
     _updateStatsData(gameWon: gameWon);
     await _addToDatabase(
-        gameState: gameWon ? GameState.won : GameState.lost);
+      gameState: gameWon ? GameState.won : GameState.lost,
+      date: _boardDate(),
+    );
   }
 
   /// Directly replaces the board state. Used by the [Tile] widget after the
@@ -411,6 +443,9 @@ class Grid extends _$Grid {
         .remove(SharedPreferencesKeys.gridState)
         .catchError((Object _) {}));
 
+    // Every caller also re-inits WordleService around this call, so the new
+    // board is scored against today's word and belongs to today.
+    _stampBoardDate(getDateOnly(DateTime.now()));
     state = _emptyBoard();
   }
 

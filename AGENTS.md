@@ -111,6 +111,15 @@ knowing:
   spent hint. `_AppState` (a `WidgetsBindingObserver` in `main.dart`) re-checks
   on resume via `hasDayRolledOver(lastSeen, now)` and, on a new day, re-inits
   `WordleService` and invalidates `gridProvider` + `hintProvider`.
+- **`gameDate` names the day the board belongs to, and only `Grid` writes it** —
+  when a board is created (`build` for a fresh/rolled-over/unstamped board,
+  `resetGrid`), never on a later save. `recordOutcome` files the history row
+  under that day (`_boardDate()`). The `Tile` widget used to re-stamp it with
+  `DateTime.now()` after every flip, so a game begun before midnight and
+  continued after it moved onto the new day: the next launch treated it as
+  today's board (a finished one locked the player out of the new word) and its
+  history row carried *today's* answer. Don't write `gameDate` from anywhere
+  else.
 
 **Game state lives in one Riverpod notifier.** `Grid` (`lib/riverpod/grid/grid.dart`) owns the entire board. All input — letters, DELETE, ENTER — funnels through `onKeyboardPressed`. Its `build()` rehydrates an in-progress game from a base64-encoded JSON blob in SharedPreferences and handles **day rollover**: if the stored game is from a previous day and wasn't finished, it's archived to the database as `GameState.incomplete` and a fresh board is returned. On a submitted guess it also enforces **hard mode** (`_hardModeViolation`, gated by the `isHardMode` pref — green letters must stay put, yellow letters must reappear) and celebrates **streak milestones** (`isStreakMilestone`) by swapping the win snackbar for a share nudge. Outcome side effects go through two overridable hooks — `recordOutcome` (stats + history) and `getGuessResult` (answer lookup) — so practice mode can change them without duplicating `onKeyboardPressed`.
 

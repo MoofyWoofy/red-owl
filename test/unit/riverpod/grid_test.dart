@@ -21,7 +21,7 @@ import 'package:red_owl/database/database.dart';
 import 'package:red_owl/models/shared.dart' as models;
 import 'package:red_owl/l10n/app_localizations.dart';
 import 'package:red_owl/riverpod/shared.dart' show GameMessenger, gridProvider;
-import 'package:red_owl/util/misc.dart' show dateToString;
+import 'package:red_owl/util/misc.dart' show dateToString, getDateOnly;
 import 'package:red_owl/util/shared.dart'
     show SharedPreferenceService, WordleService, showSnackBar;
 
@@ -428,6 +428,55 @@ void main() {
       final rows = await AppDatabase().select(AppDatabase().history).get();
       expect(rows, hasLength(1));
       expect(rows.first.gameState, GameState.incomplete.name);
+    });
+
+    testWidgets('a fresh board is stamped with today', (tester) async {
+      // No stamp at all — a first launch.
+      await pumpHost(tester);
+      expect(
+        SharedPreferenceService().getString(SharedPreferencesKeys.gameDate),
+        dateToString(DateTime.now()),
+      );
+    });
+
+    // Regression: the history row used to be filed under `DateTime.now()`
+    // with the word for *that* day, so a game begun before midnight and
+    // finished after it was recorded as today's result — with today's answer in
+    // it, before the player had even started today's puzzle.
+    testWidgets('finishing a game files history under the board\'s own day',
+        (tester) async {
+      await pumpHost(tester);
+      final yesterday =
+          getDateOnly(DateTime.now()).subtract(const Duration(days: 1));
+      // The board on screen belongs to yesterday: it was created before
+      // midnight and the app has stayed open since.
+      SharedPreferenceService().setString(
+          SharedPreferencesKeys.gameDate, dateToString(yesterday));
+
+      await type(WordleService().wordOfTheDay);
+      await enter();
+      await tester.pumpAndSettle();
+
+      final rows = await AppDatabase().select(AppDatabase().history).get();
+      expect(rows, hasLength(1));
+      expect(rows.single.date, yesterday);
+      expect(
+          rows.single.word, await WordleService().getWordOfTheDay(yesterday));
+      expect(rows.single.gameState, GameState.won.name);
+      await drainSnackBars(tester);
+    });
+
+    testWidgets('resetGrid stamps the new board with today', (tester) async {
+      await pumpHost(tester);
+      SharedPreferenceService()
+          .setString(SharedPreferencesKeys.gameDate, '2000-01-01');
+
+      capturedRef.read(gridProvider.notifier).resetGrid();
+
+      expect(
+        SharedPreferenceService().getString(SharedPreferencesKeys.gameDate),
+        dateToString(DateTime.now()),
+      );
     });
 
     testWidgets('resetGrid clears the board and persisted grid state',

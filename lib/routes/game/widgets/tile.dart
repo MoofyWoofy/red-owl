@@ -10,7 +10,7 @@ import 'package:red_owl/models/shared.dart' show Grid;
 import 'package:red_owl/routes/game/widgets/a11y_labels.dart'
     show letterStatusLabel;
 import 'package:red_owl/util/shared.dart'
-    show Localization, SharedPreferenceService, dateToString;
+    show Localization, SharedPreferenceService;
 
 /// A single interactive tile in the 5×6 Wordle grid.
 ///
@@ -127,10 +127,10 @@ class _TileState extends ConsumerState<Tile>
 
           SharedPreferenceService()
               .setString(SharedPreferencesKeys.gridState, gameStateBase64);
-
-          // Update the date stamp alongside the grid.
-          SharedPreferenceService().setString(
-              SharedPreferencesKeys.gameDate, dateToString(DateTime.now()));
+          // `gameDate` is deliberately not touched here. It names the day the
+          // board belongs to and is set by the Grid notifier when the board is
+          // created; re-stamping it with "now" on every save moved a game that
+          // crossed midnight onto the new day.
         }
       });
     });
