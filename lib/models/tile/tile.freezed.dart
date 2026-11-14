@@ -34,16 +34,21 @@ $TileCopyWith<Tile> get copyWith => _$TileCopyWithImpl<Tile>(this as Tile, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Tile&&(identical(other.letter, letter) || other.letter == letter)&&(identical(other.status, status) || other.status == status)&&(identical(other.hasFlipAnimationPlayed, hasFlipAnimationPlayed) || other.hasFlipAnimationPlayed == hasFlipAnimationPlayed));
+  final _this = this as Tile;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Tile&&(identical(other.letter, _this.letter) || other.letter == _this.letter)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.hasFlipAnimationPlayed, _this.hasFlipAnimationPlayed) || other.hasFlipAnimationPlayed == _this.hasFlipAnimationPlayed));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,letter,status,hasFlipAnimationPlayed);
+int get hashCode {
+  final _this = this as Tile;
+  return Object.hash(runtimeType,_this.letter,_this.status,_this.hasFlipAnimationPlayed);
+}
 
 @override
 String toString() {
-  return 'Tile(letter: $letter, status: $status, hasFlipAnimationPlayed: $hasFlipAnimationPlayed)';
+  final _this = this as Tile;
+  return 'Tile(letter: ${_this.letter}, status: ${_this.status}, hasFlipAnimationPlayed: ${_this.hasFlipAnimationPlayed})';
 }
 
 
@@ -242,16 +247,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Tile&&(identical(other.letter, letter) || other.letter == letter)&&(identical(other.status, status) || other.status == status)&&(identical(other.hasFlipAnimationPlayed, hasFlipAnimationPlayed) || other.hasFlipAnimationPlayed == hasFlipAnimationPlayed));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Tile&&(identical(other.letter, letter) || other.letter == letter)&&(identical(other.status, status) || other.status == status)&&(identical(other.hasFlipAnimationPlayed, hasFlipAnimationPlayed) || other.hasFlipAnimationPlayed == hasFlipAnimationPlayed));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,letter,status,hasFlipAnimationPlayed);
+int get hashCode {
+    return Object.hash(runtimeType,letter,status,hasFlipAnimationPlayed);
+}
 
 @override
 String toString() {
-  return 'Tile(letter: $letter, status: $status, hasFlipAnimationPlayed: $hasFlipAnimationPlayed)';
+    return 'Tile(letter: $letter, status: $status, hasFlipAnimationPlayed: $hasFlipAnimationPlayed)';
 }
 
 

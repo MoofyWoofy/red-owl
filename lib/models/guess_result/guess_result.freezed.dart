@@ -36,16 +36,21 @@ $GuessResultCopyWith<GuessResult> get copyWith => _$GuessResultCopyWithImpl<Gues
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GuessResult&&(identical(other.guess, guess) || other.guess == guess)&&(identical(other.isCorrect, isCorrect) || other.isCorrect == isCorrect)&&(identical(other.isWordInList, isWordInList) || other.isWordInList == isWordInList)&&const DeepCollectionEquality().equals(other.characterInfo, characterInfo));
+  final _this = this as GuessResult;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GuessResult&&(identical(other.guess, _this.guess) || other.guess == _this.guess)&&(identical(other.isCorrect, _this.isCorrect) || other.isCorrect == _this.isCorrect)&&(identical(other.isWordInList, _this.isWordInList) || other.isWordInList == _this.isWordInList)&&const DeepCollectionEquality().equals(other.characterInfo, _this.characterInfo));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,guess,isCorrect,isWordInList,const DeepCollectionEquality().hash(characterInfo));
+int get hashCode {
+  final _this = this as GuessResult;
+  return Object.hash(runtimeType,_this.guess,_this.isCorrect,_this.isWordInList,const DeepCollectionEquality().hash(_this.characterInfo));
+}
 
 @override
 String toString() {
-  return 'GuessResult(guess: $guess, isCorrect: $isCorrect, isWordInList: $isWordInList, characterInfo: $characterInfo)';
+  final _this = this as GuessResult;
+  return 'GuessResult(guess: ${_this.guess}, isCorrect: ${_this.isCorrect}, isWordInList: ${_this.isWordInList}, characterInfo: ${_this.characterInfo})';
 }
 
 
@@ -259,16 +264,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GuessResult&&(identical(other.guess, guess) || other.guess == guess)&&(identical(other.isCorrect, isCorrect) || other.isCorrect == isCorrect)&&(identical(other.isWordInList, isWordInList) || other.isWordInList == isWordInList)&&const DeepCollectionEquality().equals(other._characterInfo, _characterInfo));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _GuessResult&&(identical(other.guess, guess) || other.guess == guess)&&(identical(other.isCorrect, isCorrect) || other.isCorrect == isCorrect)&&(identical(other.isWordInList, isWordInList) || other.isWordInList == isWordInList)&&const DeepCollectionEquality().equals(other.characterInfo, _characterInfo));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,guess,isCorrect,isWordInList,const DeepCollectionEquality().hash(_characterInfo));
+int get hashCode {
+    return Object.hash(runtimeType,guess,isCorrect,isWordInList,const DeepCollectionEquality().hash(_characterInfo));
+}
 
 @override
 String toString() {
-  return 'GuessResult(guess: $guess, isCorrect: $isCorrect, isWordInList: $isWordInList, characterInfo: $characterInfo)';
+    return 'GuessResult(guess: $guess, isCorrect: $isCorrect, isWordInList: $isWordInList, characterInfo: $characterInfo)';
 }
 
 
@@ -328,16 +335,21 @@ $CharacterInfoCopyWith<CharacterInfo> get copyWith => _$CharacterInfoCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CharacterInfo&&(identical(other.char, char) || other.char == char)&&(identical(other.scoring, scoring) || other.scoring == scoring));
+  final _this = this as CharacterInfo;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CharacterInfo&&(identical(other.char, _this.char) || other.char == _this.char)&&(identical(other.scoring, _this.scoring) || other.scoring == _this.scoring));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,char,scoring);
+int get hashCode {
+  final _this = this as CharacterInfo;
+  return Object.hash(runtimeType,_this.char,_this.scoring);
+}
 
 @override
 String toString() {
-  return 'CharacterInfo(char: $char, scoring: $scoring)';
+  final _this = this as CharacterInfo;
+  return 'CharacterInfo(char: ${_this.char}, scoring: ${_this.scoring})';
 }
 
 
@@ -540,16 +552,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CharacterInfo&&(identical(other.char, char) || other.char == char)&&(identical(other.scoring, scoring) || other.scoring == scoring));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _CharacterInfo&&(identical(other.char, char) || other.char == char)&&(identical(other.scoring, scoring) || other.scoring == scoring));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,char,scoring);
+int get hashCode {
+    return Object.hash(runtimeType,char,scoring);
+}
 
 @override
 String toString() {
-  return 'CharacterInfo(char: $char, scoring: $scoring)';
+    return 'CharacterInfo(char: $char, scoring: $scoring)';
 }
 
 
@@ -618,16 +632,21 @@ $CharacterScoringCopyWith<CharacterScoring> get copyWith => _$CharacterScoringCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CharacterScoring&&(identical(other.inWord, inWord) || other.inWord == inWord)&&(identical(other.correctIndex, correctIndex) || other.correctIndex == correctIndex));
+  final _this = this as CharacterScoring;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CharacterScoring&&(identical(other.inWord, _this.inWord) || other.inWord == _this.inWord)&&(identical(other.correctIndex, _this.correctIndex) || other.correctIndex == _this.correctIndex));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,inWord,correctIndex);
+int get hashCode {
+  final _this = this as CharacterScoring;
+  return Object.hash(runtimeType,_this.inWord,_this.correctIndex);
+}
 
 @override
 String toString() {
-  return 'CharacterScoring(inWord: $inWord, correctIndex: $correctIndex)';
+  final _this = this as CharacterScoring;
+  return 'CharacterScoring(inWord: ${_this.inWord}, correctIndex: ${_this.correctIndex})';
 }
 
 
@@ -823,16 +842,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CharacterScoring&&(identical(other.inWord, inWord) || other.inWord == inWord)&&(identical(other.correctIndex, correctIndex) || other.correctIndex == correctIndex));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _CharacterScoring&&(identical(other.inWord, inWord) || other.inWord == inWord)&&(identical(other.correctIndex, correctIndex) || other.correctIndex == correctIndex));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,inWord,correctIndex);
+int get hashCode {
+    return Object.hash(runtimeType,inWord,correctIndex);
+}
 
 @override
 String toString() {
-  return 'CharacterScoring(inWord: $inWord, correctIndex: $correctIndex)';
+    return 'CharacterScoring(inWord: $inWord, correctIndex: $correctIndex)';
 }
 
 

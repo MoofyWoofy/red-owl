@@ -50,16 +50,21 @@ $GridCopyWith<Grid> get copyWith => _$GridCopyWithImpl<Grid>(this as Grid, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Grid&&(identical(other.column, column) || other.column == column)&&(identical(other.row, row) || other.row == row)&&const DeepCollectionEquality().equals(other.tiles, tiles)&&const DeepCollectionEquality().equals(other.keyboardStatus, keyboardStatus)&&(identical(other.runFlipAnimation, runFlipAnimation) || other.runFlipAnimation == runFlipAnimation)&&(identical(other.isEnterOrDeletePressed, isEnterOrDeletePressed) || other.isEnterOrDeletePressed == isEnterOrDeletePressed)&&(identical(other.isGameWon, isGameWon) || other.isGameWon == isGameWon)&&(identical(other.isGameOver, isGameOver) || other.isGameOver == isGameOver)&&(identical(other.notEnoughCharacters, notEnoughCharacters) || other.notEnoughCharacters == notEnoughCharacters)&&(identical(other.persistState, persistState) || other.persistState == persistState));
+  final _this = this as Grid;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Grid&&(identical(other.column, _this.column) || other.column == _this.column)&&(identical(other.row, _this.row) || other.row == _this.row)&&const DeepCollectionEquality().equals(other.tiles, _this.tiles)&&const DeepCollectionEquality().equals(other.keyboardStatus, _this.keyboardStatus)&&(identical(other.runFlipAnimation, _this.runFlipAnimation) || other.runFlipAnimation == _this.runFlipAnimation)&&(identical(other.isEnterOrDeletePressed, _this.isEnterOrDeletePressed) || other.isEnterOrDeletePressed == _this.isEnterOrDeletePressed)&&(identical(other.isGameWon, _this.isGameWon) || other.isGameWon == _this.isGameWon)&&(identical(other.isGameOver, _this.isGameOver) || other.isGameOver == _this.isGameOver)&&(identical(other.notEnoughCharacters, _this.notEnoughCharacters) || other.notEnoughCharacters == _this.notEnoughCharacters)&&(identical(other.persistState, _this.persistState) || other.persistState == _this.persistState));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,column,row,const DeepCollectionEquality().hash(tiles),const DeepCollectionEquality().hash(keyboardStatus),runFlipAnimation,isEnterOrDeletePressed,isGameWon,isGameOver,notEnoughCharacters,persistState);
+int get hashCode {
+  final _this = this as Grid;
+  return Object.hash(runtimeType,_this.column,_this.row,const DeepCollectionEquality().hash(_this.tiles),const DeepCollectionEquality().hash(_this.keyboardStatus),_this.runFlipAnimation,_this.isEnterOrDeletePressed,_this.isGameWon,_this.isGameOver,_this.notEnoughCharacters,_this.persistState);
+}
 
 @override
 String toString() {
-  return 'Grid(column: $column, row: $row, tiles: $tiles, keyboardStatus: $keyboardStatus, runFlipAnimation: $runFlipAnimation, isEnterOrDeletePressed: $isEnterOrDeletePressed, isGameWon: $isGameWon, isGameOver: $isGameOver, notEnoughCharacters: $notEnoughCharacters, persistState: $persistState)';
+  final _this = this as Grid;
+  return 'Grid(column: ${_this.column}, row: ${_this.row}, tiles: ${_this.tiles}, keyboardStatus: ${_this.keyboardStatus}, runFlipAnimation: ${_this.runFlipAnimation}, isEnterOrDeletePressed: ${_this.isEnterOrDeletePressed}, isGameWon: ${_this.isGameWon}, isGameOver: ${_this.isGameOver}, notEnoughCharacters: ${_this.notEnoughCharacters}, persistState: ${_this.persistState})';
 }
 
 
@@ -305,16 +310,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Grid&&(identical(other.column, column) || other.column == column)&&(identical(other.row, row) || other.row == row)&&const DeepCollectionEquality().equals(other._tiles, _tiles)&&const DeepCollectionEquality().equals(other._keyboardStatus, _keyboardStatus)&&(identical(other.runFlipAnimation, runFlipAnimation) || other.runFlipAnimation == runFlipAnimation)&&(identical(other.isEnterOrDeletePressed, isEnterOrDeletePressed) || other.isEnterOrDeletePressed == isEnterOrDeletePressed)&&(identical(other.isGameWon, isGameWon) || other.isGameWon == isGameWon)&&(identical(other.isGameOver, isGameOver) || other.isGameOver == isGameOver)&&(identical(other.notEnoughCharacters, notEnoughCharacters) || other.notEnoughCharacters == notEnoughCharacters)&&(identical(other.persistState, persistState) || other.persistState == persistState));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Grid&&(identical(other.column, column) || other.column == column)&&(identical(other.row, row) || other.row == row)&&const DeepCollectionEquality().equals(other.tiles, _tiles)&&const DeepCollectionEquality().equals(other.keyboardStatus, _keyboardStatus)&&(identical(other.runFlipAnimation, runFlipAnimation) || other.runFlipAnimation == runFlipAnimation)&&(identical(other.isEnterOrDeletePressed, isEnterOrDeletePressed) || other.isEnterOrDeletePressed == isEnterOrDeletePressed)&&(identical(other.isGameWon, isGameWon) || other.isGameWon == isGameWon)&&(identical(other.isGameOver, isGameOver) || other.isGameOver == isGameOver)&&(identical(other.notEnoughCharacters, notEnoughCharacters) || other.notEnoughCharacters == notEnoughCharacters)&&(identical(other.persistState, persistState) || other.persistState == persistState));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,column,row,const DeepCollectionEquality().hash(_tiles),const DeepCollectionEquality().hash(_keyboardStatus),runFlipAnimation,isEnterOrDeletePressed,isGameWon,isGameOver,notEnoughCharacters,persistState);
+int get hashCode {
+    return Object.hash(runtimeType,column,row,const DeepCollectionEquality().hash(_tiles),const DeepCollectionEquality().hash(_keyboardStatus),runFlipAnimation,isEnterOrDeletePressed,isGameWon,isGameOver,notEnoughCharacters,persistState);
+}
 
 @override
 String toString() {
-  return 'Grid(column: $column, row: $row, tiles: $tiles, keyboardStatus: $keyboardStatus, runFlipAnimation: $runFlipAnimation, isEnterOrDeletePressed: $isEnterOrDeletePressed, isGameWon: $isGameWon, isGameOver: $isGameOver, notEnoughCharacters: $notEnoughCharacters, persistState: $persistState)';
+    return 'Grid(column: $column, row: $row, tiles: $tiles, keyboardStatus: $keyboardStatus, runFlipAnimation: $runFlipAnimation, isEnterOrDeletePressed: $isEnterOrDeletePressed, isGameWon: $isGameWon, isGameOver: $isGameOver, notEnoughCharacters: $notEnoughCharacters, persistState: $persistState)';
 }
 
 
