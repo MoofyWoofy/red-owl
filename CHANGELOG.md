@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- New release sections are inserted directly below this marker by the release workflow. Do not remove it. -->
 <!-- BEGIN_VERSIONS -->
 
+## 2.3.1
+
+### Changed
+- Move Gradle wrapper to 9.3.1 so builds run on Java 25
+
+### Fixed
+- Keep a game that crosses midnight on the day it started
+
+### Documentation
+- Record the Gradle 9 move, signing split and formatter trap
+- Add FAQ covering "Can't install" and other common problems
+- Add 2.3.0 [skip ci]
+
 ## 2.3.0
 
 ### Added
