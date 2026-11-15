@@ -49,6 +49,9 @@ jobs:
 
           while IFS= read -r subject; do
             [ -z "$subject" ] && continue
+            # This job's own commit from the previous release lands on main
+            # after that tag, so it falls inside this range. Leave it out.
+            [[ "$subject" == "docs(changelog): add "*" [skip ci]" ]] && continue
             if [[ "$subject" =~ ^([a-zA-Z]+)(\([^\)]*\))?!?:[[:space:]]*(.*)$ ]]; then
               type="${BASH_REMATCH[1],,}"
               desc="${BASH_REMATCH[3]}"

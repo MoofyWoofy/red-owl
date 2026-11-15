@@ -19,7 +19,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Documentation
 - Record the Gradle 9 move, signing split and formatter trap
 - Add FAQ covering "Can't install" and other common problems
-- Add 2.3.0 [skip ci]
 
 ## 2.3.0
 
@@ -68,8 +67,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Record this pass's changes and fix stale claims
 - Record the toolchain upgrade and correct the dependency ceilings
 - Rename CLAUDE.md to AGENTS.md and record this pass's findings
-- Add 2.1.0 [skip ci]
-- Add 2.0.1 [skip ci]
 
 ## 2.1.0
 
